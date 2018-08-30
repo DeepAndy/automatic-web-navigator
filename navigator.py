@@ -4,10 +4,8 @@ Description: Provides interface for adding web pages and actions to perform
 	in a queue.
 '''
 
-#from selenium import webdriver
-
-#driver = webdriver.Chrome(executable_path=
-#				"/Users/am058613/Desktop/chromedriver")
+from selenium import webdriver
+import time
 
 def initialization():
 	web_queue = []
@@ -37,12 +35,12 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 		print
 		print("Added \"connect\" to action queue")
 		return action_queue
-	elif (option == 2):
+	elif (option == 3):
 		menu(web_queue, action_queue, web_action_queue)
 	else:
 		print
 		print("Invalid number.")
-		add_action_all(web_queue, action_queue)
+		add_action_all(web_queue, action_queue, web_action_queue)
 
 def add_action_all(web_queue, action_queue, web_action_queue):
 	option = "\0"
@@ -51,15 +49,17 @@ def add_action_all(web_queue, action_queue, web_action_queue):
 		print
 		print("----------------------------------------------------")
 		print("1. Connect to page in new tab")
-		print("2. Back to menu")
+		print("2. Press a button")
+		print("3. Back to menu")
 		print("----------------------------------------------------")
 
 		try:
+			print
 			option = int(raw_input("Select an option: "))
 		except:
 			print
 			print("Not a number.")
-			add_action_all(web_queue, action_queue)
+			add_action_all(web_queue, action_queue, web_action_queue)
 
 		action_queue = add_action_all_input(
 			web_queue, action_queue, web_action_queue, option)
@@ -126,6 +126,25 @@ def print_web_action_queue(web_queue, action_queue, web_action_queue):
 		for index2 in range(len(action_queue)):
 			print("    Action: " + action_queue[index2])
 
+def run_web_action_queue(web_queue, action_queue, web_action_queue):
+	if (web_action_queue == 0):
+		print
+		print("The website-action queue is empty.")
+		return
+
+	driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
+
+	for index in range(len(web_queue)):
+		for index2 in range(len(action_queue)):
+			if (web_action_queue[index][index2] == "connect"):
+				if (index == 0):
+					driver.get(web_queue[index])
+				else:
+					driver.execute_script("window.open('" + web_queue[index] + "');")
+				time.sleep(2)
+
+	driver.quit()
+
 def menu(web_queue, action_queue, web_action_queue):
 	option = "\0"
 
@@ -155,6 +174,7 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("----------------------------------------------------")
 
 		try:
+			print
 			option = int(raw_input("Select an option: "))
 		except:
 			print
@@ -190,6 +210,10 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 		print_web_action_queue(
 			web_queue, action_queue, web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 13):
+		run_web_action_queue(
+			web_queue, action_queue, web_action_queue)
+		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 14):
 		print
 		quit()
@@ -199,5 +223,3 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 		menu(web_queue, action_queue, web_action_queue)
 
 initialization()
-
-#driver.get("file:///Users/am058613/Documents/awn/example1.html")
