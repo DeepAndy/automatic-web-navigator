@@ -29,5 +29,9 @@ Note that some operating systems will require you to run Python as `python2`
 The above command will present the user with a menu to manage website and action
 queues.
 
+## Notes
+The chromedriver executable path is set to my personal directory for now.
+You will have to change the path in *navigator.py* to get it to work.
+
 ## License
 This software is licensed under the GPLv3 license.
