@@ -128,26 +128,30 @@ def apply_action_queue_all(web_queue, action_queue, web_action_queue):
 
 	return web_action_queue
 
-def write_web_queue(web_queue_name, web_queue):
-	f = open(web_queue_name, "w")
+def write_queue(queue_name, queue):
+	f = open(queue_name, "w")
 
-	for web_name in web_queue:
-		f.write(web_name + "\n")
+	for name in queue:
+		f.write(name + "\n")
 
 	print
-	print("Saved web queue to \"" + web_queue_name + "\"")
+	print("Saved web queue to \"" + queue_name + "\"")
 	f.close()
 
-
-def save_web_queue(web_queue):
+def save_queue(queue, queue_type):
 	exists = True
 	answer = ""
 
 	print
-	web_queue_name = raw_input("Enter name of the web queue: ") + ".wq"
+	queue_name = raw_input("Enter name of the web queue: ")
+
+	if (queue_type == "web_queue"):
+		queue_name += ".wq"
+	elif (queue_type == "action_queue"):
+		queue_name += ".aq"
 
 	try:
-		open(web_queue_name)
+		open(queue_name)
 		exists = True
 	except:
 		exists = False
@@ -156,13 +160,13 @@ def save_web_queue(web_queue):
 		print
 		print("A file with that name already exists.")
 		while (answer != "y" and answer != "n"):
-			answer = raw_input("Would you like to overwrite \"" + web_queue_name + "\" (y or n): ")	
+			answer = raw_input("Would you like to overwrite \"" + queue_name + "\" (y or n): ")	
 		if (answer == "y"):
-			write_web_queue(web_queue_name, web_queue)
+			write_queue(queue_name, queue)
 		else:
 			return
 	else:
-		write_web_queue(web_queue_name, web_queue)
+		write_queue(queue_name, queue)
 
 def print_web_queue(web_queue):
 	if (len(web_queue) == 0):
@@ -247,8 +251,8 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("----------------------------------------------------")
 		print("3.  Apply action queue to all sites in website queue")
 		print("----------------------------------------------------")
-		print("4.  Save website queue (NOT IMPLEMENTED)")
-		print("5.  Save action queue (NOT IMPLEMENTED)")
+		print("4.  Save website queue")
+		print("5.  Save action queue")
 		print("6.  Save website-action queue (NOT IMPLEMENTED)")
 		print("----------------------------------------------------")
 		print("7.  Load website queue (NOT IMPLEMENTED)")
@@ -292,7 +296,12 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 			web_queue, action_queue, web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 4):
-		save_web_queue(web_queue)
+		queue_type = "web_queue"
+		save_queue(web_queue, queue_type)
+		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 5):
+		queue_type = "action_queue"
+		save_queue(action_queue, queue_type)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 10):
 		print_web_queue(web_queue)
