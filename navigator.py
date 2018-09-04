@@ -1,11 +1,25 @@
 '''
-Initial Author: Austin Moore
-Description: Provides interface for adding web pages and actions to perform
-	in a queue.
+Copyright (C) 2018, Austin Moore
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '''
+
+# Description: Provides interface for adding websites and actions in a queue
 
 from selenium import webdriver
 import time
+import re
 
 def initialization():
 	web_queue = []
@@ -35,6 +49,21 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 		print
 		print("Added \"connect\" to action queue")
 		return action_queue
+	elif (option == 2):
+		print
+		element_name = raw_input("Enter element name: ")
+		action = "click`" + element_name
+		attribute_name = "\0"
+		while (attribute_name != "q"):
+			print
+			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
+			if (attribute_name == "q"):
+				action_queue.append(action)
+				return action_queue
+			else:
+				print
+				attribute_value = raw_input("Enter the attribute value: ")
+				action += "`" + attribute_name + "`" + attribute_value
 	elif (option == 3):
 		menu(web_queue, action_queue, web_action_queue)
 	else:
@@ -48,8 +77,11 @@ def add_action_all(web_queue, action_queue, web_action_queue):
 	while (option == "\0"):
 		print
 		print("----------------------------------------------------")
+		print("WARNING: MAKE SURE YOUR ACTION IS UNIQUE")
+		print("         ACROSS ALL WEBSITES IN THE WEBSITE QUEUE")
+		print("----------------------------------------------------")
 		print("1. Connect to page in new tab")
-		print("2. Press a button")
+		print("2. Click an element")
 		print("3. Back to menu")
 		print("----------------------------------------------------")
 
@@ -122,11 +154,14 @@ def print_web_action_queue(web_queue, action_queue, web_action_queue):
 		return
 	print
 	for index in range(len(web_queue)):
-		print("Website: " + web_queue[index]),
+		print("Website: " + web_queue[index])
 		for index2 in range(len(action_queue)):
 			print("    Action: " + action_queue[index2])
 
 def run_web_action_queue(web_queue, action_queue, web_action_queue):
+	xpath = ""
+	key = -1
+
 	if (web_action_queue == 0):
 		print
 		print("The website-action queue is empty.")
@@ -135,12 +170,33 @@ def run_web_action_queue(web_queue, action_queue, web_action_queue):
 	driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
 
 	for index in range(len(web_queue)):
+		first_time_connect = True
 		for index2 in range(len(action_queue)):
 			if (web_action_queue[index][index2] == "connect"):
 				if (index == 0):
 					driver.get(web_queue[index])
 				else:
 					driver.execute_script("window.open('" + web_queue[index] + "');")
+
+				time.sleep(2)
+			elif (web_action_queue[index][index2].find("click") == 0):
+				order = re.split(r'`', web_action_queue[index][index2])
+				xpath += "//" + order[1]
+
+				for index3 in range(2, len(order)):
+					if (index3 % 2 == 0):
+						xpath += "[@" + order[index3]
+					else:
+						xpath += "='" + order[index3] + "']"
+
+				if (first_time_connect == True and key != index):
+					driver.get(web_queue[index])
+					key = index
+					first_time_connect = False
+
+				driver.find_element_by_xpath(xpath).click()
+				xpath = ""
+
 				time.sleep(2)
 
 	driver.quit()
@@ -168,7 +224,7 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("11. Print action queue")
 		print("12. Print website-action queue")
 		print("----------------------------------------------------")
-		print("13. Run website-action queue (NOT IMPLEMENTED)")
+		print("13. Run website-action queue")
 		print("----------------------------------------------------")
 		print("14. Quit")
 		print("----------------------------------------------------")
