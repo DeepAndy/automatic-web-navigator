@@ -77,6 +77,7 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 				print
 				attribute_value = raw_input("Enter the attribute value: ")
 				action += "`" + attribute_name + "`" + attribute_value
+		print
 		fill = raw_input("Enter your input: ")
 		action += "`" + fill
 		action_queue.append(action)
@@ -162,7 +163,7 @@ def save_queue(queue, queue_type):
 	answer = ""
 
 	print
-	queue_name = raw_input("Enter name of the web queue: ")
+	queue_name = raw_input("Enter name of the queue: ")
 
 	if (queue_type == "web_queue"):
 		queue_name += ".wq"
@@ -186,6 +187,30 @@ def save_queue(queue, queue_type):
 			return
 	else:
 		write_queue(queue_name, queue)
+
+def load_queue(queue, queue_type):
+	exists = True
+	answer = ""
+
+	print
+	queue_name = raw_input("Enter name of the queue file (include file extension): ")
+
+	try:
+		open(queue_name)
+		exists = True
+	except:
+		exists = False
+
+	if (exists == True):
+		f = open(queue_name)
+		lines = f.readlines()
+		for line in lines:
+			queue.append(line.replace("\n", ""))
+		return queue
+	else:
+		print
+		print("A file of that name does not exist in this directory.")
+		return queue
 
 def print_web_queue(web_queue):
 	if (len(web_queue) == 0):
@@ -296,8 +321,8 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("5.  Save action queue")
 		print("6.  Save website-action queue (NOT IMPLEMENTED)")
 		print("----------------------------------------------------")
-		print("7.  Load website queue (NOT IMPLEMENTED)")
-		print("8.  Load action queue (NOT IMPLEMENTED)")
+		print("7.  Load website queue")
+		print("8.  Load action queue")
 		print("9.  Load website-action queue (NOT IMPLEMENTED)")
 		print("----------------------------------------------------")
 		print("10. Print website queue")
@@ -343,6 +368,14 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 	elif (option == 5):
 		queue_type = "action_queue"
 		save_queue(action_queue, queue_type)
+		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 7):
+		queue_type = "web_queue"
+		web_queue = load_queue(web_queue, queue_type)
+		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 8):
+		queue_type = "action_queue"
+		action_queue = load_queue(action_queue, queue_type)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 10):
 		print_web_queue(web_queue)
