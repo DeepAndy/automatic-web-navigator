@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Description: Provides interface for adding websites and actions in a queue
 
-#from selenium import webdriver
+from selenium import webdriver
 import time
 import re
 
@@ -64,6 +64,24 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 				attribute_value = raw_input("Enter the attribute value: ")
 				action += "`" + attribute_name + "`" + attribute_value
 	elif (option == 3):
+		print
+		element_name = raw_input("Enter element name: ")
+		action = "fill`" + element_name
+		attribute_name = "\0"
+		while (attribute_name != "q"):
+			print
+			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
+			if (attribute_name == "q"):
+				break
+			else:
+				print
+				attribute_value = raw_input("Enter the attribute value: ")
+				action += "`" + attribute_name + "`" + attribute_value
+		fill = raw_input("Enter your input: ")
+		action += "`" + fill
+		action_queue.append(action)
+		return action_queue
+	elif (option == 4):
 		menu(web_queue, action_queue, web_action_queue)
 	else:
 		print
@@ -81,7 +99,8 @@ def add_action_all(web_queue, action_queue, web_action_queue):
 		print("----------------------------------------------------")
 		print("1. Connect to page in new tab")
 		print("2. Click an element")
-		print("3. Back to menu")
+		print("3. Fill out a form")
+		print("4. Back to menu")
 		print("----------------------------------------------------")
 
 		try:
@@ -206,7 +225,7 @@ def run_web_action_queue(web_queue, action_queue, web_action_queue):
 		print("The website-action queue is empty.")
 		return
 
-	driver = webdriver.Chrome(executable_path="/home/amoore/Documents/web-drivers/chromedriver")
+	driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
 
 	for index in range(len(web_queue)):
 		first_time_connect = True
@@ -230,10 +249,32 @@ def run_web_action_queue(web_queue, action_queue, web_action_queue):
 
 				if (first_time_connect == True and key != index):
 					driver.get(web_queue[index])
+					time.sleep(2)
 					key = index
 					first_time_connect = False
 
 				driver.find_element_by_xpath(xpath).click()
+				xpath = ""
+
+				time.sleep(2)
+			elif (web_action_queue[index][index2].find("fill") == 0):
+				order = re.split(r'`', web_action_queue[index][index2])
+				xpath += "//" + order[1]
+
+				for index3 in range(2, len(order) - 1):
+					if (index3 % 2 == 0):
+						xpath += "[@" + order[index3]
+					else:
+						xpath += "='" + order[index3] + "']"
+
+				if (first_time_connect == True and key != index):
+					driver.get(web_queue[index])
+					time.sleep(2)
+					key = index
+					first_time_connect = False
+
+				index3 += 1
+				driver.find_element_by_xpath(xpath).send_keys(order[index3])
 				xpath = ""
 
 				time.sleep(2)
