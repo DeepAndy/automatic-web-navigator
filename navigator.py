@@ -1,3 +1,4 @@
+# Initial Author: Austin Moore
 # Description: Provides interface for adding websites and actions in a queue
 
 from selenium import webdriver
@@ -12,9 +13,9 @@ def initialization():
 	menu(web_queue, action_queue, web_action_queue)
 
 def add_web_queue(web_queue):
-	web_name = "\0"
+	web_name = ""
 
-	while (web_name == "\0"):
+	while (web_name == ""):
 		print
 		web_name = raw_input("Enter website name: ")
 	
@@ -35,7 +36,7 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 		print
 		element_name = raw_input("Enter element name: ")
 		action = "click`" + element_name
-		attribute_name = "\0"
+		attribute_name = ""
 		while (attribute_name != "q"):
 			print
 			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
@@ -50,7 +51,7 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 		print
 		element_name = raw_input("Enter element name: ")
 		action = "fill`" + element_name
-		attribute_name = "\0"
+		attribute_name = ""
 		while (attribute_name != "q"):
 			print
 			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
@@ -73,9 +74,9 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 		add_action_all(web_queue, action_queue, web_action_queue)
 
 def add_action_all(web_queue, action_queue, web_action_queue):
-	option = "\0"
+	option = ""
 
-	while (option == "\0"):
+	while (option == ""):
 		print
 		print("----------------------------------------------------")
 		print("WARNING: MAKE SURE YOUR ACTION IS UNIQUE")
@@ -171,6 +172,14 @@ def save_queue(queue, queue_type):
 	else:
 		write_queue(queue_name, queue)
 
+def save_web_action(queue):
+	if (queue == 0):
+		print
+		print("The website-action queue is empty.")
+	else:
+		for index in queue:
+			print(index)
+
 def load_queue(queue, queue_type):
 	exists = True
 	answer = ""
@@ -218,11 +227,37 @@ def print_web_action_queue(web_queue, action_queue, web_action_queue):
 		print
 		print("The website-action queue is empty.")
 		return
+	elif (len(web_queue) == 0):
+		print
+		print("The website queue is empty.")
+		return
+	elif (len(action_queue) == 0):
+		print
+		print("The action queue is empty.")
+		return
 	print
 	for index in range(len(web_queue)):
 		print("Website: " + web_queue[index])
 		for index2 in range(len(action_queue)):
 			print("    Action: " + action_queue[index2])
+
+def clear_web_queue(web_queue):
+	web_queue = []
+	print
+	print("The website queue has been cleared.")
+	return web_queue
+
+def clear_action_queue(action_queue):
+	action_queue = []
+	print
+	print("The action queue has been cleared.")
+	return action_queue
+
+def clear_web_action_queue(web_action_queue):
+	web_action_queue = 0
+	print
+	print("The website-action queue has been cleared.")
+	return web_action_queue
 
 def run_web_action_queue(web_queue, action_queue, web_action_queue):
 	xpath = ""
@@ -231,6 +266,14 @@ def run_web_action_queue(web_queue, action_queue, web_action_queue):
 	if (web_action_queue == 0):
 		print
 		print("The website-action queue is empty.")
+		return
+	elif (len(web_queue) == 0):
+		print
+		print("The website queue is empty.")
+		return
+	elif (len(action_queue) == 0):
+		print
+		print("The action queue is empty.")
 		return
 
 	driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
@@ -290,9 +333,9 @@ def run_web_action_queue(web_queue, action_queue, web_action_queue):
 	driver.quit()
 
 def menu(web_queue, action_queue, web_action_queue):
-	option = "\0"
+	option = ""
 
-	while (option == "\0"):
+	while (option == ""):
 		print
 		print("----------------------------------------------------")
 		print("1.  Add site to website queue")
@@ -302,19 +345,21 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("----------------------------------------------------")
 		print("4.  Save website queue")
 		print("5.  Save action queue")
-		print("6.  Save website-action queue (NOT IMPLEMENTED)")
 		print("----------------------------------------------------")
-		print("7.  Load website queue")
-		print("8.  Load action queue")
-		print("9.  Load website-action queue (NOT IMPLEMENTED)")
+		print("6.  Load website queue")
+		print("7.  Load action queue")
 		print("----------------------------------------------------")
-		print("10. Print website queue")
-		print("11. Print action queue")
-		print("12. Print website-action queue")
+		print("8.  Print website queue")
+		print("9.  Print action queue")
+		print("10. Print website-action queue")
 		print("----------------------------------------------------")
-		print("13. Run website-action queue")
+		print("11. Clear website queue")
+		print("12. Clear action queue")
+		print("13. Clear website-action queue")
 		print("----------------------------------------------------")
-		print("14. Quit")
+		print("14. Run website-action queue")
+		print("----------------------------------------------------")
+		print("15. Quit")
 		print("----------------------------------------------------")
 
 		try:
@@ -352,29 +397,38 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 		queue_type = "action_queue"
 		save_queue(action_queue, queue_type)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 7):
+	elif (option == 6):
 		queue_type = "web_queue"
 		web_queue = load_queue(web_queue, queue_type)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 8):
+	elif (option == 7):
 		queue_type = "action_queue"
 		action_queue = load_queue(action_queue, queue_type)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 10):
+	elif (option == 8):
 		print_web_queue(web_queue)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 11):
+	elif (option == 9):
 		print_action_queue(action_queue)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 12):
+	elif (option == 10):
 		print_web_action_queue(
 			web_queue, action_queue, web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 11):
+		web_queue = clear_web_queue(web_queue)
+		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 12):
+		action_queue = clear_action_queue(action_queue)
+		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 13):
+		web_action_queue = clear_web_action_queue(web_action_queue)
+		menu(web_queue, action_queue, web_action_queue)
+	elif (option == 14):
 		run_web_action_queue(
 			web_queue, action_queue, web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 14):
+	elif (option == 15):
 		print
 		quit()
 	else:
