@@ -117,16 +117,12 @@ def apply_action_queue_all(web_queue, action_queue, web_action_queue):
 		return
 
 	web_action_queue = []
-	for index in range(len(web_queue)):
-		column = []
-		for index2 in range(len(action_queue)):
-			column.append(0)
-		web_action_queue.append(column)
 
+	# Create the columns for our actions
 	for index in range(len(web_queue)):
-		for index2 in range(len(action_queue)):
-			web_action_queue[index][index2] = action_queue[index2]
-
+		web_action_queue.append([web_queue[index]])
+		for action in action_queue:
+			web_action_queue[index].append(action)
 	print
 	print("Applied action queue to website queue.")
 
@@ -227,19 +223,19 @@ def print_web_action_queue(web_queue, action_queue, web_action_queue):
 		print
 		print("The website-action queue is empty.")
 		return
-	elif (len(web_queue) == 0):
-		print
-		print("The website queue is empty.")
-		return
-	elif (len(action_queue) == 0):
-		print
-		print("The action queue is empty.")
-		return
+
 	print
-	for index in range(len(web_queue)):
-		print("Website: " + web_queue[index])
-		for index2 in range(len(action_queue)):
-			print("    Action: " + action_queue[index2])
+
+	first_time = True
+
+	for index in range(len(web_action_queue)):
+		print("Website: " + web_action_queue[index][0])
+		for action in web_action_queue[index]:
+			if (first_time == False):
+				print("    Action: " + action)
+			else:
+				first_time = False
+		first_time = True
 
 def clear_web_queue(web_queue):
 	web_queue = []
@@ -267,68 +263,66 @@ def run_web_action_queue(web_queue, action_queue, web_action_queue):
 		print
 		print("The website-action queue is empty.")
 		return
-	elif (len(web_queue) == 0):
-		print
-		print("The website queue is empty.")
-		return
-	elif (len(action_queue) == 0):
-		print
-		print("The action queue is empty.")
-		return
 
 	driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
 
-	for index in range(len(web_queue)):
+	web_check = True
+
+	for index in range(len(web_action_queue)):
 		first_time_connect = True
-		for index2 in range(len(action_queue)):
-			if (web_action_queue[index][index2] == "connect"):
-				if (index == 0):
-					driver.get(web_queue[index])
-				else:
-					driver.execute_script("window.open('" + web_queue[index] + "');")
-
-				time.sleep(2)
-			elif (web_action_queue[index][index2].find("click") == 0):
-				order = re.split(r'`', web_action_queue[index][index2])
-				xpath += "//" + order[1]
-
-				for index3 in range(2, len(order)):
-					if (index3 % 2 == 0):
-						xpath += "[@" + order[index3]
+		for action in web_action_queue[index]:
+			if (web_check == False):
+				if (action == "connect"):
+					if (index == 0):
+						driver.get(web_action_queue[index][0])
 					else:
-						xpath += "='" + order[index3] + "']"
+						driver.execute_script("window.open('" + web_action_queue[index][0] + "');")
 
-				if (first_time_connect == True and key != index):
-					driver.get(web_queue[index])
 					time.sleep(2)
-					key = index
-					first_time_connect = False
+				elif (action.find("click") == 0):
+					order = re.split(r'`', action)
+					xpath += "//" + order[1]
 
-				driver.find_element_by_xpath(xpath).click()
-				xpath = ""
+					for index2 in range(2, len(order)):
+						if (index2 % 2 == 0):
+							xpath += "[@" + order[index2]
+						else:
+							xpath += "='" + order[index2] + "']"
 
-				time.sleep(2)
-			elif (web_action_queue[index][index2].find("fill") == 0):
-				order = re.split(r'`', web_action_queue[index][index2])
-				xpath += "//" + order[1]
+					if (first_time_connect == True and key != index):
+						driver.get(web_action_queue[index][0])
+						time.sleep(2)
+						key = index
+						first_time_connect = False
 
-				for index3 in range(2, len(order) - 1):
-					if (index3 % 2 == 0):
-						xpath += "[@" + order[index3]
-					else:
-						xpath += "='" + order[index3] + "']"
+					driver.find_element_by_xpath(xpath).click()
+					xpath = ""
 
-				if (first_time_connect == True and key != index):
-					driver.get(web_queue[index])
 					time.sleep(2)
-					key = index
-					first_time_connect = False
+				elif (action.find("fill") == 0):
+					order = re.split(r'`', action)
+					xpath += "//" + order[1]
 
-				index3 += 1
-				driver.find_element_by_xpath(xpath).send_keys(order[index3])
-				xpath = ""
+					for index2 in range(2, len(order) - 1):
+						if (index2 % 2 == 0):
+							xpath += "[@" + order[index2]
+						else:
+							xpath += "='" + order[index2] + "']"
 
-				time.sleep(2)
+					if (first_time_connect == True and key != index):
+						driver.get(web_action_queue[index][0])
+						time.sleep(2)
+						key = index
+						first_time_connect = False
+
+					index2 += 1
+					driver.find_element_by_xpath(xpath).send_keys(order[index2])
+					xpath = ""
+
+					time.sleep(2)
+			else:
+				web_check = False
+		web_check = True
 
 	driver.quit()
 
