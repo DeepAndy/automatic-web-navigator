@@ -218,7 +218,7 @@ def print_action_queue(action_queue):
 	for action in action_queue:
 		print("Action: " + action)
 
-def print_web_action_queue(web_queue, action_queue, web_action_queue):
+def print_web_action_queue(web_action_queue):
 	if (web_action_queue == 0):
 		print
 		print("The website-action queue is empty.")
@@ -255,7 +255,7 @@ def clear_web_action_queue(web_action_queue):
 	print("The website-action queue has been cleared.")
 	return web_action_queue
 
-def run_web_action_queue(web_queue, action_queue, web_action_queue):
+def run_web_action_queue(web_action_queue):
 	xpath = ""
 	key = -1
 
@@ -406,8 +406,7 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 		print_action_queue(action_queue)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 10):
-		print_web_action_queue(
-			web_queue, action_queue, web_action_queue)
+		print_web_action_queue(web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 11):
 		web_queue = clear_web_queue(web_queue)
@@ -419,8 +418,7 @@ def menu_input(web_queue, action_queue, web_action_queue, option):
 		web_action_queue = clear_web_action_queue(web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 14):
-		run_web_action_queue(
-			web_queue, action_queue, web_action_queue)
+		run_web_action_queue(web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
 	elif (option == 15):
 		print
