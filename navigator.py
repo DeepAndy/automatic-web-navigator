@@ -16,7 +16,6 @@ def add_web_queue(web_queue):
 	while (web_name == ""):
 		print
 		web_name = raw_input("Enter website name: ")
-	
 	web_queue.append(web_name)
 	print
 	print("Added \"" + web_name + "\" to queue")
@@ -333,35 +332,14 @@ def run_web_action_queue(web_action_queue):
 		web_check = True
 	driver.quit()
 
-def menu(web_queue, action_queue, web_action_queue):
+def save_queue_menu(web_queue, action_queue, web_action_queue):
 	option = ""
 	while (option == ""):
 		print
 		print("----------------------------------------------------")
-		print("1.  Add site to website queue")
-		print("2.  Add action to action queue")
-		print("----------------------------------------------------")
-		print("3.  Apply action queue to all sites in website queue")
-		print("----------------------------------------------------")
-		print("4.  Save website queue")
-		print("5.  Save action queue")
-		print("6.  Save website-action queue")
-		print("----------------------------------------------------")
-		print("7.  Load website queue")
-		print("8.  Load action queue")
-		print("9.  Load website-action queue")
-		print("----------------------------------------------------")
-		print("10. Print website queue")
-		print("11. Print action queue")
-		print("12. Print website-action queue")
-		print("----------------------------------------------------")
-		print("13. Clear website queue")
-		print("14. Clear action queue")
-		print("15. Clear website-action queue")
-		print("----------------------------------------------------")
-		print("16. Run website-action queue")
-		print("----------------------------------------------------")
-		print("17. Quit")
+		print("1. Save website queue")
+		print("2. Save action queue")
+		print("3. Save website-action queue")
 		print("----------------------------------------------------")
 		try:
 			print
@@ -370,76 +348,171 @@ def menu(web_queue, action_queue, web_action_queue):
 			print
 			print("Not a number.")
 			menu(web_queue, action_queue, web_action_queue)
-		menu_input(web_queue, action_queue, web_action_queue, option)
+		if (option == 1):
+			queue_type = "web_queue"
+			save_queue(web_queue, queue_type)
+		elif (option == 2):
+			queue_type = "action_queue"
+			save_queue(action_queue, queue_type)
+		elif (option == 3):
+			queue_type = "web_action_queue"
+			save_queue(web_action_queue, queue_type)
+		else:
+			print
+			print("Invalid number.")
+			save_queue_menu(web_queue, action_queue, web_action_queue)
+		menu(web_queue, action_queue, web_action_queue)
 
-def menu_input(web_queue, action_queue, web_action_queue, option):
-	if (option == 1):
-		web_queue = add_web_queue(web_queue)
+def load_queue_menu(web_queue, action_queue, web_action_queue):
+	option = ""
+	while (option == ""):
+		print
+		print("----------------------------------------------------")
+		print("1. Load website queue")
+		print("2. Load action queue")
+		print("3. Load website-action queue")
+		print("----------------------------------------------------")
+		try:
+			print
+			option = int(raw_input("Select an option: "))
+		except:
+			print
+			print("Not a number.")
+			load_queue_menu(web_queue, action_queue, web_action_queue)
+		if (option == 1):
+			queue_type = "web_queue"
+			web_queue = load_queue(web_queue, queue_type)
+		elif (option == 2):
+			queue_type = "action_queue"
+			action_queue = load_queue(action_queue, queue_type)
+		elif (option == 3):
+			queue_type = "web_action_queue"
+			web_action_queue = load_queue(web_action_queue, queue_type)
+		else:
+			print
+			print("Invalid number.")
+			load_queue_menu(web_queue, action_queue, web_action_queue)
 		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 2):
-		action_queue = add_action_all(
+
+def print_queue_menu(web_queue, action_queue, web_action_queue):
+	option = ""
+	while (option == ""):
+		print
+		print("----------------------------------------------------")
+		print("1. Print website queue")
+		print("2. Print action queue")
+		print("3. Print website-action queue")
+		print("----------------------------------------------------")
+		try:
+			print
+			option = int(raw_input("Select an option: "))
+		except:
+			print
+			print("Not a number.")
+			print_queue_menu(web_queue, action_queue, web_action_queue)
+		if (option == 1):
+			print_web_queue(web_queue)
+		elif (option == 2):
+			print_action_queue(action_queue)
+			queue_type = "action_queue"
+		elif (option == 3):
+			print_web_action_queue(web_action_queue)
+			queue_type = "web_action_queue"
+		else:
+			print
+			print("Invalid number.")
+			print_queue_menu(web_queue, action_queue, web_action_queue)
+		menu(web_queue, action_queue, web_action_queue)
+
+def clear_queue_menu(web_queue, action_queue, web_action_queue):
+	option = ""
+	while (option == ""):
+		print
+		print("----------------------------------------------------")
+		print("1. Clear website queue")
+		print("2. Clear action queue")
+		print("3. Clear website-action queue")
+		print("----------------------------------------------------")
+		try:
+			print
+			option = int(raw_input("Select an option: "))
+		except:
+			print
+			print("Not a number.")
+			clear_queue_menu(web_queue, action_queue, web_action_queue)
+		if (option == 1):
+			web_queue = clear_web_queue(web_queue)
+		elif (option == 2):
+			action_queue = clear_action_queue(action_queue)
+			queue_type = "action_queue"
+		elif (option == 3):
+			web_action_queue = clear_web_action_queue(web_action_queue)
+			queue_type = "web_action_queue"
+		else:
+			print
+			print("Invalid number.")
+			clear_queue_menu(web_queue, action_queue, web_action_queue)
+		menu(web_queue, action_queue, web_action_queue)
+
+def menu(web_queue, action_queue, web_action_queue):
+	option = ""
+	while (option == ""):
+		print
+		print("----------------------------------------------------")
+		print("1. Add site to website queue")
+		print("2. Add action to action queue")
+		print("3. Apply action queue to all sites in website queue")
+		print("4. Save a queue")
+		print("5. Load a queue")
+		print("6. Print a queue")
+		print("7. Clear a queue")
+		print("8. Run website-action queue")
+		print("9. Quit")
+		print("----------------------------------------------------")
+		try:
+			print
+			option = int(raw_input("Select an option: "))
+		except:
+			print
+			print("Not a number.")
+			menu(web_queue, action_queue, web_action_queue)
+		if (option == 1):
+			web_queue = add_web_queue(web_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 2):
+			action_queue = add_action_all(
+					web_queue, action_queue, web_action_queue)
+			'''
+			add_action_all() will redirect to add_action_all_input()
+			which will require web_action_queue to call menu().
+			This is why we need to add web_action_queue to this function
+			'''
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 3):
+			web_action_queue = apply_action_queue_all(
 				web_queue, action_queue, web_action_queue)
-		'''
-		add_action_all() will redirect to add_action_all_input()
-		which will require web_action_queue to call menu().
-		This is why we need to add web_action_queue to this function
-		'''
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 3):
-		web_action_queue = apply_action_queue_all(
-			web_queue, action_queue, web_action_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 4):
-		queue_type = "web_queue"
-		save_queue(web_queue, queue_type)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 5):
-		queue_type = "action_queue"
-		save_queue(action_queue, queue_type)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 6):
-		queue_type = "web_action_queue"
-		save_queue(web_action_queue, queue_type)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 7):
-		queue_type = "web_queue"
-		web_queue = load_queue(web_queue, queue_type)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 8):
-		queue_type = "action_queue"
-		action_queue = load_queue(action_queue, queue_type)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 9):
-		queue_type = "web_action_queue"
-		web_action_queue = load_queue(web_action_queue, queue_type)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 10):
-		print_web_queue(web_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 11):
-		print_action_queue(action_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 12):
-		print_web_action_queue(web_action_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 13):
-		web_queue = clear_web_queue(web_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 14):
-		action_queue = clear_action_queue(action_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 15):
-		web_action_queue = clear_web_action_queue(web_action_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 16):
-		run_web_action_queue(web_action_queue)
-		menu(web_queue, action_queue, web_action_queue)
-	elif (option == 17):
-		print
-		quit()
-	else:
-		print
-		print("Invalid number.")
-		menu(web_queue, action_queue, web_action_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 4):
+			save_queue_menu(web_queue, action_queue, web_action_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 5):
+			load_queue_menu(web_queue, action_queue, web_action_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 6):
+			print_queue_menu(web_queue, action_queue, web_action_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 7):
+			clear_queue_menu(web_queue, action_queue, web_action_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 8):
+			run_web_action_queue(web_action_queue)
+			menu(web_queue, action_queue, web_action_queue)
+		elif (option == 9):
+			print
+			quit()
+		else:
+			print
+			print("Invalid number.")
+			menu(web_queue, action_queue, web_action_queue)
 
 initialization()
