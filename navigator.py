@@ -141,7 +141,6 @@ def save_queue(queue, queue_type):
 	answer = ""
 	print
 	queue_name = raw_input("Enter name of the queue: ")
-
 	if (queue_type == "web_queue"):
 		queue_name += ".wq"
 		if (len(queue) == 0):
@@ -340,6 +339,7 @@ def save_queue_menu(web_queue, action_queue, web_action_queue):
 		print("1. Save website queue")
 		print("2. Save action queue")
 		print("3. Save website-action queue")
+		print("4. Back")
 		print("----------------------------------------------------")
 		try:
 			print
@@ -347,7 +347,7 @@ def save_queue_menu(web_queue, action_queue, web_action_queue):
 		except:
 			print
 			print("Not a number.")
-			menu(web_queue, action_queue, web_action_queue)
+			save_queue_menu(web_queue, action_queue, web_action_queue)
 		if (option == 1):
 			queue_type = "web_queue"
 			save_queue(web_queue, queue_type)
@@ -357,6 +357,8 @@ def save_queue_menu(web_queue, action_queue, web_action_queue):
 		elif (option == 3):
 			queue_type = "web_action_queue"
 			save_queue(web_action_queue, queue_type)
+		elif (option == 4):
+			menu(web_queue, action_queue, web_action_queue)
 		else:
 			print
 			print("Invalid number.")
@@ -371,6 +373,7 @@ def load_queue_menu(web_queue, action_queue, web_action_queue):
 		print("1. Load website queue")
 		print("2. Load action queue")
 		print("3. Load website-action queue")
+		print("4. Back")
 		print("----------------------------------------------------")
 		try:
 			print
@@ -388,6 +391,8 @@ def load_queue_menu(web_queue, action_queue, web_action_queue):
 		elif (option == 3):
 			queue_type = "web_action_queue"
 			web_action_queue = load_queue(web_action_queue, queue_type)
+		elif (option == 4):
+			menu(web_queue, action_queue, web_action_queue)
 		else:
 			print
 			print("Invalid number.")
@@ -402,6 +407,7 @@ def print_queue_menu(web_queue, action_queue, web_action_queue):
 		print("1. Print website queue")
 		print("2. Print action queue")
 		print("3. Print website-action queue")
+		print("4. Back")
 		print("----------------------------------------------------")
 		try:
 			print
@@ -418,6 +424,8 @@ def print_queue_menu(web_queue, action_queue, web_action_queue):
 		elif (option == 3):
 			print_web_action_queue(web_action_queue)
 			queue_type = "web_action_queue"
+		elif (option == 4):
+			menu(web_queue, action_queue, web_action_queue)
 		else:
 			print
 			print("Invalid number.")
@@ -432,6 +440,7 @@ def clear_queue_menu(web_queue, action_queue, web_action_queue):
 		print("1. Clear website queue")
 		print("2. Clear action queue")
 		print("3. Clear website-action queue")
+		print("4. Back")
 		print("----------------------------------------------------")
 		try:
 			print
@@ -448,6 +457,8 @@ def clear_queue_menu(web_queue, action_queue, web_action_queue):
 		elif (option == 3):
 			web_action_queue = clear_web_action_queue(web_action_queue)
 			queue_type = "web_action_queue"
+		elif (option == 4):
+			menu(web_queue, action_queue, web_action_queue)
 		else:
 			print
 			print("Invalid number.")
