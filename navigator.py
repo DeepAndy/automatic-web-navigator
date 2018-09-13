@@ -9,21 +9,17 @@ def initialization():
 	web_queue = []
 	action_queue = []
 	web_action_queue = 0
-
 	menu(web_queue, action_queue, web_action_queue)
 
 def add_web_queue(web_queue):
 	web_name = ""
-
 	while (web_name == ""):
 		print
 		web_name = raw_input("Enter website name: ")
 	
 	web_queue.append(web_name)
-
 	print
 	print("Added \"" + web_name + "\" to queue")
-
 	return web_queue
 
 def add_action_all_input(web_queue, action_queue, web_action_queue, option):
@@ -75,7 +71,6 @@ def add_action_all_input(web_queue, action_queue, web_action_queue, option):
 
 def add_action_all(web_queue, action_queue, web_action_queue):
 	option = ""
-
 	while (option == ""):
 		print
 		print("----------------------------------------------------")
@@ -87,7 +82,6 @@ def add_action_all(web_queue, action_queue, web_action_queue):
 		print("3. Fill out a form")
 		print("4. Back to menu")
 		print("----------------------------------------------------")
-
 		try:
 			print
 			option = int(raw_input("Select an option: "))
@@ -98,7 +92,6 @@ def add_action_all(web_queue, action_queue, web_action_queue):
 
 		action_queue = add_action_all_input(
 			web_queue, action_queue, web_action_queue, option)
-
 		return action_queue
 
 def apply_action_queue_all(web_queue, action_queue, web_action_queue):
@@ -115,9 +108,7 @@ def apply_action_queue_all(web_queue, action_queue, web_action_queue):
 		print
 		print("The action queue is empty. Can not apply any actions.")
 		return
-
 	web_action_queue = []
-
 	# Create the columns for our actions
 	for index in range(len(web_queue)):
 		web_action_queue.append([web_queue[index]])
@@ -125,24 +116,23 @@ def apply_action_queue_all(web_queue, action_queue, web_action_queue):
 			web_action_queue[index].append(action)
 	print
 	print("Applied action queue to website queue.")
-
 	return web_action_queue
 
 def write_queue(queue_name, queue, queue_type):
 	f = open(queue_name, "w")
-
 	if (queue_type == "web_action_queue"):
 		for index in range(len(queue)):
 			for index2 in range(len(queue[index])):
 				f.write(queue[index][index2] + "\n")
 			if (index == len(queue) - 1):
 				f.close()
+				print
+				print("Saved web queue to \"" + queue_name + "\"")
 			else:
 				f.write("\n")
 	else:
 		for name in queue:
 			f.write(str(name) + "\n")
-
 		print
 		print("Saved web queue to \"" + queue_name + "\"")
 		f.close()
@@ -150,7 +140,6 @@ def write_queue(queue_name, queue, queue_type):
 def save_queue(queue, queue_type):
 	exists = True
 	answer = ""
-
 	print
 	queue_name = raw_input("Enter name of the queue: ")
 
@@ -172,7 +161,6 @@ def save_queue(queue, queue_type):
 			print
 			print("The website-action queue is empty.")
 			return
-
 	try:
 		open(queue_name)
 		exists = True
@@ -194,28 +182,38 @@ def save_queue(queue, queue_type):
 def load_queue(queue, queue_type):
 	exists = True
 	answer = ""
-
 	print
 	queue_name = raw_input("Enter name of the queue file: ")
-
 	if (queue_type == "web_queue"):
 		queue_name += ".wq"
 	elif (queue_type == "action_queue"):
 		queue_name += ".aq"
 	elif (queue_type == "web_action_queue"):
 		queue_name += ".waq"
-
 	try:
 		open(queue_name)
 		exists = True
 	except:
 		exists = False
-
 	if (exists == True):
 		f = open(queue_name)
 		lines = f.readlines()
-		for line in lines:
-			queue.append(line.replace("\n", ""))
+		if (queue_type != "web_action_queue"):
+			for line in lines:
+				queue.append(line.replace("\n", ""))
+		else:
+			queue = [[]]
+			# Create the columns for our actions
+			index = 0
+			for line in lines:
+				if (line != "\n"):
+					queue[index].append(line.replace("\n", ""))
+				else:
+					queue.append([])
+					index += 1
+					continue
+		print
+		print("\"" + queue_name + "\" has been loaded")
 		return queue
 	else:
 		print
@@ -245,11 +243,8 @@ def print_web_action_queue(web_action_queue):
 		print
 		print("The website-action queue is empty.")
 		return
-
 	print
-
 	first_time = True
-
 	for index in range(len(web_action_queue)):
 		print("Website: " + web_action_queue[index][0])
 		for action in web_action_queue[index]:
@@ -280,16 +275,12 @@ def clear_web_action_queue(web_action_queue):
 def run_web_action_queue(web_action_queue):
 	xpath = ""
 	key = -1
-
 	if (web_action_queue == 0):
 		print
 		print("The website-action queue is empty.")
 		return
-
 	driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
-
 	web_check = True
-
 	for index in range(len(web_action_queue)):
 		first_time_connect = True
 		for action in web_action_queue[index]:
@@ -304,7 +295,6 @@ def run_web_action_queue(web_action_queue):
 				elif (action.find("click") == 0):
 					order = re.split(r'`', action)
 					xpath += "//" + order[1]
-
 					for index2 in range(2, len(order)):
 						if (index2 % 2 == 0):
 							xpath += "[@" + order[index2]
@@ -316,10 +306,8 @@ def run_web_action_queue(web_action_queue):
 						time.sleep(2)
 						key = index
 						first_time_connect = False
-
 					driver.find_element_by_xpath(xpath).click()
 					xpath = ""
-
 					time.sleep(2)
 				elif (action.find("fill") == 0):
 					order = re.split(r'`', action)
@@ -330,7 +318,6 @@ def run_web_action_queue(web_action_queue):
 							xpath += "[@" + order[index2]
 						else:
 							xpath += "='" + order[index2] + "']"
-
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
 						time.sleep(2)
@@ -340,17 +327,14 @@ def run_web_action_queue(web_action_queue):
 					index2 += 1
 					driver.find_element_by_xpath(xpath).send_keys(order[index2])
 					xpath = ""
-
 					time.sleep(2)
 			else:
 				web_check = False
 		web_check = True
-
 	driver.quit()
 
 def menu(web_queue, action_queue, web_action_queue):
 	option = ""
-
 	while (option == ""):
 		print
 		print("----------------------------------------------------")
@@ -365,7 +349,7 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("----------------------------------------------------")
 		print("7.  Load website queue")
 		print("8.  Load action queue")
-		print("9.  Load website-action queue (NOT IMPLEMENTED)")
+		print("9.  Load website-action queue")
 		print("----------------------------------------------------")
 		print("10. Print website queue")
 		print("11. Print action queue")
@@ -379,7 +363,6 @@ def menu(web_queue, action_queue, web_action_queue):
 		print("----------------------------------------------------")
 		print("17. Quit")
 		print("----------------------------------------------------")
-
 		try:
 			print
 			option = int(raw_input("Select an option: "))
@@ -387,7 +370,6 @@ def menu(web_queue, action_queue, web_action_queue):
 			print
 			print("Not a number.")
 			menu(web_queue, action_queue, web_action_queue)
-
 		menu_input(web_queue, action_queue, web_action_queue, option)
 
 def menu_input(web_queue, action_queue, web_action_queue, option):
