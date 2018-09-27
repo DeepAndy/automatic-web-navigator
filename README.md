@@ -31,7 +31,7 @@ queues.
 
 ## Notes
 The chromedriver executable path is set to my personal directory for now.
-You will have to change the path in *navigator.py* to get it to work.
+You will have to change the path in *config.ini* to get it to work.
 
 ## License
 This software is licensed under the MIT license.
