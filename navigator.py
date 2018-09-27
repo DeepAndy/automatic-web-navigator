@@ -343,7 +343,8 @@ def run_web_action_queue(web_action_queue, the_driver):
 		print
 		print("The website-action queue is empty.")
 		return
-	driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+	if (the_driver.driver_type == "chrome"):
+		driver = webdriver.Chrome(executable_path=the_driver.driver_path)
 	web_check = True
 	for index in range(len(web_action_queue)):
 		first_time_connect = True
