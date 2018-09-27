@@ -4,6 +4,7 @@
 from selenium import webdriver
 import time
 import re
+import ConfigParser
 
 class queue:
         def __init__(self, web_queue, action_queue, web_action_queue):
@@ -18,7 +19,61 @@ class web_driver:
 
 def initialization():
         queues = queue([], [], 0)
-        the_driver = web_driver("chrome", "/home/amoore/Documents/web-drivers/chromedriver")
+        config = ConfigParser.ConfigParser()
+	config_file = "config.ini"
+	complete_config = True
+	try:
+		config.read(config_file)
+	except:
+		print
+		print("Could not find the configuration file \"" + config_file + "\" or the file has no sections")
+		print
+		quit()
+	found_driver_section = False
+	driver_section = "Driver"
+	for section in config.sections():
+		if (section == driver_section):
+			found_driver_section = True
+	if (found_driver_section == False):
+		print
+		print("Could not find the \"" + driver_section + "\" section.")
+		print("Make sure a \"[" + driver_section + "]\" section is included in \"" + config_file + "\".")
+		print
+		quit()
+	driver_option_type = "driver_type"
+	driver_option_path = "driver_path"
+	found_driver_type = False
+	found_correct_driver_type = False
+	found_driver_path = False
+	for option in config.options(driver_section):
+		if (option == driver_option_type):
+			found_driver_type = True
+			if (config.get(driver_section, driver_option_type) == "chrome"):
+				found_correct_driver_type = True
+				driver_type = config.get(driver_section, driver_option_type)
+		if (option == driver_option_path):
+			found_driver_path = True
+			driver_path = config.get(driver_section, driver_option_path)
+	if (found_driver_type == False):
+		print
+		print("Could not find the \"" + driver_option_type + "\" option.")
+		print("Make sure a \"" + driver_option_type + "\" option is included under the \"[" + driver_section + "]\" section.")
+		complete_config = False
+	if (found_correct_driver_type == False):
+		print
+		print("The \"" + driver_option_type + "\" value is either incorrect or the option is missing.")
+		print("Make sure the value is a valid option.")
+		complete_config = False
+	if (found_driver_path == False):
+		print
+		print("Could not find the \"" + driver_option_path + "\" option.")
+		print("Make sure a \"" + driver_option_path + "\" option is included under the \"[" + driver_section + "]\" section.")
+		complete_config = False
+	if (complete_config == False):
+		print
+		quit()
+	else:
+		the_driver = web_driver(driver_type, driver_path)
 	menu(queues, the_driver)
 
 def add_web_queue(queues):
