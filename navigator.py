@@ -185,36 +185,30 @@ def apply_action_queue_all(queues):
 
 def insert_queue(queue, queue_type):
 	if (queue_type != "web_action_queue"):
-		if (queue_type == "web_queue"):
-			if (len(queue) == 0):
-				print
-				print("The website queue is empty.")
-				return
-		elif (queue_type == "action_queue"):
-			if (len(queue) == 0):
-				print
-				print("The action queue is empty.")
-				return
 		print
 		for index in range(len(queue)):
 			print("Website[" + str(index + 1) + "]: " + queue[index])
-		option = ""
-		while (option == ""):
-			try:
+		if (len(queue) > 0):
+			option = ""
+			while (option == ""):
+				try:
+					print
+					option = int(raw_input("Enter the position to insert: "))
+				except:
+					print
+					print("Not a number.")
+					option = ""
+			if (option <= len(queue) and option > 0):
+				if (queue_type == "web_queue"):
+					web_name = raw_input("Enter the website name: ")
+					queue.insert(int(option - 1), web_name)
+			else:
 				print
-				option = int(raw_input("Enter the position to insert: "))
-			except:
-				print
-				print("Not a number.")
-				option = ""
-		if (option <= len(queue) and option > 0):
-			if (queue_type == "web_queue"):
-				web_name = raw_input("Enter the website name: ")
-				queue.insert(int(option - 1), web_name)
+				print("Invalid number.")
+				insert_queue(queue, queue_type)
 		else:
-			print
-			print("Invalid number.")
-			insert_queue(queue, queue_type)
+			web_name = raw_input("Enter the website name: ")
+			queue.append(web_name)
 
 def insert_queue_menu(queues, the_driver):
 	option = ""
