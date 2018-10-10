@@ -186,9 +186,11 @@ def apply_action_queue_all(queues):
 def insert_queue(queue, queue_type):
 	if (queue_type != "web_action_queue"):
 		print
-		for index in range(len(queue)):
-			print("Website[" + str(index + 1) + "]: " + queue[index])
-		if (len(queue) > 0):
+		if (len(queue) >= 0):
+			for index in range(len(queue)):
+				print("Website[" + str(index + 1) + "]: " + queue[index])
+			print("Website[" + str(len(queue) + 1) + "]: ")
+		if (len(queue) >= 0):
 			option = ""
 			while (option == ""):
 				try:
@@ -198,7 +200,7 @@ def insert_queue(queue, queue_type):
 					print
 					print("Not a number.")
 					option = ""
-			if (option <= len(queue) and option > 0):
+			if (option <= len(queue) + 1 and option > 0):
 				if (queue_type == "web_queue"):
 					web_name = raw_input("Enter the website name: ")
 					queue.insert(int(option - 1), web_name)
