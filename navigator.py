@@ -185,11 +185,21 @@ def apply_action_queue_all(queues):
 
 def insert_queue(queue, queue_type):
 	if (queue_type != "web_action_queue"):
+		if (queue_type == "web_queue"):
+			web_string = "Website"
+		elif (queue_type == "action_queue"):
+			action_string = "Action"
 		print
 		if (len(queue) >= 0):
 			for index in range(len(queue)):
-				print("Website[" + str(index + 1) + "]: " + queue[index])
-			print("Website[" + str(len(queue) + 1) + "]: ")
+				if (queue_type == "web_queue"):
+					print(web_string + "[" + str(index + 1) + "]: " + queue[index])
+				elif (queue_type == "action_queue"):
+					print(action_string + "[" + str(index + 1) + "]: " + queue[index])
+			if (queue_type == "web_queue"):
+				print(web_string + "[" + str(len(queue) + 1) + "]: ")
+			elif (queue_type == "action_queue"):
+				print(action_string + "[" + str(len(queue) + 1) + "]: ")
 		if (len(queue) >= 0):
 			option = ""
 			while (option == ""):
