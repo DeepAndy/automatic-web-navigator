@@ -86,12 +86,15 @@ def add_web_queue(queues):
 	print("Added \"" + web_name + "\" to queue")
 	return queues.web_queue
 
-def add_action(queues, the_driver, option, pos):
+def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 	if (option == 1):
 		if (pos < 0):
 			queues.action_queue.append("connect")
 		else:
-			queues.action_queue.insert(pos, "connect")
+			if (from_web_action == False):
+				queues.action_queue.insert(pos, "connect")
+			else:
+				queues.web_action_queue[pos].insert(pos2, "connect")
 		print
 		print("Added \"connect\" to action queue")
 		return queues.action_queue
@@ -105,7 +108,10 @@ def add_action(queues, the_driver, option, pos):
 			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
 			if (attribute_name == "q"):
 				if (pos < 0):
-					queues.action_queue.append(action)
+					if (from_web_action == False):
+						queues.action_queue.append(action)
+					else:
+						queues.web_action_queue[pos][pos2] = action
 				else:
 					queues.action_queue.insert(pos, action)
 				return queues.action_queue
@@ -140,9 +146,9 @@ def add_action(queues, the_driver, option, pos):
 	else:
 		print
 		print("Invalid number.")
-		add_action_menu(queues, option, pos)
+		add_action_menu(queues, option, pos, pos2, from_web_action)
 
-def add_action_menu(queues, the_driver, pos):
+def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
 	option = ""
 	while (option == ""):
 		print
@@ -162,9 +168,9 @@ def add_action_menu(queues, the_driver, pos):
 		except:
 			print
 			print("Not a number.")
-			add_action_menu(queues, the_driver, pos)
+			add_action_menu(queues, the_driver, pos, pos2, from_web_action)
 
-		queues.action_queue = add_action(queues, the_driver, option, pos)
+		queues.action_queue = add_action(queues, the_driver, option, pos, pos2, from_web_action)
 		return queues.action_queue
 
 def apply_action_queue_all(queues):
@@ -220,7 +226,7 @@ def insert_queue(queue, queue_type, queues, the_driver):
 					web_name = raw_input("Enter the website name: ")
 					queue.insert(int(option - 1), web_name)
 				elif (queue_type == "action_queue"):
-					add_action_menu(queues, the_driver, int(option - 1))
+					add_action_menu(queues, the_driver, int(option - 1), -1, False)
 			else:
 				print
 				print("Invalid number.")
@@ -245,6 +251,43 @@ def insert_queue(queue, queue_type, queues, the_driver):
 				print("    " + action_string + "[" + str(index_save2 + 1) + "]: ")
 				print
 			print(web_string + "[" + str(index_save1 + 2) + "]: ") 
+		option = ""
+		while (option == ""):
+			print
+			option = raw_input("Enter the position to insert (EX: \"1 3\" or \"1\"): ")
+			option = re.split(' ', option)
+			if (len(option) < 1 or len(option) > 2):
+				print
+				print("Expected one or two arguments.")
+				continue
+			if (len(option) == 2):
+				try:
+					option1 = int(option[0])
+					option2 = int(option[1])
+				except:
+					print
+					print("Expected integer arguments.")
+					continue	
+			else:
+				try:
+					option1 = int(option[0])
+					option2 = -1
+				except:
+					print
+					print("Expected integer arguments.")
+			if (option2 == -1):
+				if (queue == 0):
+					queues.web_action_queue = [[]]
+				else:
+					queues.web_action_queue.insert(option1 - 1, [])
+				web_name = raw_input("Enter the website name: ")
+				queues.web_action_queue[option1 - 1].insert(0, web_name)
+			'''
+			else:
+				if (queue == 0):
+					queues.web_action_queue = [[]]
+				add_action_menu(queues, the_driver, option1 - 1, option2, True)
+			'''
 
 def insert_queue_menu(queues, the_driver):
 	option = ""
@@ -278,7 +321,6 @@ def insert_queue_menu(queues, the_driver):
 			print
 			print("Invalid number.")
 			insert_queue_menu(queues, the_driver)
-	menu(queues, the_driver)
 
 def write_queue(queue_name, queue, queue_type):
 	f = open(queue_name, "w")
@@ -654,10 +696,10 @@ def menu(queues, the_driver):
 			queues.web_queue = add_web_queue(queues)
 			menu(queues, the_driver)
 		elif (option == 2):
-			queues.action_queue = add_action_menu(queues, the_driver, -1)
+			queues.action_queue = add_action_menu(queues, the_driver, -1, -1, False)
 			menu(queues, the_driver)
 		elif (option == 3):
-			web_action_queue = apply_action_queue_all(queues)
+			queues.web_action_queue = apply_action_queue_all(queues)
 			menu(queues, the_driver)
 		elif (option == 4):
 			insert_queue_menu(queues, the_driver)
