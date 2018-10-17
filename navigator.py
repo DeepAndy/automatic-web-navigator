@@ -18,7 +18,7 @@ class web_driver:
 		self.driver_path = driver_path
 
 def initialization():
-	queues = queue([], [], 0)
+	queues = queue([], [], [[]])
 	config = ConfigParser.ConfigParser()
 	config_file = "config.ini"
 	complete_config = True
@@ -197,7 +197,7 @@ def apply_action_queue_all(queues):
 	print("Applied action queue to website queue.")
 	return queues.web_action_queue
 
-def insert_queue(queue, queue_type, queues, the_driver):
+def insert_queue(queues, queue_type, the_driver):
 	web_string = "Website"
 	action_string = "Action"
 	if (queue_type != "web_action_queue"):
@@ -307,14 +307,11 @@ def insert_queue_menu(queues, the_driver):
 			print("Not a number.")
 			insert_queue_menu(queues, the_driver)
 		if (option == 1):
-			queue_type = "web_queue"
-			insert_queue(queues.web_queue, queue_type, queues, the_driver)
+			insert_queue(queues, "web_queue", the_driver)
 		elif (option == 2):
-			queue_type = "action_queue"
-			insert_queue(queues.action_queue, queue_type, queues, the_driver)
+			insert_queue(queues, "action_queue", the_driver)
 		elif (option == 3):
-			queue_type = "web_action_queue"
-			insert_queue(queues.web_action_queue, queue_type, queues, the_driver)
+			insert_queue(queues, "web_action_queue", the_driver)
 		elif (option == 4):
 			menu(queues, the_driver)
 		else:
@@ -322,45 +319,51 @@ def insert_queue_menu(queues, the_driver):
 			print("Invalid number.")
 			insert_queue_menu(queues, the_driver)
 
-def write_queue(queue_name, queue, queue_type):
+def write_queue(queue_name, queues, queue_type):
 	f = open(queue_name, "w")
 	if (queue_type == "web_action_queue"):
-		for index in range(len(queue)):
-			for index2 in range(len(queue[index])):
-				f.write(queue[index][index2] + "\n")
-			if (index == len(queue) - 1):
+		for index in range(len(queues.web_action_queue)):
+			for index2 in range(len(queues.web_action_queue[index])):
+				f.write(queues.web_action_queue[index][index2] + "\n")
+			if (index == len(queues.web_action_queue) - 1):
 				f.close()
 				print
 				print("Saved web queue to \"" + queue_name + "\"")
 			else:
 				f.write("\n")
-	else:
-		for name in queue:
+	elif (queue_type == "web_queue"):
+		for name in queues.web_queue:
+			f.write(str(name) + "\n")
+		print
+		print("Saved web queue to \"" + queue_name + "\"")
+		f.close()
+	elif (queue_type == "action_queue"):
+		for name in queues.action_queue:
 			f.write(str(name) + "\n")
 		print
 		print("Saved web queue to \"" + queue_name + "\"")
 		f.close()
 
-def save_queue(queue, queue_type):
+def save_queue(queues, queue_type):
 	exists = True
 	answer = ""
 	print
 	queue_name = raw_input("Enter name of the queue: ")
 	if (queue_type == "web_queue"):
 		queue_name += ".wq"
-		if (len(queue) == 0):
+		if (len(queues.web_queue) == 0):
 			print
 			print("The website queue is empty.")
 			return
 	elif (queue_type == "action_queue"):
 		queue_name += ".aq"
-		if (len(queue) == 0):
+		if (len(queues.action_queue) == 0):
 			print
 			print("The action queue is empty.")
 			return
 	elif (queue_type == "web_action_queue"):
 		queue_name += ".waq"
-		if (queue == 0):
+		if (queues.web_action_queue == [[]]):
 			print
 			print("The website-action queue is empty.")
 			return
@@ -375,13 +378,13 @@ def save_queue(queue, queue_type):
 		while (answer != "y" and answer != "n"):
 			answer = raw_input("Would you like to overwrite \"" + queue_name + "\" (y or n): ")
 		if (answer == "y"):
-			write_queue(queue_name, queue, queue_type)
+			write_queue(queue_name, queues, queue_type)
 		else:
 			return
 	else:
-		write_queue(queue_name, queue, queue_type)
+		write_queue(queue_name, queues, queue_type)
 
-def load_queue(queue, queue_type):
+def load_queue(queues, queue_type):
 	exists = True
 	answer = ""
 	print
@@ -402,82 +405,76 @@ def load_queue(queue, queue_type):
 		lines = f.readlines()
 		if (queue_type != "web_action_queue"):
 			for line in lines:
-				queue.append(line.replace("\n", ""))
+				if (queue_type == "web_queue"):
+					queues.web_queue.append(line.replace("\n", ""))
+				elif (queue_type == "action_queue"):
+					queues.action_queue.append(line.replace("\n", ""))
 		else:
-			queue = [[]]
+			queues.web_action_queue = [[]]
 			# Create the columns for our actions
 			index = 0
 			for line in lines:
 				if (line != "\n"):
-					queue[index].append(line.replace("\n", ""))
+					queues.web_action_queue[index].append(line.replace("\n", ""))
 				else:
-					queue.append([])
+					queues.web_action_queue.append([])
 					index += 1
 					continue
 		print
 		print("\"" + queue_name + "\" has been loaded")
-		return queue
 	else:
 		print
 		print("A file of that name does not exist in this directory.")
-		return queue
 
-def print_web_queue(queues):
-	if (len(queues.web_queue) == 0):
+def print_queue(queues, queue_type):
+	if (queue_type == "web_queue"):
+		if (len(queues.web_queue) == 0):
+			print
+			print("The website queue is empty.")
+			return
 		print
-		print("The website queue is empty.")
-		return
-	print
-	for web_name in queues.web_queue:
-		print("Website: " + web_name)
-
-def print_action_queue(queues):
-	if (len(queues.action_queue) == 0):
+		for web_name in queues.web_queue:
+			print("Website: " + web_name)
+	elif (queue_type == "action_queue"):
+		if (len(queues.action_queue) == 0):
+			print
+			print("The action queue is empty.")
+			return
 		print
-		print("The action queue is empty.")
-		return
-	print
-	for action in queues.action_queue:
-		print("Action: " + action)
-
-def print_web_action_queue(queues):
-	if (queues.web_action_queue == 0):
+		for action in queues.action_queue:
+			print("Action: " + action)
+	elif (queue_type == "web_action_queue"):
+		if (queues.web_action_queue == [[]]):
+			print
+			print("The website-action queue is empty.")
+			return
 		print
-		print("The website-action queue is empty.")
-		return
-	print
-	first_time = True
-	for index in range(len(queues.web_action_queue)):
-		print("Website: " + queues.web_action_queue[index][0])
-		for action in queues.web_action_queue[index]:
-			if (first_time == False):
-				print("    Action: " + action)
-			else:
-				first_time = False
 		first_time = True
+		for index in range(len(queues.web_action_queue)):
+			print("Website: " + queues.web_action_queue[index][0])
+			for action in queues.web_action_queue[index]:
+				if (first_time == False):
+					print("    Action: " + action)
+				else:
+					first_time = False
+			first_time = True
 
-def clear_web_queue(web_queue):
-	web_queue = []
+def clear_queue(queues, queue_type):
 	print
-	print("The website queue has been cleared.")
-	return web_queue
-
-def clear_action_queue(action_queue):
-	action_queue = []
-	print
-	print("The action queue has been cleared.")
-	return action_queue
-
-def clear_web_action_queue(web_action_queue):
-	web_action_queue = 0
-	print
-	print("The website-action queue has been cleared.")
-	return web_action_queue
+	if (queue_type == "web_queue"):
+		queues.web_queue = []
+		print("The website queue has been cleared.")
+	elif (queue_type == "action_queue"):
+		queues.action_queue = []
+		print("The action queue has been cleared.")
+	elif (queue_type == "web_action_queue"):
+		queues.web_action_queue = [[]]
+		print("The website-action queue has been cleared.")
 
 def run_web_action_queue(web_action_queue, the_driver):
 	xpath = ""
 	key = -1
-	if (web_action_queue == 0):
+	if (web_action_queue == [[]]):
 		print
 		print("The website-action queue is empty.")
 		return
@@ -552,14 +549,11 @@ def save_queue_menu(queues, the_driver):
 			print("Not a number.")
 			save_queue_menu(queues, the_driver)
 		if (option == 1):
-			queue_type = "web_queue"
-                        save_queue(queues.web_queue, queue_type)
+			save_queue(queues, "web_queue")
 		elif (option == 2):
-			queue_type = "action_queue"
-                        save_queue(queues.action_queue, queue_type)
+			save_queue(queues, "action_queue")
 		elif (option == 3):
-			queue_type = "web_action_queue"
-                        save_queue(queues.web_action_queue, queue_type)
+			save_queue(queues, "web_action_queue")
 		elif (option == 4):
 			menu(queues, the_driver)
 		else:
@@ -586,14 +580,11 @@ def load_queue_menu(queues, the_driver):
 			print("Not a number.")
 			load_queue_menu(queues, the_driver)
 		if (option == 1):
-			queue_type = "web_queue"
-			queues.web_queue = load_queue(queues.web_queue, queue_type)
+			load_queue(queues, "web_queue")
 		elif (option == 2):
-			queue_type = "action_queue"
-			queues.action_queue = load_queue(queues.action_queue, queue_type)
+			load_queue(queues, "action_queue")
 		elif (option == 3):
-			queue_type = "web_action_queue"
-			queues.web_action_queue = load_queue(queues.web_action_queue, queue_type)
+			load_queue(queues, "web_action_queue")
 		elif (option == 4):
 			menu(queues, the_driver)
 		else:
@@ -620,13 +611,11 @@ def print_queue_menu(queues, the_driver):
 			print("Not a number.")
 			print_queue_menu(queues, the_driver)
 		if (option == 1):
-			print_web_queue(queues)
+			print_queue(queues, "web_queue")
 		elif (option == 2):
-			print_action_queue(queues)
-			queue_type = "action_queue"
+			print_queue(queues, "action_queue")
 		elif (option == 3):
-			print_web_action_queue(queues)
-			queue_type = "web_action_queue"
+			print_queue(queues, "web_action_queue")
 		elif (option == 4):
 			menu(queues, the_driver)
 		else:
@@ -653,13 +642,11 @@ def clear_queue_menu(queues, the_driver):
 			print("Not a number.")
 			clear_queue_menu(queues, the_driver)
 		if (option == 1):
-			queues.web_queue = clear_web_queue(queues.web_queue)
+			clear_queue(queues, "web_queue")
 		elif (option == 2):
-			queues.action_queue = clear_action_queue(queues.action_queue)
-			queue_type = "action_queue"
+			clear_queue(queues, "action_queue")
 		elif (option == 3):
-			queues.web_action_queue = clear_web_action_queue(queues.web_action_queue)
-			queue_type = "web_action_queue"
+			clear_queue(queues, "web_action_queue")
 		elif (option == 4):
 			menu(queues, the_driver)
 		else:
