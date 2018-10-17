@@ -197,97 +197,46 @@ def apply_action_queue_all(queues):
 	print("Applied action queue to website queue.")
 	return queues.web_action_queue
 
+def insert_print(queues, queue_type):
+	if (queue_type == "web_queue"):
+		if (len(queues.web_queue) == 0):
+			print
+			print("Website[1]: ")
+		else:
+			for index in range(len(queues.web_queue)):
+				print
+				print("Website[" + str(index + 1) + "]: " + queues.web_queue[index])
+				last_index = index + 2
+			print
+			print("Website[" + str(last_index) + "]: ")
+
 def insert_queue(queues, queue_type, the_driver):
 	web_string = "Website"
 	action_string = "Action"
 	if (queue_type != "web_action_queue"):
-		print
-		if (len(queue) >= 0):
-			for index in range(len(queue)):
-				if (queue_type == "web_queue"):
-					print(web_string + "[" + str(index + 1) + "]: " + queue[index])
-				elif (queue_type == "action_queue"):
-					print(action_string + "[" + str(index + 1) + "]: " + queue[index])
-			if (queue_type == "web_queue"):
-				print(web_string + "[" + str(len(queue) + 1) + "]: ")
-			elif (queue_type == "action_queue"):
-				print(action_string + "[" + str(len(queue) + 1) + "]: ")
+		if (queue_type == "web_queue"):
+			insert_print(queues, queue_type)
 			option = ""
 			while (option == ""):
 				try:
 					print
 					option = int(raw_input("Enter the position to insert: "))
 				except:
+					option = ""
 					print
 					print("Not a number.")
-					option = ""
-			if (option <= len(queue) + 1 and option > 0):
-				if (queue_type == "web_queue"):
+					insert_print(queues, queue_type)
+					continue
+				if (option <= len(queues.web_queue) + 1 and option > 0):
+					print
 					web_name = raw_input("Enter the website name: ")
-					queue.insert(int(option - 1), web_name)
-				elif (queue_type == "action_queue"):
-					add_action_menu(queues, the_driver, int(option - 1), -1, False)
-			else:
-				print
-				print("Invalid number.")
-				insert_queue(queue, queue_type, queues, the_driver)
-		else:
-			web_name = raw_input("Enter the website name: ")
-			queue.append(web_name)
-	else:
-		print
-		if (queue == 0):
-			print(web_string + "[1]: ")
-			print("    " + action_string + "[1]: ")
-		elif (len(queue) > 0):
-			for index in range(len(queue)):
-				for index2 in range(len(queue[index])):
-					if (index2 == 0):
-						print(web_string + "[" + str(index + 1) + "]: " + queue[index][index2])
-					else:
-						print("    " + action_string + "[" + str(index2) + "]: " + queue[index][index2])
-					index_save1 = index
-					index_save2 = index2
-				print("    " + action_string + "[" + str(index_save2 + 1) + "]: ")
-				print
-			print(web_string + "[" + str(index_save1 + 2) + "]: ") 
-		option = ""
-		while (option == ""):
-			print
-			option = raw_input("Enter the position to insert (EX: \"1 3\" or \"1\"): ")
-			option = re.split(' ', option)
-			if (len(option) < 1 or len(option) > 2):
-				print
-				print("Expected one or two arguments.")
-				continue
-			if (len(option) == 2):
-				try:
-					option1 = int(option[0])
-					option2 = int(option[1])
-				except:
-					print
-					print("Expected integer arguments.")
-					continue	
-			else:
-				try:
-					option1 = int(option[0])
-					option2 = -1
-				except:
-					print
-					print("Expected integer arguments.")
-			if (option2 == -1):
-				if (queue == 0):
-					queues.web_action_queue = [[]]
+					queues.web_queue.insert(int(option - 1), web_name)
 				else:
-					queues.web_action_queue.insert(option1 - 1, [])
-				web_name = raw_input("Enter the website name: ")
-				queues.web_action_queue[option1 - 1].insert(0, web_name)
-			'''
-			else:
-				if (queue == 0):
-					queues.web_action_queue = [[]]
-				add_action_menu(queues, the_driver, option1 - 1, option2, True)
-			'''
+					option = ""
+					print
+					print("Invalid number.")
+					insert_print(queues, queue_type)
+					continue
 
 def insert_queue_menu(queues, the_driver):
 	option = ""
