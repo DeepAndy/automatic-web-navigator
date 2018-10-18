@@ -48,7 +48,7 @@ def initialization():
 	for option in config.options(driver_section):
 		if (option == driver_option_type):
 			found_driver_type = True
-			if (config.get(driver_section, driver_option_type) == "chrome"):
+			if (config.get(driver_section, driver_option_type) == "chrome" or config.get(driver_section, driver_option_type) == "firefox"):
 				found_correct_driver_type = True
 				driver_type = config.get(driver_section, driver_option_type)
 		if (option == driver_option_path):
@@ -429,6 +429,8 @@ def run_web_action_queue(web_action_queue, the_driver):
 		return
 	if (the_driver.driver_type == "chrome"):
 		driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+        elif (the_driver.driver_type == "firefox"):
+                driver = webdriver.Firefox(executable_path=the_driver.driver_path)
 	web_check = True
 	for index in range(len(web_action_queue)):
 		first_time_connect = True

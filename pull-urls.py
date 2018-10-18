@@ -65,7 +65,7 @@ def initialization():
         if (option == driver_option_type):
             found_driver_type = True
             
-            if (config.get(driver_section, driver_option_type) == "chrome"):
+            if (config.get(driver_section, driver_option_type) == "chrome" or config.get(driver_section, driver_option_type) == "firefox"):
                 found_correct_driver_type = True
                 driver_type = config.get(driver_section, driver_option_type)
 
@@ -195,6 +195,10 @@ def main(the_driver, pull_urls_config):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--headless")
         driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = chrome_options)
+    elif (the_driver.driver_type == "firefox"):
+        firefox_options = webdriver.FirefoxOptions()
+        firefox_options.add_argument("--headless")
+        driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_options = firefox_options)
     
     print
     url = raw_input("Enter page to parse: ")
