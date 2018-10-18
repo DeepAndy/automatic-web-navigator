@@ -206,8 +206,10 @@ def main(the_driver, pull_urls_config):
     # Remove anything that does not look like an actual URL
     for current_url in urls:
         if (current_url.find("http://") == -1 and current_url.find("https://") == -1):
-            if (current_url.find(".com") == -1 and current_url.find(".org") == -1 and current_url.find(".edu") == -1 and current_url.find(".gov") == -1 and current_url.find(".net") == -1):
-                urls = remove_values_from_list(urls, current_url)
+            if (current_url.find(".com") == -1 and current_url.find(".org") == -1 and current_url.find(".edu") == -1 and current_url.find(".gov") == -1 and current_url.find(".net") == -1 and current_url.find(".html") == -1):
+                if (current_url.find("/") != 0):
+                    urls = remove_values_from_list(urls, current_url)
+                    
         if (current_url.find("mailto:") == 0):
             urls = remove_values_from_list(urls, current_url)
 
@@ -216,15 +218,29 @@ def main(the_driver, pull_urls_config):
             if (current_url.find("/") == 0):
                 urls = remove_values_from_list(urls, current_url)
     else:
+        if (url.find(".com") != -1):
+            new_url = re.split(r'\.com', url)[0] + ".com"
+        elif (url.find(".org") != -1):
+            new_url = re.split(r'\.org', url)[0] + ".org"
+        elif (url.find(".edu") != -1):
+            new_url = re.split(r'\.edu', url)[0] + ".edu"
+        elif (url.find(".gov") != -1):
+            new_url = re.split(r'\.gov', url)[0] + ".gov"
+        elif (url.find(".net") != -1):
+            new_url = re.split(r'\.net', url)[0] + ".net"
+        elif (url.find(".html") != -1):
+            new_url = re.split(r'\.html', url)[0] + ".html"
+            
         for index in range(len(urls)):
             if (urls[index].find("/") == 0):
-                urls[index] = driver.current_url + urls[index]
+                urls[index] = new_url + urls[index]
 
     if (pull_urls_config.remove_current_page == True):
         urls = remove_values_from_list(urls, "#")
         urls = remove_values_from_list(urls, "/")
         urls = remove_values_from_list(urls, "\\")
-    
+        urls = remove_values_from_list(urls, url)
+
     select_urls(urls)
 
 initialization()
