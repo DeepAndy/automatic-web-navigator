@@ -676,7 +676,7 @@ def menu(queues, the_driver):
 		print("1. Add site to website queue")
 		print("2. Add action to action queue")
 		print("3. Apply action queue to all sites in website queue")
-		print("4. Insert into a queue")
+		print("4. Insert into a queue (NOT FULLY IMPLEMENTED)")
 		print("5. Remove from queue (NOT IMPLEMENTED)")
 		print("6. Save a queue")
 		print("7. Load a queue")
