@@ -200,25 +200,21 @@ def apply_action_queue_all(queues):
 def insert_print(queues, queue_type):
 	if (queue_type == "web_queue"):
 		if (len(queues.web_queue) == 0):
-			print
+                        print
 			print("Website[1]: ")
 		else:
 			for index in range(len(queues.web_queue)):
-				print
 				print("Website[" + str(index + 1) + "]: " + queues.web_queue[index])
 				last_index = index + 2
-			print
 			print("Website[" + str(last_index) + "]: ")
         elif (queue_type == "action_queue"):
-                if (len(queues.web_queue) == 0):
+                if (len(queues.action_queue) == 0):
 			print
 			print("Action[1]: ")
 		else:
-			for index in range(len(queues.web_queue)):
-				print
-				print("Action[" + str(index + 1) + "]: " + queues.web_queue[index])
+			for index in range(len(queues.action_queue)):
+				print("Action[" + str(index + 1) + "]: " + queues.action_queue[index])
 				last_index = index + 2
-			print
 			print("Action[" + str(last_index) + "]: ")
 
 def insert_queue(queues, queue_type, the_driver):
@@ -261,9 +257,9 @@ def insert_queue(queues, queue_type, the_driver):
 					print("Not a number.")
 					insert_print(queues, queue_type)
 					continue
-				if (option <= len(queues.web_queue) + 1 and option > 0):
+				if (option <= len(queues.action_queue) + 1 and option > 0):
 					print
-					add_action_menu(queues, the_driver, option, -1, False)
+					add_action_menu(queues, the_driver, option - 1, -1, False)
 				else:
 					option = ""
 					print
@@ -670,7 +666,7 @@ def menu(queues, the_driver):
 		print("2. Add action to action queue")
 		print("3. Apply action queue to all sites in website queue")
 		print("4. Insert into a queue (NOT FULLY IMPLEMENTED)")
-		print("5. Remove from queue (NOT IMPLEMENTED)")
+		print("5. Remove from a queue (NOT IMPLEMENTED)")
 		print("6. Save a queue")
 		print("7. Load a queue")
 		print("8. Print a queue")
