@@ -216,56 +216,67 @@ def insert_print(queues, queue_type):
 				print("Action[" + str(index + 1) + "]: " + queues.action_queue[index])
 				last_index = index + 2
 			print("Action[" + str(last_index) + "]: ")
+        elif (queue_type == "web_action_queue"):
+                if (queues.web_action_queue == [[]]):
+                        print
+                        print("Website[1]: ")
+                else:
+                        for index in range(len(queues.web_action_queue)):
+                                print
+                                print("Website[" + str(index + 1) + "]: " + queues.web_action_queue[index][0])
+                                for index2 in range(1, len(queues.web_action_queue[index])):
+                                        print("    Action[" + str(index2) + "] " + queues.web_action_queue[index][index2])
 
 def insert_queue(queues, queue_type, the_driver):
 	web_string = "Website"
 	action_string = "Action"
-	if (queue_type != "web_action_queue"):
-		if (queue_type == "web_queue"):
-			insert_print(queues, queue_type)
-			option = ""
-			while (option == ""):
-				try:
-					print
-					option = int(raw_input("Enter the position to insert: "))
-				except:
-					option = ""
-					print
-					print("Not a number.")
-					insert_print(queues, queue_type)
-					continue
-				if (option <= len(queues.web_queue) + 1 and option > 0):
-					print
-					web_name = raw_input("Enter the website name: ")
-					queues.web_queue.insert(int(option - 1), web_name)
-				else:
-					option = ""
-					print
-					print("Invalid number.")
-					insert_print(queues, queue_type)
-					continue
-                elif (queue_type == "action_queue"):
-                        insert_print(queues, queue_type)
-                        option = ""
-			while (option == ""):
-				try:
-					print
-					option = int(raw_input("Enter the position to insert: "))
-				except:
-					option = ""
-					print
-					print("Not a number.")
-					insert_print(queues, queue_type)
-					continue
-				if (option <= len(queues.action_queue) + 1 and option > 0):
-					print
-					add_action_menu(queues, the_driver, option - 1, -1, False)
-				else:
-					option = ""
-					print
-					print("Invalid number.")
-					insert_print(queues, queue_type)
-					continue
+        if (queue_type == "web_queue"):
+                insert_print(queues, queue_type)
+                option = ""
+                while (option == ""):
+                        try:
+                                print
+                                option = int(raw_input("Enter the position to insert: "))
+                        except:
+                                option = ""
+                                print
+                                print("Not a number.")
+                                insert_print(queues, queue_type)
+                                continue
+                        if (option <= len(queues.web_queue) + 1 and option > 0):
+                                print
+                                web_name = raw_input("Enter the website name: ")
+                                queues.web_queue.insert(int(option - 1), web_name)
+                        else:
+                                option = ""
+                                print
+                                print("Invalid number.")
+                                insert_print(queues, queue_type)
+                                continue
+        elif (queue_type == "action_queue"):
+                insert_print(queues, queue_type)
+                option = ""
+                while (option == ""):
+                        try:
+                                print
+                                option = int(raw_input("Enter the position to insert: "))
+                        except:
+                                option = ""
+                                print
+                                print("Not a number.")
+                                insert_print(queues, queue_type)
+                                continue
+                        if (option <= len(queues.action_queue) + 1 and option > 0):
+                                print
+                                add_action_menu(queues, the_driver, option - 1, -1, False)
+                        else:
+                                option = ""
+                                print
+                                print("Invalid number.")
+                                insert_print(queues, queue_type)
+                                continue
+        elif (queue_type == "web_action_queue"):
+                insert_print(queues, queue_type)
 
 def insert_queue_menu(queues, the_driver):
 	option = ""
