@@ -209,7 +209,7 @@ def main(the_driver, pull_urls_config):
 
     # Remove anything that does not look like an actual URL
     for current_url in urls:
-        if (current_url.find("http://") == -1 and current_url.find("https://") == -1):
+        if (current_url.find("http://") == -1 and current_url.find("https://") == -1 and current_url.find("www.") == -1):
             if (current_url.find(".com") == -1 and current_url.find(".org") == -1 and current_url.find(".edu") == -1 and current_url.find(".gov") == -1 and current_url.find(".net") == -1 and current_url.find(".html") == -1):
                 if (current_url.find("/") != 0):
                     urls = remove_values_from_list(urls, current_url)
@@ -220,6 +220,8 @@ def main(the_driver, pull_urls_config):
     if (pull_urls_config.remove_absolute == True):
         for current_url in urls:
             if (current_url.find("/") == 0):
+                urls = remove_values_from_list(urls, current_url)
+            elif (current_url.find("http://") == -1 and current_url.find("https://") == -1 and current_url.find("www.") == -1 and current_url.find("file://") == -1):
                 urls = remove_values_from_list(urls, current_url)
     else:
         if (url.find(".com") != -1):
@@ -238,6 +240,10 @@ def main(the_driver, pull_urls_config):
         for index in range(len(urls)):
             if (urls[index].find("/") == 0):
                 urls[index] = new_url + urls[index]
+            elif (urls[index].find("http://") == -1 and urls[index].find("https://") == -1 and urls [index].find("www.") == -1 and urls[index].find("file://") == -1):
+                if (re.findall(r'(.*?)/[\w+|-]+\.\w+$', url)):
+                    new_url = re.findall(r'(.*?)/[\w+|-]+\.\w+$', url)[0]
+                    urls[index] = new_url + "/" + urls[index]
 
     if (pull_urls_config.remove_current_page == True):
         urls = remove_values_from_list(urls, "#")
