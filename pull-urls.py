@@ -9,9 +9,10 @@ class web_driver:
         self.driver_path = driver_path
 
 class options:
-    def __init__(self, remove_absolute, remove_current_page):
+    def __init__(self, remove_absolute, remove_current_page, remove_duplicates):
         self.remove_absolute = remove_absolute
         self.remove_current_page = remove_current_page
+        self.remove_duplicates = remove_duplicates
 
 def initialization():
     config = ConfigParser.ConfigParser()
@@ -56,11 +57,16 @@ def initialization():
     driver_option_path = "driver_path"
     pull_urls_option_absolute = "remove_absolute"
     pull_urls_option_current_page = "remove_current_page"
+    pull_urls_option_duplicates = "remove_duplicates"
     found_driver_type = False
     found_correct_driver_type = False
     found_driver_path = False
     found_pull_urls_absolute = False
     found_pull_urls_current_page = False
+    found_pull_urls_duplicates = False
+    pull_urls_remove_absolute = False
+    pull_urls_remove_current_page = False
+    pull_urls_remove_duplicates = False
 
     for option in config.options(driver_section):
         if (option == driver_option_type):
@@ -96,31 +102,41 @@ def initialization():
             found_pull_urls_absolute = True
             if (config.get(pull_urls_section, pull_urls_option_absolute) == "true"):
                 pull_urls_remove_absolute = True
-            else:
-                pull_urls_remove_absolute = False
 
         if (option == pull_urls_option_current_page):
             found_pull_urls_current_page = True
             if (config.get(pull_urls_section, pull_urls_option_current_page) == "true"):
                 pull_urls_remove_current_page = True
-            else:
-                pull_urls_remove_current_page = False
+
+        if (option == pull_urls_option_duplicates):
+            found_pull_urls_duplicates = True
+            if (config.get(pull_urls_section, pull_urls_option_duplicates) == "true"):
+                pull_urls_remove_duplicates = True
 
     if (found_pull_urls_absolute == False):
         print
         print("Could not find the \"" + pull_urls_option_absolute + "\" option.")
         print("Make sure \"" + pull_urls_option_absolute + "\" is included under the \"[" + pull_urls_section + "]\" section.")
+        complete_config = False
+        
     if (found_pull_urls_current_page == False):
         print
         print("Could not find the \"" + pull_urls_option_current_page + "\" option.")
         print("Make sure \"" + pull_urls_option_current_page + "\" is included under the \"[" + pull_urls_section + "]\" section.")
+        complete_config = False
+        
+    if (found_pull_urls_duplicates == False):
+        print
+        print("Could not find the \"" + pull_urls_option_duplicates + "\" option.")
+        print("Make sure \"" + pull_urls_option_duplicates + "\" is included under the \"[" + pull_urls_section + "]\" section.")
+        complete_config = False
 
     if (complete_config == False):
         print
         quit()
     else:
         the_driver = web_driver(driver_type, driver_path)
-        pull_urls_config = options(pull_urls_remove_absolute, pull_urls_remove_current_page)
+        pull_urls_config = options(pull_urls_remove_absolute, pull_urls_remove_current_page, pull_urls_remove_duplicates)
 
     main(the_driver, pull_urls_config)
 
@@ -270,6 +286,9 @@ def main(the_driver, pull_urls_config):
         urls = remove_values_from_list(urls, "\\")
         urls = remove_values_from_list(urls, url)
 
+    if (pull_urls_config.remove_duplicates == True):
+        urls = list(OrderedDict.fromkeys(urls))
+    
     select_urls(urls)
 
 initialization()
