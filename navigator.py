@@ -209,6 +209,17 @@ def insert_print(queues, queue_type):
 				last_index = index + 2
 			print
 			print("Website[" + str(last_index) + "]: ")
+        elif (queue_type == "action_queue"):
+                if (len(queues.web_queue) == 0):
+			print
+			print("Action[1]: ")
+		else:
+			for index in range(len(queues.web_queue)):
+				print
+				print("Action[" + str(index + 1) + "]: " + queues.web_queue[index])
+				last_index = index + 2
+			print
+			print("Action[" + str(last_index) + "]: ")
 
 def insert_queue(queues, queue_type, the_driver):
 	web_string = "Website"
@@ -231,6 +242,28 @@ def insert_queue(queues, queue_type, the_driver):
 					print
 					web_name = raw_input("Enter the website name: ")
 					queues.web_queue.insert(int(option - 1), web_name)
+				else:
+					option = ""
+					print
+					print("Invalid number.")
+					insert_print(queues, queue_type)
+					continue
+                elif (queue_type == "action_queue"):
+                        insert_print(queues, queue_type)
+                        option = ""
+			while (option == ""):
+				try:
+					print
+					option = int(raw_input("Enter the position to insert: "))
+				except:
+					option = ""
+					print
+					print("Not a number.")
+					insert_print(queues, queue_type)
+					continue
+				if (option <= len(queues.web_queue) + 1 and option > 0):
+					print
+					add_action_menu(queues, the_driver, option, -1, False)
 				else:
 					option = ""
 					print
@@ -420,7 +453,7 @@ def clear_queue(queues, queue_type):
 		queues.web_action_queue = [[]]
 		print("The website-action queue has been cleared.")
 
-def run_web_action_queue(web_action_queue, the_driver):
+def run_web_action_queue(queues, web_action_queue, the_driver):
 	xpath = ""
 	key = -1
 	if (web_action_queue == [[]]):
@@ -428,9 +461,31 @@ def run_web_action_queue(web_action_queue, the_driver):
 		print("The website-action queue is empty.")
 		return
 	if (the_driver.driver_type == "chrome"):
-		driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+                try:
+		        driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+                except:
+                        print
+                        print("Could not open the chromedriver")
+                        print("Check that the driver type and driver path is correct in config.ini")
+                        print("These are the current driver settings:")
+                        print
+                        print("driver_type = " + the_driver.driver_type)
+                        print("driver_path = " + the_driver.driver_path)
+                        print
+                        menu(queues, the_driver)
         elif (the_driver.driver_type == "firefox"):
-                driver = webdriver.Firefox(executable_path=the_driver.driver_path)
+                try:
+                        driver = webdriver.Firefox(executable_path=the_driver.driver_path)
+                except:
+                        print
+                        print("Could not open the geckodriver")
+                        print("Check that the driver type and driver path is correct in config.ini")
+                        print("These are the current driver settings:")
+                        print
+                        print("driver_type = " + the_driver.driver_type)
+                        print("driver_path = " + the_driver.driver_path)
+                        print
+                        menu(queues, the_driver)
 	web_check = True
 	for index in range(len(web_action_queue)):
 		first_time_connect = True
@@ -655,7 +710,7 @@ def menu(queues, the_driver):
 			clear_queue_menu(queues, the_driver)
 			menu(queues, the_driver)
 		elif (option == 10):
-			run_web_action_queue(queues.web_action_queue, the_driver)
+			run_web_action_queue(queues, queues.web_action_queue, the_driver)
 			menu(queues, the_driver)
 		elif (option == 11):
 			print

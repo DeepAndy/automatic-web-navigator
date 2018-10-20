@@ -229,11 +229,35 @@ def main(the_driver, pull_urls_config):
     if (the_driver.driver_type == "chrome"):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = chrome_options)
+        
+        try:
+            driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = chrome_options)
+        except:
+            print
+            print("Could not open the chromedriver")
+            print("Check that the driver type and driver path is correct in config.ini")
+            print("These are the current driver settings:")
+            print
+            print("driver_type = " + the_driver.driver_type)
+            print("driver_path = " + the_driver.driver_path)
+            print
+            quit()
+            
     elif (the_driver.driver_type == "firefox"):
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless")
-        driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_options = firefox_options)
+        try:
+            driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_options = firefox_options)
+        except:
+            print
+            print("Could not open the geckodriver")
+            print("Check that the driver type and driver path is correct in config.ini")
+            print("These are the current driver settings:")
+            print
+            print("driver_type = " + the_driver.driver_type)
+            print("driver_path = " + the_driver.driver_path)
+            print
+            quit()
     
     print
     url = raw_input("Enter page to parse: ")
