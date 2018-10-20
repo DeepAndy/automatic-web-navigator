@@ -1,6 +1,7 @@
 import re
 import ConfigParser
 from selenium import webdriver
+from collections import OrderedDict
 
 class web_driver:
     def __init__(self, driver_type, driver_path):
@@ -128,20 +129,34 @@ def select_urls(urls):
     upper = 0
     exists = False
     print
-    
+
     for index in range(len(urls)):
         url = urls[index]
         print("Website[" + str(index + 1) + "]: " + url)
 
-    print
-    url_input = raw_input("Enter individual sites to add or specify a range: ")
-    url_list = re.split(r' ', url_input)
-    
-    if (len(url_list) == 1 and url_list[0].find("-") != -1):
-        lower = int(re.findall(r'(\d+)-', url_list[0])[0])
-        upper = int(re.findall(r'-(\d+)', url_list[0])[0])
+    complete = False
+
+    while (complete == False):
+        print
+        url_input = raw_input("Enter individual sites to add or specify a range: ")
+        input_list = re.split(r' ', url_input)
+        url_list = []
+
+        for input_url in input_list:
+            if (re.findall(r'\d+-\d+', input_url)):
+                url_list.append(input_url)
+            else:
+                try:
+                    url_list.append(int(input_url))
+                except:
+                    print
+                    print("Incorrect input.")
+                    continue
+
+        complete = True
 
     option = ""
+    
     while (option == ""):
         print
         output_file = raw_input("Enter a file name to write to: ")
@@ -176,13 +191,17 @@ def select_urls(urls):
             else:
                 quit()
 
-    if (lower == 0 and upper == 0):
-        for index in url_list:
-            f.write(urls[int(index) - 1] + "\n")
-    else:
-        for index in range(lower - 1, upper):
-            f.write(urls[index] + "\n")
+    for url in url_list:
+        if (isinstance(url, int)):
+            f.write(urls[url - 1] + "\n")
+        else:
+            numbers = re.split(r'-', url)
+            lower = int(numbers[0])
+            upper = int(numbers[1])
 
+            for index in range(lower - 1, upper):
+                f.write(urls[index] + "\n")
+                
     print
     print("Wrote output to \"" + output_file + "\"")
     print
