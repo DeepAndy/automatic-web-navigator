@@ -200,7 +200,7 @@ def apply_action_queue_all(queues):
 	print("Applied action queue to website queue.")
 	return queues.web_action_queue
 
-def insert_print(queues, queue_type):
+def edit_print(queues, queue_type):
         last_index_web = 0
         last_index_action = 0
         
@@ -241,34 +241,40 @@ def insert_print(queues, queue_type):
                         print
                         print("Website[" + str(last_index_web) + "]: ")
 
-def insert_queue(queues, queue_type, the_driver):
+def edit_queue(queues, queue_type, edit_type, the_driver):
 	web_string = "Website"
 	action_string = "Action"
         if (queue_type == "web_queue"):
-                insert_print(queues, queue_type)
+                edit_print(queues, queue_type)
                 option = ""
                 while (option == ""):
                         try:
                                 print
-                                option = int(raw_input("Enter the position to insert: "))
+                                if (edit_type == "insert"):
+                                        option = int(raw_input("Enter the position to insert: "))
+                                elif (edit_type == "remove"):
+                                        option = int(raw_input("Enter the position to remove: "))
                         except:
                                 option = ""
                                 print
                                 print("Not a number.")
-                                insert_print(queues, queue_type)
+                                edit_print(queues, queue_type)
                                 continue
                         if (option <= len(queues.web_queue) + 1 and option > 0):
                                 print
-                                web_name = raw_input("Enter the website name: ")
-                                queues.web_queue.insert(int(option - 1), web_name)
+                                if (edit_type == "insert"):
+                                        web_name = raw_input("Enter the website name: ")
+                                        queues.web_queue.insert(int(option - 1), web_name)
+                                elif (edit_type == "remove"):
+                                        del queues.web_queue[option - 1]
                         else:
                                 option = ""
                                 print
                                 print("Invalid number.")
-                                insert_print(queues, queue_type)
+                                edit_print(queues, queue_type)
                                 continue
         elif (queue_type == "action_queue"):
-                insert_print(queues, queue_type)
+                edit_print(queues, queue_type)
                 option = ""
                 while (option == ""):
                         try:
@@ -278,7 +284,7 @@ def insert_queue(queues, queue_type, the_driver):
                                 option = ""
                                 print
                                 print("Not a number.")
-                                insert_print(queues, queue_type)
+                                edit_print(queues, queue_type)
                                 continue
                         if (option <= len(queues.action_queue) + 1 and option > 0):
                                 print
@@ -287,7 +293,7 @@ def insert_queue(queues, queue_type, the_driver):
                                 option = ""
                                 print
                                 print("Invalid number.")
-                                insert_print(queues, queue_type)
+                                edit_print(queues, queue_type)
                                 continue
         elif (queue_type == "web_action_queue"):
                 # Error checking
@@ -295,7 +301,7 @@ def insert_queue(queues, queue_type, the_driver):
                 while (option == ""):
                         arg1 = -1
                         arg2 = -1
-                        insert_print(queues, queue_type)
+                        edit_print(queues, queue_type)
                         print
                         option = raw_input("Enter the position to insert: ")
                         options = re.split(r' ', option)
@@ -362,35 +368,44 @@ def insert_queue(queues, queue_type, the_driver):
                         add_action_menu(queues, the_driver, arg1 - 1, arg2, True)
                         
                 
-def insert_queue_menu(queues, the_driver):
+def edit_queue_menu(queues, the_driver, edit_type):
 	option = ""
 	while (option == ""):
-		print
-		print("----------------------------------------------------")
-		print("1. Insert into website queue")
-		print("2. Insert into action queue")
-		print("3. Insert into website-action queue")
-		print("4. Back")
-		print("----------------------------------------------------")
+                if (edit_type == "insert"):
+		        print
+                        print("----------------------------------------------------")
+                        print("1. Insert into website queue")
+                        print("2. Insert into action queue")
+                        print("3. Insert into website-action queue")
+                        print("4. Back")
+                        print("----------------------------------------------------")
+                elif (edit_type == "remove"):
+                        print
+                        print("----------------------------------------------------")
+                        print("1. Remove from website queue")
+                        print("2. Remove from action queue")
+                        print("3. Remove from website-action queue")
+                        print("4. Back")
+                        print("----------------------------------------------------")
 		try:
 			print
 			option = int(raw_input("Select an option: "))
 		except:
 			print
 			print("Not a number.")
-			insert_queue_menu(queues, the_driver)
+			edit_queue_menu(queues, the_driver)
 		if (option == 1):
-			insert_queue(queues, "web_queue", the_driver)
+			edit_queue(queues, "web_queue", edit_type, the_driver)
 		elif (option == 2):
-			insert_queue(queues, "action_queue", the_driver)
+			edit_queue(queues, "action_queue", edit_type, the_driver)
 		elif (option == 3):
-			insert_queue(queues, "web_action_queue", the_driver)
+			edit_queue(queues, "web_action_queue", edit_type, the_driver)
 		elif (option == 4):
 			menu(queues, the_driver)
 		else:
 			print
 			print("Invalid number.")
-			insert_queue_menu(queues, the_driver)
+			edit_queue_menu(queues, the_driver)
 
 def write_queue(queue_name, queues, queue_type):
 	f = open(queue_name, "w")
@@ -761,7 +776,7 @@ def menu(queues, the_driver):
 		print("2. Add action to action queue")
 		print("3. Apply action queue to all sites in website queue")
 		print("4. Insert into a queue")
-		print("5. Remove from a queue (NOT IMPLEMENTED)")
+		print("5. Remove from a queue") 
 		print("6. Save a queue")
 		print("7. Load a queue")
 		print("8. Print a queue")
@@ -786,8 +801,11 @@ def menu(queues, the_driver):
 			queues.web_action_queue = apply_action_queue_all(queues)
 			menu(queues, the_driver)
 		elif (option == 4):
-			insert_queue_menu(queues, the_driver)
+			edit_queue_menu(queues, the_driver, "insert")
 			menu(queues, the_driver)
+                elif (option == 5):
+                        edit_queue_menu(queues, the_driver, "remove")
+                        menu(queues, the_driver)
 		elif (option == 6):
 			save_queue_menu(queues, the_driver)
 			menu(queues, the_driver)
