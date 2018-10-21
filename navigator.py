@@ -669,7 +669,6 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 					time.sleep(2)
 				elif (action.find("fill") == 0):
 					order = re.split(r'`', action)
-                                        print(order)
                                         xpath = order[len(order) - 2]
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
