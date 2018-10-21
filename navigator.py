@@ -108,12 +108,12 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
 			if (attribute_name == "q"):
 				if (pos < 0):
-					if (from_web_action == False):
-						queues.action_queue.append(action)
-					else:
-						queues.web_action_queue[pos][pos2] = action
+                                        queues.action_queue.append(action)
 				else:
-					queues.action_queue.insert(pos, action)
+                                        if (from_web_action == False):
+                                                queues.action_queue.insert(pos, action)
+					else:
+						queues.web_action_queue[pos].insert(pos2, action)
 				return queues.action_queue
 			else:
 				print
@@ -139,7 +139,10 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 		if (pos < 0):
 			queues.action_queue.append(action)
 		else:
-			queues.action_queue.insert(pos, action)
+                        if (from_web_action == False):
+			        queues.action_queue.insert(pos, action)
+                        else:
+                                queues.web_action_queue[pos].insert(pos2, action)
 		return queues.action_queue
 	elif (option == 6):
 		menu(queues, the_driver)
@@ -198,6 +201,9 @@ def apply_action_queue_all(queues):
 	return queues.web_action_queue
 
 def insert_print(queues, queue_type):
+        last_index_web = 0
+        last_index_action = 0
+        
 	if (queue_type == "web_queue"):
 		if (len(queues.web_queue) == 0):
                         print
@@ -224,8 +230,16 @@ def insert_print(queues, queue_type):
                         for index in range(len(queues.web_action_queue)):
                                 print
                                 print("Website[" + str(index + 1) + "]: " + queues.web_action_queue[index][0])
+                                last_index_web = index + 2
                                 for index2 in range(1, len(queues.web_action_queue[index])):
-                                        print("    Action[" + str(index2) + "] " + queues.web_action_queue[index][index2])
+                                        print("    Action[" + str(index2) + "]: " + queues.web_action_queue[index][index2])
+                                        last_index_action = index2 + 1
+                                if (len(queues.web_action_queue[index]) == 1):
+                                        print("    Action[1]: ")
+                                else:
+                                        print("    Action[" + str(last_index_action) + "]: ")
+                        print
+                        print("Website[" + str(last_index_web) + "]: ")
 
 def insert_queue(queues, queue_type, the_driver):
 	web_string = "Website"
@@ -276,8 +290,79 @@ def insert_queue(queues, queue_type, the_driver):
                                 insert_print(queues, queue_type)
                                 continue
         elif (queue_type == "web_action_queue"):
-                insert_print(queues, queue_type)
+                # Error checking
+                option = ""
+                while (option == ""):
+                        arg1 = -1
+                        arg2 = -1
+                        insert_print(queues, queue_type)
+                        print
+                        option = raw_input("Enter the position to insert: ")
+                        options = re.split(r' ', option)
 
+                        if (len(options) > 2):
+                                option = ""
+                                print
+                                print("Must take 1 or 2 arguments")
+                                continue
+                        try:
+                                arg1 = int(options[0])
+                        except:
+                                option = ""
+                                print
+                                print("The first argument is not a number")
+                                continue
+
+                        if (len(options) == 2):
+                                try:
+                                        arg2 = int(options[1])
+                                except:
+                                        option = ""
+                                        print
+                                        print("The second argument is not a number")
+                                        continue
+
+                        if (queues.web_action_queue == [[]]):
+                                if (arg1 > len(queues.web_action_queue) or arg1 < 1):
+                                        option = ""
+                                        print
+                                        print("Invalid website position")
+                                        continue
+                        else:
+                                if (arg1 > (len(queues.web_action_queue) + 1) or arg1 < 1):
+                                        option = ""
+                                        print
+                                        print("Invalid website position")
+                                        continue
+                                
+                        if (arg2 != -1):
+                                try:
+                                        queues.web_action_queue[arg1 - 1]
+                                except:
+                                        option = ""
+                                        print
+                                        print("Invalid action position")
+                                        continue
+                                
+                                if (arg2 > len(queues.web_action_queue[arg1 - 1]) or arg1 < 1):
+                                        option = ""
+                                        print
+                                        print("Invalid action position")
+                                        continue
+                if (arg2 == -1):
+                        print
+                        web_name = raw_input("Enter the website name: ")
+                        
+                        if (queues.web_action_queue == [[]]):
+                                queues.web_action_queue[arg1 - 1].insert(0, web_name)
+                        else:
+                                queues.web_action_queue.insert(arg1 - 1, [web_name])
+                                
+                        print(queues.web_action_queue)
+                else:
+                        add_action_menu(queues, the_driver, arg1 - 1, arg2, True)
+                        
+                
 def insert_queue_menu(queues, the_driver):
 	option = ""
 	while (option == ""):
@@ -676,7 +761,7 @@ def menu(queues, the_driver):
 		print("1. Add site to website queue")
 		print("2. Add action to action queue")
 		print("3. Apply action queue to all sites in website queue")
-		print("4. Insert into a queue (NOT FULLY IMPLEMENTED)")
+		print("4. Insert into a queue")
 		print("5. Remove from a queue (NOT IMPLEMENTED)")
 		print("6. Save a queue")
 		print("7. Load a queue")
