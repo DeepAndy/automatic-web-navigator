@@ -102,39 +102,20 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 		return queues.action_queue
 	elif (option == 2):
 		print
-		element_name = raw_input("Enter element name: ")
-		action = "click`" + element_name
-		attribute_name = ""
-		while (attribute_name != "q"):
-			print
-			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
-			if (attribute_name == "q"):
-				if (pos < 0):
-                                        queues.action_queue.append(action)
-				else:
-                                        if (from_web_action == False):
-                                                queues.action_queue.insert(pos, action)
-					else:
-						queues.web_action_queue[pos].insert(pos2, action)
-				return queues.action_queue
-			else:
-				print
-				attribute_value = raw_input("Enter the attribute value: ")
-				action += "`" + attribute_name + "`" + attribute_value
+		xpath = raw_input("Enter xpath of element: ")
+		action = "click`" + xpath
+                if (pos < 0):
+                        queues.action_queue.append(action)
+                else:
+                        if (from_web_action == False):
+                                queues.action_queue.insert(pos, action)
+                        else:
+                                queues.web_action_queue[pos].insert(pos2, action)
+                return queues.action_queue
 	elif (option == 3):
 		print
-		element_name = raw_input("Enter element name: ")
-		action = "fill`" + element_name
-		attribute_name = ""
-		while (attribute_name != "q"):
-			print
-			attribute_name = raw_input("Enter an attribute name (Type 'q' to stop entering attributes): ")
-			if (attribute_name == "q"):
-				break
-			else:
-				print
-				attribute_value = raw_input("Enter the attribute value: ")
-				action += "`" + attribute_name + "`" + attribute_value
+		xpath = raw_input("Enter xpath of element: ")
+		action = "fill`" + xpath
 		print
 		fill = raw_input("Enter your input: ")
 		action += "`" + fill
@@ -633,7 +614,6 @@ def clear_queue(queues, queue_type):
 		print("The website-action queue has been cleared.")
 
 def run_web_action_queue(queues, web_action_queue, the_driver):
-	xpath = ""
 	key = -1
 	if (web_action_queue == [[]]):
 		print
@@ -679,37 +659,24 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 					time.sleep(2)
 				elif (action.find("click") == 0):
 					order = re.split(r'`', action)
-					xpath += "//" + order[1]
-					for index2 in range(2, len(order)):
-						if (index2 % 2 == 0):
-							xpath += "[@" + order[index2]
-						else:
-							xpath += "='" + order[index2] + "']"
-
+					xpath = order[len(order) - 1]
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
 						time.sleep(2)
 						key = index
 						first_time_connect = False
 					driver.find_element_by_xpath(xpath).click()
-					xpath = ""
 					time.sleep(2)
 				elif (action.find("fill") == 0):
 					order = re.split(r'`', action)
-					xpath += "//" + order[1]
-					for index2 in range(2, len(order) - 1):
-						if (index2 % 2 == 0):
-							xpath += "[@" + order[index2]
-						else:
-							xpath += "='" + order[index2] + "']"
+                                        print(order)
+                                        xpath = order[len(order) - 2]
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
 						time.sleep(2)
 						key = index
 						first_time_connect = False
-					index2 += 1
-					driver.find_element_by_xpath(xpath).send_keys(order[index2])
-					xpath = ""
+					driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
 					time.sleep(2)
 			else:
 				web_check = False

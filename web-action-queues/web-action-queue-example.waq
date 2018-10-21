@@ -1,11 +1,11 @@
 file:///Users/am058613/Documents/awn/example-files/example1.html
-fill`input`type`text`Testing
-click`button
+fill`/html/body/input[3]`Testing
+click`/html/body/a/button
 
 file:///Users/am058613/Documents/awn/example-files/example2.html
-fill`input`type`text`Testing
-click`button
+fill`/html/body/input[3]`Testing
+click`/html/body/a/button
 
 file:///Users/am058613/Documents/awn/example-files/example3.html
-fill`input`type`text`Testing
-click`button
+fill`/html/body/input[3]`Testing
+click`/html/body/a/button

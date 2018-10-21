@@ -1,2 +1,2 @@
-fill`input`type`text`Testing
-click`button
+fill`/html/body/input[3]`Testing
+click`/html/body/a/button
