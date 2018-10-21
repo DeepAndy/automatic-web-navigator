@@ -176,7 +176,7 @@ def select_urls(urls):
     while (option == ""):
         print
         output_file = raw_input("Enter a file name to write to: ")
-        output_file += ".wq"
+        output_file = "web-queues/" + output_file + ".wq"
     
         try:
             open(output_file)
