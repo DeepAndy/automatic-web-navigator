@@ -358,7 +358,6 @@ def insert_queue(queues, queue_type, the_driver):
                         else:
                                 queues.web_action_queue.insert(arg1 - 1, [web_name])
                                 
-                        print(queues.web_action_queue)
                 else:
                         add_action_menu(queues, the_driver, arg1 - 1, arg2, True)
                         
