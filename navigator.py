@@ -5,6 +5,8 @@ from selenium import webdriver
 import time
 import re
 import ConfigParser
+import os
+import sys
 
 class queue:
 	def __init__(self, web_queue, action_queue, web_action_queue):
@@ -488,19 +490,19 @@ def save_queue(queues, queue_type):
 	print
 	queue_name = raw_input("Enter name of the queue: ")
 	if (queue_type == "web_queue"):
-		queue_name += ".wq"
+		queue_name = "web-queues/" + queue_name + ".wq"
 		if (len(queues.web_queue) == 0):
 			print
 			print("The website queue is empty.")
 			return
 	elif (queue_type == "action_queue"):
-		queue_name += ".aq"
+		queue_name = "action-queues/" + queue_name + ".aq"
 		if (len(queues.action_queue) == 0):
 			print
 			print("The action queue is empty.")
 			return
 	elif (queue_type == "web_action_queue"):
-		queue_name += ".waq"
+		queue_name = "web-action-queues/" + queue_name + ".waq"
 		if (queues.web_action_queue == [[]]):
 			print
 			print("The website-action queue is empty.")
@@ -526,13 +528,34 @@ def load_queue(queues, queue_type):
 	exists = True
 	answer = ""
 	print
+        
+        if (queue_type == "web_queue"):
+                path = "web-queues/"
+                print("Website Queues:")
+        elif (queue_type == "action_queue"):
+                path = "action-queues/"
+                print("Action Queues:")
+        elif (queue_type == "web_action_queue"):
+                path = "web-action-queues/"
+                print("Website-Action Queues:")
+                
+        dirs = os.listdir(path)
+        for file in dirs:
+                if (queue_type == "web_queue"):
+                        print(str(file.split(".wq")[0]))
+                elif (queue_type == "action_queue"):
+                        print(str(file.split(".aq")[0]))
+                elif (queue_type == "web_action_queue"):
+                        print(str(file.split(".waq")[0]))
+                        
+        print
 	queue_name = raw_input("Enter name of the queue file: ")
 	if (queue_type == "web_queue"):
-		queue_name += ".wq"
+		queue_name = "web-queues/" + queue_name + ".wq"
 	elif (queue_type == "action_queue"):
-		queue_name += ".aq"
+		queue_name = "action-queues/" + queue_name + ".aq"
 	elif (queue_type == "web_action_queue"):
-		queue_name += ".waq"
+		queue_name = "web-action-queues/" + queue_name + ".waq"
 	try:
 		open(queue_name)
 		exists = True
