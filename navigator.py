@@ -7,6 +7,7 @@ import re
 import ConfigParser
 import os
 import sys
+import importlib
 
 class queue:
 	def __init__(self, web_queue, action_queue, web_action_queue):
@@ -127,7 +128,34 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                         else:
                                 queues.web_action_queue[pos].insert(pos2, action)
 		return queues.action_queue
-	elif (option == 6):
+        elif (option == 4):
+                print
+                dirs = os.listdir(".")
+                for file in dirs:
+                        if (re.findall(r'[^\.].*?(\.py)$', str(file))):
+                                print(str(file.split(".py")[0]))
+                print
+                exists = False
+                while (exists == False):
+                        script = raw_input("Enter name of the Python script: ")
+                        script_file = script + ".py"
+                        try:
+                                f = open(script_file)
+                                exists = True
+                        except:
+                                exists = False
+                                print
+                                print("Could not find the script")
+                action = "script`" + script
+                if (pos < 0):
+			queues.action_queue.append(action)
+		else:
+                        if (from_web_action == False):
+			        queues.action_queue.insert(pos, action)
+                        else:
+                                queues.web_action_queue[pos].insert(pos2, action)
+                return queues.action_queue
+	elif (option == 5):
 		menu(queues, the_driver)
 	else:
 		print
@@ -144,9 +172,8 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
 		print("1. Connect to page in new tab")
 		print("2. Click an element")
 		print("3. Fill out a form")
-		print("4. Add Python 2 script (NOT IMPLEMENTED)")
-		print("5. Add Python 3 script (NOT IMPLEMENTED)")
-		print("6. Back to menu")
+		print("4. Add Python script")
+		print("5. Back to menu")
 		print("----------------------------------------------------")
 		try:
 			print
@@ -677,6 +704,11 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 						first_time_connect = False
 					driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
 					time.sleep(2)
+                                elif (action.find("script") == 0):
+                                        order = re.split(r'`', action)
+                                        import_module = order[len(order) - 1]
+                                        func = importlib.import_module(import_module).__getattribute__("script_main")
+                                        func(the_driver.driver_type, the_driver.driver_path, web_action_queue[index][0])
 			else:
 				web_check = False
 		web_check = True
