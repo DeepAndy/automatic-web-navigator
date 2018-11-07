@@ -4,9 +4,12 @@ import HTMLParser
 import StringIO
 import re
 from fix_html import *
+import getpass
+import time
 
 def script_main(driver):
-        source = driver.page_source
+        source = driver.page_source.encode("ascii", "ignore")
+
         source = source.replace("&nbsp;", "")
 
         soup = BeautifulSoup(source, features="html.parser")
@@ -34,4 +37,29 @@ def script_main(driver):
         for line in lines:
                 output += line + "\n"
 
-        print(output)
+	cofa_main_page = "https://webcms.ohio.edu/fine-arts/admin/content"
+	cas_username_xpath = "//*[@id='username']"
+	cas_password_xpath = "//*[@id='password']"
+	cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
+	add_content_xpath = "//*[@id='block-seven-local-actions']/ul/li/a"
+	basic_page_xpath = "//*[@id='block-seven-content']/ul/li[7]/a"
+	body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML = "' + output + '"'
+
+	driver.get(cofa_main_page)
+
+	if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
+		username = raw_input("Enter OHIO username: ")
+		password = getpass.getpass("Enter OHIO password: ")
+
+		element = driver.find_element_by_xpath(cas_username_xpath)
+		element.send_keys(username)
+		element = driver.find_element_by_xpath(cas_password_xpath)
+		element.send_keys(password)
+		element = driver.find_element_by_xpath(cas_login_button_xpath)
+		element.click()
+
+	element = driver.find_element_by_xpath(add_content_xpath)
+	element.click()
+	element = driver.find_element_by_xpath(basic_page_xpath)
+	element.click()
+	driver.execute_script(body_textarea_script)
