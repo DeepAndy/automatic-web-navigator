@@ -7,10 +7,11 @@ from fix_html import *
 
 def script_main(driver):
         source = driver.page_source
+        source = source.replace("&nbsp;", "")
 
         soup = BeautifulSoup(source, features="html.parser")
 
-        content = soup.find_all("div", id="cofa_contentCol1")[0]
+        content = soup.find("div", id="cofa_contentCol1")
 
         for script in content.find_all("script"):
                 script.decompose()
@@ -25,11 +26,9 @@ def script_main(driver):
         content = StringIO.StringIO(content)
         content = content.readlines()
 
-        for index in range(len(content)):
-                content[index] = content[index].replace("\n", "")
-
         lines, errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
         fix_all(lines, errors)
+        
         output = ""
 
         for line in lines:
