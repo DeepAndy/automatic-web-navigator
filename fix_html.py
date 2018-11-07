@@ -133,7 +133,7 @@ def find_errors(lines):
                         errors.append("empty <p>")
 			print_friendly_errors.append("ERROR, Line " + str(i + 1) + ": empty <p> tag found")
 			error_line_string.append(lines[i])
-		if (re.findall(r'<[^/>]+>[ \n\r\t]*</[^>]+>', lines[i])):
+		elif (re.findall(r'<[^/>]+>[ \n\r\t]*</[^>]+>', lines[i])):
 			warnings.append("empty")
 			print_friendly_errors.append("WARNING, Line " + str(i + 1) + ": empty tag found")
 			error_line_string.append(lines[i])
@@ -282,7 +282,6 @@ def fix_all(lines, errors):
 		lines[i] = re.sub(r'</div>', "", lines[i])
 		lines[i] = re.sub(r'<h\d>&nbsp;</h\d>', "", lines[i])
 		lines[i] = re.sub(r'<p>&nbsp;</p>', "", lines[i])
-		lines[i] = re.sub(r'<p>\s*</p>', "", lines[i])
 		lines[i] = re.sub(r'&nbsp;', "", lines[i])
 		lines[i] = re.sub(r'<span.*?>', "", lines[i])
 		lines[i] = re.sub(r'</span>', "", lines[i])
