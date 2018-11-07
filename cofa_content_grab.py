@@ -1,31 +1,14 @@
 from selenium import webdriver
-import BeautifulSoup
 from bs4 import BeautifulSoup
 import HTMLParser
 import StringIO
 import re
 from fix_html import *
 
-def script_main(driver_type, driver_path, url):
-        if (driver_type == "chrome"):
-                chrome_options = webdriver.ChromeOptions()
-                chrome_options.add_argument("--headless")
-                driver = webdriver.Chrome(executable_path=driver_path)
-                driver.get(url)
-        elif (driver_type == "firefox"):
-                firefox_options = webdriver.FirefoxOptions()
-                firefox_options.add_argument("--headless")
-                driver = webdriver.Firefox(executable_path=driver_path)
-                driver.get(url)
-        else:
-                print
-                print("Failed to load webdriver")
-                return
-
+def script_main(driver):
         source = driver.page_source
 
         soup = BeautifulSoup(source, features="html.parser")
-        #print(soup.prettify())
 
         content = soup.find_all("div", id="cofa_contentCol1")[0]
 
@@ -47,8 +30,9 @@ def script_main(driver_type, driver_path, url):
 
         lines, errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
         fix_all(lines, errors)
+        output = ""
 
         for line in lines:
-                print(line)
+                output += line + "\n"
 
-        driver.close()
+        print(output)

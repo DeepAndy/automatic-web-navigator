@@ -708,7 +708,8 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                                         order = re.split(r'`', action)
                                         import_module = order[len(order) - 1]
                                         func = importlib.import_module(import_module).__getattribute__("script_main")
-                                        func(the_driver.driver_type, the_driver.driver_path, web_action_queue[index][0])
+                                        driver.get(web_action_queue[index][0])
+                                        func(driver)
 			else:
 				web_check = False
 		web_check = True
