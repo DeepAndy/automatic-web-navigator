@@ -8,13 +8,18 @@ import getpass
 import time
 
 def script_main(driver):
+        f = open("failed_cofa_grab.txt", "a+")
+        
 	source = driver.page_source.encode("ascii", "ignore")
 
 	source = source.replace("&nbsp;", "")
 
    	soup = BeautifulSoup(source, features="html.parser")
 
-   	content = soup.find("div", id="cofa_contentCol1")
+        try:
+   	        content = soup.find("div", id="cofa_contentCol1")
+        except:
+                f.write(driver.current_url + "\n")
 
    	for script in content.find_all("script"):
    		script.decompose()
@@ -49,6 +54,7 @@ def script_main(driver):
 	body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
 	save_xpath = "//*[@id='edit-submit']"
 
+        '''
 	driver.get(cofa_main_page)
 
 	if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
@@ -65,3 +71,4 @@ def script_main(driver):
 	driver.get(basic_page_url)
 	time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
 	driver.execute_script(body_textarea_script)
+        '''
