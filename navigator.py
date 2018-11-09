@@ -8,6 +8,7 @@ import ConfigParser
 import os
 import sys
 import importlib
+import math
 
 class queue:
 	def __init__(self, web_queue, action_queue, web_action_queue):
@@ -642,6 +643,11 @@ def clear_queue(queues, queue_type):
 
 def run_web_action_queue(queues, web_action_queue, the_driver):
 	key = -1
+        entries = len(web_action_queue)
+        percent_complete = 0
+        entries_complete = 0
+        average_time = 0
+        times = []
 	if (web_action_queue == [[]]):
 		print
 		print("The website-action queue is empty.")
@@ -673,8 +679,28 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                         print
                         menu(queues, the_driver)
 	web_check = True
+        print
 	for index in range(len(web_action_queue)):
+                time_left = 0
+                time_left_seconds = 0
+                time_left_minutes = 0
+                time_left_hours = 0
+                if (index != 0):
+                        times.append(time.time() - start_time)
+                        if (len(times) > 30):
+                                times.pop(0)
+                        average_time = sum(times) / float(len(times))
+                        time_left = float(average_time) * (entries - entries_complete)
+                        time_left_hours_exact = float(time_left) / float(3600)
+                        time_left_hours = math.floor(float(time_left_hours_exact))
+                        time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
+                        time_left_minutes = math.floor(float(time_left_minutes_exact))
+                        time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
+                        time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
 		first_time_connect = True
+                sys.stdout.write("\r[" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+                sys.stdout.flush()
+                start_time = time.time()
 		for action in web_action_queue[index]:
 			if (web_check == False):
 				if (action == "connect"):
@@ -682,37 +708,42 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 						driver.get(web_action_queue[index][0])
 					else:
 						driver.execute_script("window.open('" + web_action_queue[index][0] + "');")
-
-					time.sleep(2)
+                                        entries_complete += 1
+                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("click") == 0):
 					order = re.split(r'`', action)
 					xpath = order[len(order) - 1]
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
-						time.sleep(2)
 						key = index
 						first_time_connect = False
 					driver.find_element_by_xpath(xpath).click()
-					time.sleep(2)
+                                        entries_complete += 1
+                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("fill") == 0):
 					order = re.split(r'`', action)
                                         xpath = order[len(order) - 2]
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
-						time.sleep(2)
 						key = index
 						first_time_connect = False
 					driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
-					time.sleep(2)
+                                        entries_complete += 1
+                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
                                 elif (action.find("script") == 0):
                                         order = re.split(r'`', action)
                                         import_module = order[len(order) - 1]
                                         func = importlib.import_module(import_module).__getattribute__("script_main")
                                         driver.get(web_action_queue[index][0])
                                         func(driver)
+                                        entries_complete += 1
+                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 			else:
 				web_check = False
 		web_check = True
+        sys.stdout.write("\r[" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+        sys.stdout.flush()
+        print
 	driver.quit()
 
 def save_queue_menu(queues, the_driver):
