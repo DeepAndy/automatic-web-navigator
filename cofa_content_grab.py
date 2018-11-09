@@ -36,7 +36,9 @@ def script_main(driver):
 
  	lines, errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
   	fix_all(lines, errors)
-        
+
+        title = soup.find_all("h1")[1].text
+
    	output = ""
 
    	for line in lines:
