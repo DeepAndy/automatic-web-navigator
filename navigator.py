@@ -679,28 +679,40 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                         print
                         menu(queues, the_driver)
 	web_check = True
+        time_left = 0
+        time_left_seconds = 0
+        time_left_minutes = 0
+        time_left_hours = 0
+        start_time = time.time()
+        elapsed_time = 0
+        elapsed_time_hours = 0
+        elapsed_time_minutes = 0
+        elapsed_time_seconds = 0
         print
 	for index in range(len(web_action_queue)):
-                time_left = 0
-                time_left_seconds = 0
-                time_left_minutes = 0
-                time_left_hours = 0
                 if (index != 0):
-                        times.append(time.time() - start_time)
+                        times.append(time.time() - cycle_start_time)
                         if (len(times) > 30):
                                 times.pop(0)
                         average_time = sum(times) / float(len(times))
                         time_left = float(average_time) * (entries - entries_complete)
+                        elapsed_time = time.time() - start_time
                         time_left_hours_exact = float(time_left) / float(3600)
+                        elapsed_time_hours_exact = float(elapsed_time) / float(3600)
                         time_left_hours = math.floor(float(time_left_hours_exact))
+                        elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
                         time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
+                        elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
                         time_left_minutes = math.floor(float(time_left_minutes_exact))
+                        elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
                         time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
+                        elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
                         time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
+                        elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
 		first_time_connect = True
-                sys.stdout.write("\r[" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+                sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
                 sys.stdout.flush()
-                start_time = time.time()
+                cycle_start_time = time.time()
 		for action in web_action_queue[index]:
 			if (web_check == False):
 				if (action == "connect"):
@@ -741,7 +753,22 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 			else:
 				web_check = False
 		web_check = True
-        sys.stdout.write("\r[" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+        average_time = sum(times) / float(len(times))
+        time_left = float(average_time) * (entries - entries_complete)
+        elapsed_time = time.time() - start_time
+        time_left_hours_exact = float(time_left) / float(3600)
+        elapsed_time_hours_exact = float(elapsed_time) / float(3600)
+        time_left_hours = math.floor(float(time_left_hours_exact))
+        elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
+        time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
+        elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
+        time_left_minutes = math.floor(float(time_left_minutes_exact))
+        elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
+        time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
+        elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
+        time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
+        elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
+        sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
         sys.stdout.flush()
         print
 	driver.quit()
