@@ -26,6 +26,7 @@ def initialization():
 	config = ConfigParser.ConfigParser()
 	config_file = "config.ini"
 	complete_config = True
+
 	try:
 		config.read(config_file)
 	except:
@@ -33,46 +34,57 @@ def initialization():
 		print("Could not find the configuration file \"" + config_file + "\" or the file has no sections")
 		print
 		quit()
+
 	found_driver_section = False
 	driver_section = "Driver"
+
 	for section in config.sections():
 		if (section == driver_section):
 			found_driver_section = True
+
 	if (found_driver_section == False):
 		print
 		print("Could not find the \"" + driver_section + "\" section.")
 		print("Make sure a \"[" + driver_section + "]\" section is included in \"" + config_file + "\".")
 		print
 		quit()
+
 	driver_option_type = "driver_type"
 	driver_option_path = "driver_path"
 	found_driver_type = False
 	found_correct_driver_type = False
 	found_driver_path = False
+
 	for option in config.options(driver_section):
 		if (option == driver_option_type):
 			found_driver_type = True
+
 			if (config.get(driver_section, driver_option_type) == "chrome" or config.get(driver_section, driver_option_type) == "firefox"):
 				found_correct_driver_type = True
 				driver_type = config.get(driver_section, driver_option_type)
+
 		if (option == driver_option_path):
 			found_driver_path = True
 			driver_path = config.get(driver_section, driver_option_path)
+
 	if (found_driver_type == False):
 		print
 		print("Could not find the \"" + driver_option_type + "\" option.")
 		print("Make sure a \"" + driver_option_type + "\" option is included under the \"[" + driver_section + "]\" section.")
 		complete_config = False
+
 	if (found_correct_driver_type == False):
 		print
 		print("The \"" + driver_option_type + "\" value is either incorrect or the option is missing.")
 		print("Make sure the value is a valid option.")
 		complete_config = False
+
 	if (found_driver_path == False):
 		print
 		print("Could not find the \"" + driver_option_path + "\" option.")
 		print("Make sure a \"" + driver_option_path + "\" option is included under the \"[" + driver_section + "]\" section.")
 		complete_config = False
+
 	if (complete_config == False):
 		print
 		quit()
@@ -82,15 +94,18 @@ def initialization():
 
 def add_web_queue(queues):
 	web_name = ""
+
 	while (web_name == ""):
 		print
 		web_name = raw_input("Enter website name: ")
+
 	queues.web_queue.append(web_name)
 	print
 	print("Added \"" + web_name + "\" to queue")
 	return queues.web_queue
 
 def add_action(queues, the_driver, option, pos, pos2, from_web_action):
+
 	if (option == 1):
 		if (pos < 0):
 			queues.action_queue.append("connect")
@@ -99,6 +114,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 				queues.action_queue.insert(pos, "connect")
 			else:
 				queues.web_action_queue[pos].insert(pos2, "connect")
+
 		print
 		print("Added \"connect\" to action queue")
 		return queues.action_queue
@@ -106,14 +122,16 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 		print
 		xpath = raw_input("Enter xpath of element: ")
 		action = "click`" + xpath
-                if (pos < 0):
-                        queues.action_queue.append(action)
-                else:
-                        if (from_web_action == False):
-                                queues.action_queue.insert(pos, action)
-                        else:
-                                queues.web_action_queue[pos].insert(pos2, action)
-                return queues.action_queue
+
+		if (pos < 0):
+				queues.action_queue.append(action)
+		else:
+				if (from_web_action == False):
+						queues.action_queue.insert(pos, action)
+				else:
+						queues.web_action_queue[pos].insert(pos2, action)
+
+		return queues.action_queue
 	elif (option == 3):
 		print
 		xpath = raw_input("Enter xpath of element: ")
@@ -121,41 +139,49 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 		print
 		fill = raw_input("Enter your input: ")
 		action += "`" + fill
+
 		if (pos < 0):
 			queues.action_queue.append(action)
 		else:
-                        if (from_web_action == False):
-			        queues.action_queue.insert(pos, action)
-                        else:
-                                queues.web_action_queue[pos].insert(pos2, action)
-		return queues.action_queue
-        elif (option == 4):
-                print
-                dirs = os.listdir(".")
-                for file in dirs:
-                        if (re.findall(r'[^\.].*?(\.py)$', str(file))):
-                                print(str(file.split(".py")[0]))
-                print
-                exists = False
-                while (exists == False):
-                        script = raw_input("Enter name of the Python script: ")
-                        script_file = script + ".py"
-                        try:
-                                f = open(script_file)
-                                exists = True
-                        except:
-                                exists = False
-                                print
-                                print("Could not find the script")
-                action = "script`" + script
-                if (pos < 0):
+			if (from_web_action == False):
+				queues.action_queue.insert(pos, action)
+			else:
+				queues.web_action_queue[pos].insert(pos2, action)
+
+			return queues.action_queue
+	elif (option == 4):
+		print
+		dirs = os.listdir(".")
+		for file in dirs:
+			if (re.findall(r'[^\.].*?(\.py)$', str(file))):
+				print(str(file.split(".py")[0]))
+
+		print
+		exists = False
+
+		while (exists == False):
+			script = raw_input("Enter name of the Python script: ")
+			script_file = script + ".py"
+
+			try:
+				open(script_file)
+				exists = True
+			except:
+				exists = False
+				print
+				print("Could not find the script")
+
+		action = "script`" + script
+
+		if (pos < 0):
 			queues.action_queue.append(action)
 		else:
-                        if (from_web_action == False):
-			        queues.action_queue.insert(pos, action)
-                        else:
-                                queues.web_action_queue[pos].insert(pos2, action)
-                return queues.action_queue
+			if (from_web_action == False):
+				queues.action_queue.insert(pos, action)
+			else:
+				queues.web_action_queue[pos].insert(pos2, action)
+
+		return queues.action_queue
 	elif (option == 5):
 		menu(queues, the_driver)
 	else:
@@ -165,6 +191,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 
 def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
 	option = ""
+
 	while (option == ""):
 		print
 		print("----------------------------------------------------")
@@ -176,6 +203,7 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
 		print("4. Add Python script")
 		print("5. Back to menu")
 		print("----------------------------------------------------")
+
 		try:
 			print
 			option = int(raw_input("Select an option: "))
@@ -201,7 +229,9 @@ def apply_action_queue_all(queues):
 		print
 		print("The action queue is empty. Can not apply any actions.")
 		return
+
 	queues.web_action_queue = []
+
 	# Create the columns for our actions
 	for index in range(len(queues.web_queue)):
 		queues.web_action_queue.append([queues.web_queue[index]])
@@ -212,227 +242,240 @@ def apply_action_queue_all(queues):
 	return queues.web_action_queue
 
 def edit_print(queues, queue_type, edit_type):
-        last_index_web = 0
-        last_index_action = 0
-        
+	last_index_web = 0
+	last_index_action = 0
+
 	if (queue_type == "web_queue"):
 		if (len(queues.web_queue) == 0):
-                        print
+			print
 			print("Website[1]: ")
 		else:
 			for index in range(len(queues.web_queue)):
 				print("Website[" + str(index + 1) + "]: " + queues.web_queue[index])
 				last_index = index + 2
-                        if (edit_type == "insert"):
-			        print("Website[" + str(last_index) + "]: ")
-        elif (queue_type == "action_queue"):
-                if (len(queues.action_queue) == 0):
+
+			if (edit_type == "insert"):
+				print("Website[" + str(last_index) + "]: ")
+	elif (queue_type == "action_queue"):
+		if (len(queues.action_queue) == 0):
 			print
 			print("Action[1]: ")
 		else:
 			for index in range(len(queues.action_queue)):
 				print("Action[" + str(index + 1) + "]: " + queues.action_queue[index])
 				last_index = index + 2
-                        if (edit_type == "insert"):
-			        print("Action[" + str(last_index) + "]: ")
-        elif (queue_type == "web_action_queue"):
-                if (queues.web_action_queue == [[]]):
-                        print
-                        print("Website[1]: ")
-                else:
-                        for index in range(len(queues.web_action_queue)):
-                                print
-                                print("Website[" + str(index + 1) + "]: " + queues.web_action_queue[index][0])
-                                last_index_web = index + 2
-                                for index2 in range(1, len(queues.web_action_queue[index])):
-                                        print("    Action[" + str(index2) + "]: " + queues.web_action_queue[index][index2])
-                                        last_index_action = index2 + 1
-                                if (len(queues.web_action_queue[index]) == 1):
-                                        print("    Action[1]: ")
-                                else:
-                                        if (edit_type == "insert"):
-                                                print("    Action[" + str(last_index_action) + "]: ")
-                        if (edit_type == "insert"):
-                                print
-                                print("Website[" + str(last_index_web) + "]: ")
+
+			if (edit_type == "insert"):
+				print("Action[" + str(last_index) + "]: ")
+	elif (queue_type == "web_action_queue"):
+		if (queues.web_action_queue == [[]]):
+			print
+			print("Website[1]: ")
+		else:
+			for index in range(len(queues.web_action_queue)):
+				print
+				print("Website[" + str(index + 1) + "]: " + queues.web_action_queue[index][0])
+				last_index_web = index + 2
+
+				for index2 in range(1, len(queues.web_action_queue[index])):
+					print("    Action[" + str(index2) + "]: " + queues.web_action_queue[index][index2])
+					last_index_action = index2 + 1
+
+				if (len(queues.web_action_queue[index]) == 1):
+					print("    Action[1]: ")
+				else:
+					if (edit_type == "insert"):
+						print("    Action[" + str(last_index_action) + "]: ")
+
+		if (edit_type == "insert"):
+			print
+			print("Website[" + str(last_index_web) + "]: ")
 
 def edit_queue(queues, queue_type, edit_type, the_driver):
-	web_string = "Website"
-	action_string = "Action"
-        if (queue_type == "web_queue"):
-                edit_print(queues, queue_type, edit_type)
-                option = ""
-                while (option == ""):
-                        try:
-                                print
-                                if (edit_type == "insert"):
-                                        option = int(raw_input("Enter the position to insert: "))
-                                elif (edit_type == "remove"):
-                                        option = int(raw_input("Enter the position to remove: "))
-                        except:
-                                option = ""
-                                print
-                                print("Not a number.")
-                                edit_print(queues, queue_type, edit_type)
-                                continue
-                        if (option <= len(queues.web_queue) + 1 and option > 0):
-                                print
-                                if (edit_type == "insert"):
-                                        web_name = raw_input("Enter the website name: ")
-                                        queues.web_queue.insert(int(option - 1), web_name)
-                                elif (edit_type == "remove"):
-                                        try:
-                                                del queues.web_queue[option - 1]
-                                        except:
-                                                option = ""
-                                                print
-                                                print("Invalid number.")
-                                                edit_print(queues, queue_type, edit_type)
-                                                continue
-                        else:
-                                option = ""
-                                print
-                                print("Invalid number.")
-                                edit_print(queues, queue_type, edit_type)
-                                continue
-        elif (queue_type == "action_queue"):
-                edit_print(queues, queue_type, edit_type)
-                option = ""
-                while (option == ""):
-                        try:
-                                print
-                                if (edit_type == "insert"):
-                                        option = int(raw_input("Enter the position to insert: "))
-                                elif (edit_type == "remove"):
-                                        option = int(raw_input("Enter the position to remove: "))
-                        except:
-                                option = ""
-                                print
-                                print("Not a number.")
-                                edit_print(queues, queue_type, edit_type)
-                                continue
-                        if (option <= len(queues.action_queue) + 1 and option > 0):
-                                print
-                                if (edit_type == "insert"):
-                                        add_action_menu(queues, the_driver, option - 1, -1, False)
-                                elif (edit_type == "remove"):
-                                        try:
-                                                del queues.action_queue[option - 1]
-                                        except:
-                                                option = ""
-                                                print
-                                                print("Invalid number.")
-                                                edit_print(queues, queue_type, edit_type)
-                                                continue
-                        else:
-                                option = ""
-                                print
-                                print("Invalid number.")
-                                edit_print(queues, queue_type, edit_type)
-                                continue
-        elif (queue_type == "web_action_queue"):
-                # Error checking
-                option = ""
-                while (option == ""):
-                        arg1 = -1
-                        arg2 = -1
-                        edit_print(queues, queue_type, edit_type)
-                        print
-                        option = raw_input("Enter the position to insert: ")
-                        options = re.split(r' ', option)
+	if (queue_type == "web_queue"):
+		edit_print(queues, queue_type, edit_type)
+		option = ""
 
-                        if (len(options) > 2):
-                                option = ""
-                                print
-                                print("Must take 1 or 2 arguments")
-                                continue
-                        try:
-                                arg1 = int(options[0])
-                        except:
-                                option = ""
-                                print
-                                print("The first argument is not a number")
-                                continue
+		while (option == ""):
+			try:
+				print
+				if (edit_type == "insert"):
+					option = int(raw_input("Enter the position to insert: "))
+				elif (edit_type == "remove"):
+					option = int(raw_input("Enter the position to remove: "))
+			except:
+				option = ""
+				print
+				print("Not a number.")
+				edit_print(queues, queue_type, edit_type)
+				continue
 
-                        if (len(options) == 2):
-                                try:
-                                        arg2 = int(options[1])
-                                except:
-                                        option = ""
-                                        print
-                                        print("The second argument is not a number")
-                                        continue
+			if (option <= len(queues.web_queue) + 1 and option > 0):
+				print
 
-                        if (queues.web_action_queue == [[]]):
-                                if (arg1 > len(queues.web_action_queue) or arg1 < 1):
-                                        option = ""
-                                        print
-                                        print("Invalid website position")
-                                        continue
-                        else:
-                                if (arg1 > (len(queues.web_action_queue) + 1) or arg1 < 1):
-                                        option = ""
-                                        print
-                                        print("Invalid website position")
-                                        continue
-                                
-                        if (arg2 != -1):
-                                try:
-                                        queues.web_action_queue[arg1 - 1]
-                                except:
-                                        option = ""
-                                        print
-                                        print("Invalid action position")
-                                        continue
-                                
-                                if (arg2 > len(queues.web_action_queue[arg1 - 1]) or arg1 < 1):
-                                        option = ""
-                                        print
-                                        print("Invalid action position")
-                                        continue
-                if (arg2 == -1):
-                        if (edit_type == "insert"):
-                                print
-                                web_name = raw_input("Enter the website name: ")
-                        
-                        if (queues.web_action_queue == [[]]):
-                                queues.web_action_queue[arg1 - 1].insert(0, web_name)
-                        else:
-                                if (edit_type == "insert"):
-                                        queues.web_action_queue.insert(arg1 - 1, [web_name])
-                                elif (edit_type == "remove"):
-                                        del queues.web_action_queue[arg1 - 1]
-                else:
-                        if (edit_type == "insert"):
-                                add_action_menu(queues, the_driver, arg1 - 1, arg2, True)
-                        elif (edit_type == "remove"):
-                                try:
-                                        del queues.web_action_queue[arg1 - 1][arg2]
-                                except:
-                                        option = ""
-                                        print
-                                        print("Invalid action position")
-                                        edit_queue(queues, queue_type, edit_type, the_driver)
-                
+				if (edit_type == "insert"):
+					web_name = raw_input("Enter the website name: ")
+					queues.web_queue.insert(int(option - 1), web_name)
+				elif (edit_type == "remove"):
+					try:
+						del queues.web_queue[option - 1]
+					except:
+						option = ""
+						print
+						print("Invalid number.")
+						edit_print(queues, queue_type, edit_type)
+						continue
+			else:
+				option = ""
+				print
+				print("Invalid number.")
+				edit_print(queues, queue_type, edit_type)
+				continue
+	elif (queue_type == "action_queue"):
+		edit_print(queues, queue_type, edit_type)
+		option = ""
+
+		while (option == ""):
+			try:
+				print
+
+				if (edit_type == "insert"):
+					option = int(raw_input("Enter the position to insert: "))
+				elif (edit_type == "remove"):
+					option = int(raw_input("Enter the position to remove: "))
+			except:
+				option = ""
+				print
+				print("Not a number.")
+				edit_print(queues, queue_type, edit_type)
+				continue
+
+			if (option <= len(queues.action_queue) + 1 and option > 0):
+				print
+
+				if (edit_type == "insert"):
+					add_action_menu(queues, the_driver, option - 1, -1, False)
+				elif (edit_type == "remove"):
+					try:
+						del queues.action_queue[option - 1]
+					except:
+						option = ""
+						print
+						print("Invalid number.")
+						edit_print(queues, queue_type, edit_type)
+						continue
+			else:
+				option = ""
+				print
+				print("Invalid number.")
+				edit_print(queues, queue_type, edit_type)
+				continue
+	elif (queue_type == "web_action_queue"):
+		# Error checking
+		option = ""
+
+		while (option == ""):
+			arg1 = -1
+			arg2 = -1
+			edit_print(queues, queue_type, edit_type)
+			print
+			option = raw_input("Enter the position to insert: ")
+			options = re.split(r' ', option)
+
+			if (len(options) > 2):
+				option = ""
+				print
+				print("Must take 1 or 2 arguments")
+				continue
+			try:
+				arg1 = int(options[0])
+			except:
+				option = ""
+				print
+				print("The first argument is not a number")
+				continue
+
+			if (len(options) == 2):
+				try:
+					arg2 = int(options[1])
+				except:
+					option = ""
+					print
+					print("The second argument is not a number")
+					continue
+
+			if (queues.web_action_queue == [[]]):
+				if (arg1 > len(queues.web_action_queue) or arg1 < 1):
+					option = ""
+					print
+					print("Invalid website position")
+					continue
+			else:
+				if (arg1 > (len(queues.web_action_queue) + 1) or arg1 < 1):
+					option = ""
+					print
+					print("Invalid website position")
+					continue
+
+			if (arg2 != -1):
+				try:
+					queues.web_action_queue[arg1 - 1]
+				except:
+					option = ""
+					print
+					print("Invalid action position")
+					continue
+
+				if (arg2 > len(queues.web_action_queue[arg1 - 1]) or arg1 < 1):
+					option = ""
+					print
+					print("Invalid action position")
+					continue
+		if (arg2 == -1):
+			if (edit_type == "insert"):
+				print
+				web_name = raw_input("Enter the website name: ")
+			
+			if (queues.web_action_queue == [[]]):
+				queues.web_action_queue[arg1 - 1].insert(0, web_name)
+			else:
+				if (edit_type == "insert"):
+					queues.web_action_queue.insert(arg1 - 1, [web_name])
+				elif (edit_type == "remove"):
+					del queues.web_action_queue[arg1 - 1]
+		else:
+			if (edit_type == "insert"):
+				add_action_menu(queues, the_driver, arg1 - 1, arg2, True)
+			elif (edit_type == "remove"):
+				try:
+					del queues.web_action_queue[arg1 - 1][arg2]
+				except:
+					option = ""
+					print
+					print("Invalid action position")
+					edit_queue(queues, queue_type, edit_type, the_driver)
+
 def edit_queue_menu(queues, the_driver, edit_type):
 	option = ""
+
 	while (option == ""):
-                if (edit_type == "insert"):
-		        print
-                        print("----------------------------------------------------")
-                        print("1. Insert into website queue")
-                        print("2. Insert into action queue")
-                        print("3. Insert into website-action queue")
-                        print("4. Back")
-                        print("----------------------------------------------------")
-                elif (edit_type == "remove"):
-                        print
-                        print("----------------------------------------------------")
-                        print("1. Remove from website queue")
-                        print("2. Remove from action queue")
-                        print("3. Remove from website-action queue")
-                        print("4. Back")
-                        print("----------------------------------------------------")
+		if (edit_type == "insert"):
+			print
+			print("----------------------------------------------------")
+			print("1. Insert into website queue")
+			print("2. Insert into action queue")
+			print("3. Insert into website-action queue")
+			print("4. Back")
+			print("----------------------------------------------------")
+		elif (edit_type == "remove"):
+			print
+			print("----------------------------------------------------")
+			print("1. Remove from website queue")
+			print("2. Remove from action queue")
+			print("3. Remove from website-action queue")
+			print("4. Back")
+			print("----------------------------------------------------")
+
 		try:
 			print
 			option = int(raw_input("Select an option: "))
@@ -440,26 +483,30 @@ def edit_queue_menu(queues, the_driver, edit_type):
 			print
 			print("Not a number.")
 			edit_queue_menu(queues, the_driver, edit_type)
+
 		if (option == 1):
-                        if (edit_type == "remove"):
-                                if (len(queues.web_queue) == 0):
-                                        print
-                                        print("The website queue is empty")
-                                        edit_queue_menu(queues, the_driver, edit_type)
+			if (edit_type == "remove"):
+				if (len(queues.web_queue) == 0):
+					print
+					print("The website queue is empty")
+					edit_queue_menu(queues, the_driver, edit_type)
+
 			edit_queue(queues, "web_queue", edit_type, the_driver)
 		elif (option == 2):
-                        if (edit_type == "remove"):
-                                if (len(queues.action_queue) == 0):
-                                        print
-                                        print("The action queue is empty")
-                                        edit_queue_menu(queues, the_driver, edit_type)
+			if (edit_type == "remove"):
+				if (len(queues.action_queue) == 0):
+					print
+					print("The action queue is empty")
+					edit_queue_menu(queues, the_driver, edit_type)
+
 			edit_queue(queues, "action_queue", edit_type, the_driver)
 		elif (option == 3):
-                        if (edit_type == "remove"):
-                                if (queues.web_action_queue == [[]]):
-                                        print
-                                        print("The website-action queue is empty")
-                                        edit_queue_menu(queues, the_driver, edit_type)
+			if (edit_type == "remove"):
+				if (queues.web_action_queue == [[]]):
+					print
+					print("The website-action queue is empty")
+					edit_queue_menu(queues, the_driver, edit_type)
+
 			edit_queue(queues, "web_action_queue", edit_type, the_driver)
 		elif (option == 4):
 			menu(queues, the_driver)
@@ -498,6 +545,7 @@ def save_queue(queues, queue_type):
 	answer = ""
 	print
 	queue_name = raw_input("Enter name of the queue: ")
+
 	if (queue_type == "web_queue"):
 		queue_name = "web-queues/" + queue_name + ".wq"
 		if (len(queues.web_queue) == 0):
@@ -516,16 +564,20 @@ def save_queue(queues, queue_type):
 			print
 			print("The website-action queue is empty.")
 			return
+
 	try:
 		open(queue_name)
 		exists = True
 	except:
 		exists = False
+
 	if (exists == True):
 		print
 		print("A file with that name already exists.")
+
 		while (answer != "y" and answer != "n"):
 			answer = raw_input("Would you like to overwrite \"" + queue_name + "\" (y or n): ")
+
 		if (answer == "y"):
 			write_queue(queue_name, queues, queue_type)
 		else:
@@ -535,44 +587,48 @@ def save_queue(queues, queue_type):
 
 def load_queue(queues, queue_type):
 	exists = True
-	answer = ""
 	print
-        
-        if (queue_type == "web_queue"):
-                path = "web-queues/"
-                print("Website Queues:")
-        elif (queue_type == "action_queue"):
-                path = "action-queues/"
-                print("Action Queues:")
-        elif (queue_type == "web_action_queue"):
-                path = "web-action-queues/"
-                print("Website-Action Queues:")
-                
-        dirs = os.listdir(path)
-        for file in dirs:
-                if (queue_type == "web_queue"):
-                        print(str(file.split(".wq")[0]))
-                elif (queue_type == "action_queue"):
-                        print(str(file.split(".aq")[0]))
-                elif (queue_type == "web_action_queue"):
-                        print(str(file.split(".waq")[0]))
-                        
-        print
+
+	if (queue_type == "web_queue"):
+		path = "web-queues/"
+		print("Website Queues:")
+	elif (queue_type == "action_queue"):
+		path = "action-queues/"
+		print("Action Queues:")
+	elif (queue_type == "web_action_queue"):
+		path = "web-action-queues/"
+		print("Website-Action Queues:")
+
+	dirs = os.listdir(path)
+
+	for file in dirs:
+			if (queue_type == "web_queue"):
+					print(str(file.split(".wq")[0]))
+			elif (queue_type == "action_queue"):
+					print(str(file.split(".aq")[0]))
+			elif (queue_type == "web_action_queue"):
+					print(str(file.split(".waq")[0]))
+					
+	print
 	queue_name = raw_input("Enter name of the queue file: ")
+
 	if (queue_type == "web_queue"):
 		queue_name = "web-queues/" + queue_name + ".wq"
 	elif (queue_type == "action_queue"):
 		queue_name = "action-queues/" + queue_name + ".aq"
 	elif (queue_type == "web_action_queue"):
 		queue_name = "web-action-queues/" + queue_name + ".waq"
+
 	try:
 		open(queue_name)
 		exists = True
 	except:
 		exists = False
+
 	if (exists == True):
 		f = open(queue_name)
 		lines = f.readlines()
+
 		if (queue_type != "web_action_queue"):
 			for line in lines:
 				if (queue_type == "web_queue"):
@@ -583,6 +639,7 @@ def load_queue(queues, queue_type):
 			queues.web_action_queue = [[]]
 			# Create the columns for our actions
 			index = 0
+
 			for line in lines:
 				if (line != "\n"):
 					queues.web_action_queue[index].append(line.replace("\n", ""))
@@ -590,6 +647,7 @@ def load_queue(queues, queue_type):
 					queues.web_action_queue.append([])
 					index += 1
 					continue
+
 		print
 		print("\"" + queue_name + "\" has been loaded")
 	else:
@@ -602,7 +660,9 @@ def print_queue(queues, queue_type):
 			print
 			print("The website queue is empty.")
 			return
+
 		print
+
 		for web_name in queues.web_queue:
 			print("Website: " + web_name)
 	elif (queue_type == "action_queue"):
@@ -610,7 +670,9 @@ def print_queue(queues, queue_type):
 			print
 			print("The action queue is empty.")
 			return
+
 		print
+
 		for action in queues.action_queue:
 			print("Action: " + action)
 	elif (queue_type == "web_action_queue"):
@@ -618,19 +680,24 @@ def print_queue(queues, queue_type):
 			print
 			print("The website-action queue is empty.")
 			return
+
 		print
 		first_time = True
+
 		for index in range(len(queues.web_action_queue)):
 			print("Website: " + queues.web_action_queue[index][0])
+
 			for action in queues.web_action_queue[index]:
 				if (first_time == False):
 					print("    Action: " + action)
 				else:
 					first_time = False
+
 			first_time = True
 
 def clear_queue(queues, queue_type):
 	print
+
 	if (queue_type == "web_queue"):
 		queues.web_queue = []
 		print("The website queue has been cleared.")
@@ -643,76 +710,80 @@ def clear_queue(queues, queue_type):
 
 def run_web_action_queue(queues, web_action_queue, the_driver):
 	key = -1
-        entries = len(web_action_queue)
-        percent_complete = 0
-        entries_complete = 0
-        average_time = 0
-        times = []
+	entries = len(web_action_queue)
+	percent_complete = 0
+	entries_complete = 0
+	average_time = 0
+	times = []
+
 	if (web_action_queue == [[]]):
 		print
 		print("The website-action queue is empty.")
 		return
 	if (the_driver.driver_type == "chrome"):
-                try:
-		        driver = webdriver.Chrome(executable_path=the_driver.driver_path)
-                except:
-                        print
-                        print("Could not open the chromedriver")
-                        print("Check that the driver type and driver path is correct in config.ini")
-                        print("These are the current driver settings:")
-                        print
-                        print("driver_type = " + the_driver.driver_type)
-                        print("driver_path = " + the_driver.driver_path)
-                        print
-                        menu(queues, the_driver)
-        elif (the_driver.driver_type == "firefox"):
-                try:
-                        driver = webdriver.Firefox(executable_path=the_driver.driver_path)
-                except:
-                        print
-                        print("Could not open the geckodriver")
-                        print("Check that the driver type and driver path is correct in config.ini")
-                        print("These are the current driver settings:")
-                        print
-                        print("driver_type = " + the_driver.driver_type)
-                        print("driver_path = " + the_driver.driver_path)
-                        print
-                        menu(queues, the_driver)
+		try:
+			driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+		except:
+			print
+			print("Could not open the chromedriver")
+			print("Check that the driver type and driver path is correct in config.ini")
+			print("These are the current driver settings:")
+			print
+			print("driver_type = " + the_driver.driver_type)
+			print("driver_path = " + the_driver.driver_path)
+			print
+			menu(queues, the_driver)
+	elif (the_driver.driver_type == "firefox"):
+			try:
+				driver = webdriver.Firefox(executable_path=the_driver.driver_path)
+			except:
+				print
+				print("Could not open the geckodriver")
+				print("Check that the driver type and driver path is correct in config.ini")
+				print("These are the current driver settings:")
+				print
+				print("driver_type = " + the_driver.driver_type)
+				print("driver_path = " + the_driver.driver_path)
+				print
+				menu(queues, the_driver)
+
 	web_check = True
-        time_left = 0
-        time_left_seconds = 0
-        time_left_minutes = 0
-        time_left_hours = 0
-        start_time = time.time()
-        elapsed_time = 0
-        elapsed_time_hours = 0
-        elapsed_time_minutes = 0
-        elapsed_time_seconds = 0
-        print
+	time_left = 0
+	time_left_seconds = 0
+	time_left_minutes = 0
+	time_left_hours = 0
+	start_time = time.time()
+	elapsed_time = 0
+	elapsed_time_hours = 0
+	elapsed_time_minutes = 0
+	elapsed_time_seconds = 0
+	print
+
 	for index in range(len(web_action_queue)):
-                if (index != 0):
-                        times.append(time.time() - cycle_start_time)
-                        if (len(times) > 30):
-                                times.pop(0)
-                        average_time = sum(times) / float(len(times))
-                        time_left = float(average_time) * (entries - entries_complete)
-                        elapsed_time = time.time() - start_time
-                        time_left_hours_exact = float(time_left) / float(3600)
-                        elapsed_time_hours_exact = float(elapsed_time) / float(3600)
-                        time_left_hours = math.floor(float(time_left_hours_exact))
-                        elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
-                        time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
-                        elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
-                        time_left_minutes = math.floor(float(time_left_minutes_exact))
-                        elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
-                        time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
-                        elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
-                        time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
-                        elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
+		if (index != 0):
+			times.append(time.time() - cycle_start_time)
+			if (len(times) > 30):
+					times.pop(0)
+			average_time = sum(times) / float(len(times))
+			time_left = float(average_time) * (entries - entries_complete)
+			elapsed_time = time.time() - start_time
+			time_left_hours_exact = float(time_left) / float(3600)
+			elapsed_time_hours_exact = float(elapsed_time) / float(3600)
+			time_left_hours = math.floor(float(time_left_hours_exact))
+			elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
+			time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
+			elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
+			time_left_minutes = math.floor(float(time_left_minutes_exact))
+			elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
+			time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
+			elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
+			time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
+			elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
+
 		first_time_connect = True
-                sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
-                sys.stdout.flush()
-                cycle_start_time = time.time()
+		sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+		sys.stdout.flush()
+		cycle_start_time = time.time()
 		for action in web_action_queue[index]:
 			if (web_check == False):
 				if (action == "connect"):
@@ -720,57 +791,63 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 						driver.get(web_action_queue[index][0])
 					else:
 						driver.execute_script("window.open('" + web_action_queue[index][0] + "');")
-                                        entries_complete += 1
-                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
+						entries_complete += 1
+						percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("click") == 0):
 					order = re.split(r'`', action)
 					xpath = order[len(order) - 1]
+
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
 						key = index
 						first_time_connect = False
+
 					driver.find_element_by_xpath(xpath).click()
-                                        entries_complete += 1
-                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
+					entries_complete += 1
+					percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("fill") == 0):
 					order = re.split(r'`', action)
-                                        xpath = order[len(order) - 2]
+					xpath = order[len(order) - 2]
+
 					if (first_time_connect == True and key != index):
 						driver.get(web_action_queue[index][0])
 						key = index
 						first_time_connect = False
+
 					driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
-                                        entries_complete += 1
-                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
-                                elif (action.find("script") == 0):
-                                        order = re.split(r'`', action)
-                                        import_module = order[len(order) - 1]
-                                        func = importlib.import_module(import_module).__getattribute__("script_main")
-                                        driver.get(web_action_queue[index][0])
-                                        func(driver)
-                                        entries_complete += 1
-                                        percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
+					entries_complete += 1
+					percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
+				elif (action.find("script") == 0):
+					order = re.split(r'`', action)
+					import_module = order[len(order) - 1]
+					func = importlib.import_module(import_module).__getattribute__("script_main")
+					driver.get(web_action_queue[index][0])
+					func(driver)
+					entries_complete += 1
+					percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 			else:
 				web_check = False
+
 		web_check = True
-        average_time = sum(times) / float(len(times))
-        time_left = float(average_time) * (entries - entries_complete)
-        elapsed_time = time.time() - start_time
-        time_left_hours_exact = float(time_left) / float(3600)
-        elapsed_time_hours_exact = float(elapsed_time) / float(3600)
-        time_left_hours = math.floor(float(time_left_hours_exact))
-        elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
-        time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
-        elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
-        time_left_minutes = math.floor(float(time_left_minutes_exact))
-        elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
-        time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
-        elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
-        time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
-        elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
-        sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
-        sys.stdout.flush()
-        print
+		average_time = sum(times) / float(len(times))
+		time_left = float(average_time) * (entries - entries_complete)
+		elapsed_time = time.time() - start_time
+		time_left_hours_exact = float(time_left) / float(3600)
+		elapsed_time_hours_exact = float(elapsed_time) / float(3600)
+		time_left_hours = math.floor(float(time_left_hours_exact))
+		elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
+		time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
+		elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
+		time_left_minutes = math.floor(float(time_left_minutes_exact))
+		elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
+		time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
+		elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
+		time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
+		elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
+		sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+		sys.stdout.flush()
+		print
+
 	driver.quit()
 
 def save_queue_menu(queues, the_driver):
@@ -933,9 +1010,9 @@ def menu(queues, the_driver):
 		elif (option == 4):
 			edit_queue_menu(queues, the_driver, "insert")
 			menu(queues, the_driver)
-                elif (option == 5):
-                        edit_queue_menu(queues, the_driver, "remove")
-                        menu(queues, the_driver)
+		elif (option == 5):
+			edit_queue_menu(queues, the_driver, "remove")
+			menu(queues, the_driver)
 		elif (option == 6):
 			save_queue_menu(queues, the_driver)
 			menu(queues, the_driver)
