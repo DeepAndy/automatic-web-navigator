@@ -6,14 +6,23 @@ import re
 from fix_html import *
 import getpass
 import time
+from pyexcel import *
 
 def script_main(driver):
         f = open("failed_cofa_grab.txt", "a+")
+        sheet = get_sheet(file_name="CoFA News.xlsx")
+        school_names = sheet.column[2];
+        urls = sheet.column[3];
+
+        for i in range(len(urls)):
+                if (urls[i] == driver.current_url):
+                        tag_name = school_names[i]
+
+        # print(tag_name)
+                        
         
 	source = driver.page_source.encode("ascii", "ignore")
-
 	source = source.replace("&nbsp;", "")
-
    	soup = BeautifulSoup(source, features="html.parser")
 
         try:
