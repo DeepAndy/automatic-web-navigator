@@ -287,9 +287,9 @@ def edit_print(queues, queue_type, edit_type):
 					if (edit_type == "insert"):
 						print("    Action[" + str(last_index_action) + "]: ")
 
-		if (edit_type == "insert"):
-			print
-			print("Website[" + str(last_index_web) + "]: ")
+			if (edit_type == "insert"):
+				print
+				print("Website[" + str(last_index_web) + "]: ")
 
 def edit_queue(queues, queue_type, edit_type, the_driver):
 	if (queue_type == "web_queue"):
@@ -764,6 +764,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 			times.append(time.time() - cycle_start_time)
 			if (len(times) > 30):
 					times.pop(0)
+
 			average_time = sum(times) / float(len(times))
 			time_left = float(average_time) * (entries - entries_complete)
 			elapsed_time = time.time() - start_time
@@ -785,6 +786,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 		sys.stdout.flush()
 		cycle_start_time = time.time()
 		for action in web_action_queue[index]:
+
 			if (web_check == False):
 				if (action == "connect"):
 					if (index == 0):
@@ -829,24 +831,25 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 				web_check = False
 
 		web_check = True
-		average_time = sum(times) / float(len(times))
-		time_left = float(average_time) * (entries - entries_complete)
-		elapsed_time = time.time() - start_time
-		time_left_hours_exact = float(time_left) / float(3600)
-		elapsed_time_hours_exact = float(elapsed_time) / float(3600)
-		time_left_hours = math.floor(float(time_left_hours_exact))
-		elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
-		time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
-		elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
-		time_left_minutes = math.floor(float(time_left_minutes_exact))
-		elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
-		time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
-		elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
-		time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
-		elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
-		sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
-		sys.stdout.flush()
-		print
+
+	average_time = sum(times) / float(len(times))
+	time_left = float(average_time) * (entries - entries_complete)
+	elapsed_time = time.time() - start_time
+	time_left_hours_exact = float(time_left) / float(3600)
+	elapsed_time_hours_exact = float(elapsed_time) / float(3600)
+	time_left_hours = math.floor(float(time_left_hours_exact))
+	elapsed_time_hours = math.floor(float(elapsed_time_hours_exact))
+	time_left_minutes_exact = (float(time_left_hours_exact) - float(time_left_hours)) * float(60)
+	elapsed_time_minutes_exact = (float(elapsed_time_hours_exact) - float(elapsed_time_hours)) * float(60)
+	time_left_minutes = math.floor(float(time_left_minutes_exact))
+	elapsed_time_minutes = math.floor(float(elapsed_time_minutes_exact))
+	time_left_seconds_exact = float(time_left_minutes_exact) - float(time_left_minutes)
+	elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
+	time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
+	elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
+	sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+	sys.stdout.flush()
+	print
 
 	driver.quit()
 
