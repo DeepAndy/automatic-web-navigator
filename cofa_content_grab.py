@@ -14,46 +14,27 @@ def script_main(driver):
 	school_names = sheet.column[2];
 	urls = sheet.column[3];
 
+	f1 = open("write_out.html", "w+")
+
 	for i in range(len(urls)):
 		if (urls[i] == driver.current_url):
 			tag_name = school_names[i]
 
-	# print(tag_name)
+	page_source = driver.page_source
+	page_source = page_source.replace(u"\xa0", u"")
+	page_source = page_source.replace(u"\xc2", u"")
+	soup = BeautifulSoup(page_source, features="html.parser")
 
-	source = driver.page_source.encode("ascii", "ignore")
-	source = source.replace("&nbsp;", "")
-	soup = BeautifulSoup(source, features="html.parser")
+	content = soup.find("div", id="story")
 
-	try:
-		content = soup.find("div", id="cofa_contentCol1")
-	except:
-			f.write(driver.current_url + "\n")
+	if (str(content) == "None"):
+		f.write(str(driver.current_url) + "\n")
+		return
 
-	for script in content.find_all("script"):
-		script.decompose()
-
-	for style in content.find_all("style"):
-		style.decompose()
-
-	for link in content.find_all("link"):
-		link.decompose()
-
-	content = HTMLParser().unescape(content)
-	content = StringIO.StringIO(content)
-	content = content.readlines()
-
-	lines, errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
-	fix_all(lines, errors)
+	errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
+	fix_all(content, errors)
 
 	title = soup.find_all("h1")[1].text
-
-	output = ""
-
-	for line in lines:
-		line = line.strip()
-		output += line
-
-	output = re.sub(r"'", "\\'", output)
 
 	cofa_main_page = "https://webcms.ohio.edu/fine-arts/admin/content"
 	cas_username_xpath = "//*[@id='username']"
@@ -61,8 +42,17 @@ def script_main(driver):
 	cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
 	basic_page_url = "https://webcms.ohio.edu/fine-arts/node/add/page"
 	body_textarea_xpath = "//textarea[@data-editor-value-original]"
-	body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
+	body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + soup.text + "';"
 	save_xpath = "//*[@id='edit-submit']"
+
+	output = ""
+
+	for tag in content:
+		line = str(tag.encode("utf-8"))
+		line.strip()
+		output += line
+
+	#f1.write(output)
 
 	'''
 	driver.get(cofa_main_page)
