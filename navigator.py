@@ -761,11 +761,12 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 
 	for index in range(len(web_action_queue)):
 		if (index != 0):
-			times.append(time.time() - cycle_start_time)
 			if (len(times) > 30):
-					times.pop(0)
+				times.pop(0)
 
-			average_time = sum(times) / float(len(times))
+			if (len(times) > 0):
+				average_time = sum(times) / float(len(times))
+
 			time_left = float(average_time) * (entries - entries_complete)
 			elapsed_time = time.time() - start_time
 			time_left_hours_exact = float(time_left) / float(3600)
@@ -830,9 +831,13 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 			else:
 				web_check = False
 
+			times.append(time.time() - cycle_start_time)
+
 		web_check = True
 
-	average_time = sum(times) / float(len(times))
+	if (len(times) > 0):
+		average_time = sum(times) / float(len(times))
+
 	time_left = float(average_time) * (entries - entries_complete)
 	elapsed_time = time.time() - start_time
 	time_left_hours_exact = float(time_left) / float(3600)
