@@ -130,7 +130,7 @@ def find_errors(soup):
 					errors.append("<h>")
 					print_friendly_errors.append("ERROR: First header is not an <h2>")
 					#error_line_string.append(lines[i])
-		if (re.findall(r'\?', str(soup))):
+		if (re.findall(r'\?', tag.text)):
 			warnings.append("?")
 			print_friendly_errors.append("WARNING: ? found")
 			#error_line_string.append(lines[i])
@@ -242,6 +242,7 @@ def fix_all(soup, errors):
 	first_header_correct = True
 	order_correct = True
 	min_header_num = 2
+	max_header_num = 6
 
 	# Check if first header is correct
 	for error in errors:
@@ -260,8 +261,8 @@ def fix_all(soup, errors):
 		header_lookup = dict()
 		num_in_dict = False
 
-		for header in soup.find_all(re.compile(r"^h\d$")):
-			header_num = int(re.findall(r"^h(\d)$", header.name)[0])
+		for header in soup.find_all(re.compile(r"^h?\d+$")):
+			header_num = int(re.findall(r"^h?(\d+)$", header.name)[0])
 
 			if (first_header == True):
 				header.name = "h" + str(min_header_num)
@@ -269,7 +270,8 @@ def fix_all(soup, errors):
 				last_header_num = header_num
 				correct_last_header = min_header_num
 				header_lookup[str(header_num)] = correct_last_header
-			elif ((header_num > last_header_num) and (header_num != last_header_num + 1)):
+				continue
+			elif ((header_num > last_header_num) and (header_num != correct_last_header + 1)):
 				header.name = "h" + str(correct_last_header + 1)
 				last_header_num = header_num
 				correct_last_header += 1
@@ -278,7 +280,9 @@ def fix_all(soup, errors):
 					header_lookup[str(header_num)]
 				except:
 					header_lookup[str(header_num)] = correct_last_header
-			elif (header_num <= last_header_num):
+
+				continue
+			elif (header_num < last_header_num):
 				last_header_num = header_num
 
 				try:
@@ -286,6 +290,19 @@ def fix_all(soup, errors):
 					correct_last_header = header_lookup[str(header_num)]
 				except:
 					correct_last_header = header_num
+
+				continue
+			elif (header_num == last_header_num):
+				last_header_num = header_num
+				header.name = "h" + str(correct_last_header)
+				correct_last_header = header_num
+
+				continue
+			elif (header_num == correct_last_header + 1):
+				last_header_num = header_num
+				correct_last_header = header_num
+
+				continue
 
 	# Go ahead and replace same of these easy to find errors
 	for tag in soup.find_all():
