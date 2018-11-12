@@ -69,27 +69,17 @@ def find_errors(soup):
 	warnings = []
 	print_friendly_errors = []
 	error_line_string = [] # For saving the line string an error is on
-	first_header_found = False
-
-	last_header_old = 2
-	first_header_start = 2
-	current_header_num = 3 # Whatever the current header is when we iterate
-	found_first_head = False
+	first_header = True
+	out_of_order = False
 
 	# Iterate through each line and find errors
-	if (soup.find(re.compile("^h(\d)$"))):
-		if (int(re.findall("(\d)", soup.find(re.compile("^h(\d)$")).name)[0]) != 2):
-			first_header_found = True
-			errors.append("<h>")
-			print_friendly_errors.append("ERROR: First header is not an <h2>")
-			#error_line_string.append(lines[i])
 	for tag in soup.find_all():
 		if (tag.name == "p"):
-			if (re.findall("^\s*$", tag.text)):
+			if (re.findall(r"^\s*$", tag.text)):
 				errors.append("empty <p>")
 				print_friendly_errors.append("ERROR: empty <p> tag found")
 				#error_line_string.append(lines[i])
-			if (re.findall("^\s*$", tag.text)):
+			elif (re.findall(r"^\s*$", tag.text)):
 				warnings.append("empty")
 				print_friendly_errors.append("WARNING: empty tag found")
 				#error_line_string.append(lines[i])
@@ -133,6 +123,13 @@ def find_errors(soup):
 			errors.append("<link>")
 			print_friendly_errors.append("ERROR: <link> tag found")
 			#error_line_string.append(lines[i])
+		# First header is not an h2
+		if (first_header == True):
+			if (re.findall(r"^h(\d)$", tag.name)):
+				if (int(re.findall(r"^h(\d)$", tag.name)[0]) != 2):
+					errors.append("<h>")
+					print_friendly_errors.append("ERROR: First header is not an <h2>")
+					#error_line_string.append(lines[i])
 		if (re.findall(r'\?', str(soup))):
 			warnings.append("?")
 			print_friendly_errors.append("WARNING: ? found")
@@ -192,6 +189,21 @@ def find_errors(soup):
 				print_friendly_errors.append("ERROR: CP___PAGEID found")
 				#error_line_string.append(lines[i])
 
+		# Header order check
+		if (out_of_order == False):
+			if (re.findall(r"^h\d$", tag.name)):
+				header_num = int(re.findall(r"^h(\d)$", tag.name)[0])
+
+				if (first_header == False):
+					if ((header_num > last_header_num) and (header_num != last_header_num + 1)):
+						out_of_order = True
+						errors.append("order")
+						print_friendly_errors.append("ERROR: Headers are out of order")
+						#error_line_string.append(lines[i])
+
+				first_header = False
+				last_header_num = header_num
+
 	return errors, warnings, print_friendly_errors, error_line_string
 
 # Prints all error messages
@@ -202,8 +214,10 @@ def print_errors(print_friendly_errors, error_line_string, errors, warnings):
 		for i in range(len(print_friendly_errors)):
 			print(print_friendly_errors[i])
 			#print(error_line_string[i].strip("\t"))
+
 	print (str(len(errors)) + " Errors | " + str(len(warnings)) + " Warnings")
 	print
+
 	if (len(warnings) != 0):
 		print("Note: Warnings can not be fixed.")
 		print
@@ -225,24 +239,55 @@ def print_errors_gui(print_friendly_errors, error_line_string, errors, warnings)
 # Fix all errors
 def fix_all(soup, errors):
 	# Assign default values
-	last_header_old = 2
-	first_header_start = 2
-	last_header_num = 2
-	correct_first_header_num = 2 # The header that we should ALWAYS start with
-	current_header_num = 3 # Whatever the current header is when we iterate
-	new_header_num = 2 # What the current header should be when we iterate
-	max_header_num = 6 # The max a header can be. Is 6 in HTML 5
+	first_header_correct = True
+	order_correct = True
 	min_header_num = 2
-	found_first_head = False
-	order = False
 
-	# Check if we have an issue with the first header in the errors list
-	for i in range(len(errors)):
-		if (errors[i] == "order"):
-			order = True
+	# Check if first header is correct
+	for error in errors:
+		if (error == "<h>"):
+			first_header_correct = False
+			order_correct = False # Correcting the first header will put everything out of order
+
+	# Check if headers are out of order
+	for error in errors:
+		if (error == "order"):
+			order_correct = False
+
+	# Correct out of order headers
+	if (order_correct == False):
+		first_header = True
+		header_lookup = dict()
+		num_in_dict = False
+
+		for header in soup.find_all(re.compile(r"^h\d$")):
+			header_num = int(re.findall(r"^h(\d)$", header.name)[0])
+
+			if (first_header == True):
+				header.name = "h" + str(min_header_num)
+				first_header = False
+				last_header_num = header_num
+				correct_last_header = min_header_num
+				header_lookup[str(header_num)] = correct_last_header
+			elif ((header_num > last_header_num) and (header_num != last_header_num + 1)):
+				header.name = "h" + str(correct_last_header + 1)
+				last_header_num = header_num
+				correct_last_header += 1
+
+				try:
+					header_lookup[str(header_num)]
+				except:
+					header_lookup[str(header_num)] = correct_last_header
+			elif (header_num <= last_header_num):
+				last_header_num = header_num
+
+				try:
+					header.name = "h" + str(header_lookup[str(header_num)])
+					correct_last_header = header_lookup[str(header_num)]
+				except:
+					correct_last_header = header_num
 
 	# Go ahead and replace same of these easy to find errors
-
 	for tag in soup.find_all():
 		if (tag.name == "hr"):
 			tag.decompose()
