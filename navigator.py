@@ -786,6 +786,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 		sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
 		sys.stdout.flush()
 		cycle_start_time = time.time()
+
 		for action in web_action_queue[index]:
 
 			if (web_check == False):
@@ -794,8 +795,6 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 						driver.get(web_action_queue[index][0])
 					else:
 						driver.execute_script("window.open('" + web_action_queue[index][0] + "');")
-						entries_complete += 1
-						percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("click") == 0):
 					order = re.split(r'`', action)
 					xpath = order[len(order) - 1]
@@ -806,8 +805,6 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 						first_time_connect = False
 
 					driver.find_element_by_xpath(xpath).click()
-					entries_complete += 1
-					percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("fill") == 0):
 					order = re.split(r'`', action)
 					xpath = order[len(order) - 2]
@@ -818,20 +815,19 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 						first_time_connect = False
 
 					driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
-					entries_complete += 1
-					percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 				elif (action.find("script") == 0):
 					order = re.split(r'`', action)
 					import_module = order[len(order) - 1]
 					func = importlib.import_module(import_module).__getattribute__("script_main")
 					driver.get(web_action_queue[index][0])
 					func(driver)
-					entries_complete += 1
-					percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
 			else:
 				web_check = False
 
-			times.append(time.time() - cycle_start_time)
+		entries_complete += 1
+		percent_complete = math.floor((float(entries_complete) / float(entries)) * 100)
+
+		times.append(time.time() - cycle_start_time)
 
 		web_check = True
 
