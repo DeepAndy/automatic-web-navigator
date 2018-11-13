@@ -2,6 +2,7 @@
 # Description: Provides interface for adding websites and actions in a queue
 
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 import time
 import re
 import ConfigParser
