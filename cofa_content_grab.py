@@ -26,6 +26,58 @@ def script_main(driver):
 	page_source = page_source.replace(u"\xc2", u" ")
 	soup = BeautifulSoup(page_source, features="html.parser")
 
+	title = ""
+	author = ""
+	story_date = ""
+	date = ""
+	empty_page = True
+
+	article_data = soup.find("div", id="articleData")
+	for data in article_data.find_all():
+		if (data.has_attr("id")):
+			if (data["id"] == "author"):
+				author = data.text
+				author = re.sub(r"\|", "", author)
+				author = author.strip()
+			elif (data["id"] == "storyDate"):
+				story_date = data.text
+	story_date = re.findall(r"(\S+)", story_date)
+
+	for index in range(len(story_date)):
+		story_date[index] = story_date[index].strip(",")
+		if (index == 0):
+			if (story_date[index] == "Jan"):
+				story_date[index] = "01"
+			elif (story_date[index] == "Feb"):
+				story_date[index] = "02"
+			elif (story_date[index] == "Mar"):
+				story_date[index] = "03"
+			elif (story_date[index] == "Apr"):
+				story_date[index] = "04"
+			elif (story_date[index] == "May"):
+				story_date[index] = "05"
+			elif (story_date[index] == "Jun"):
+				story_date[index] = "06"
+			elif (story_date[index] == "Jul"):
+				story_date[index] = "07"
+			elif (story_date[index] == "Aug"):
+				story_date[index] = "08"
+			elif (story_date[index] == "Sep"):
+				story_date[index] = "09"
+			elif (story_date[index] == "Oct"):
+				story_date[index] = "10"
+			elif (story_date[index] == "Nov"):
+				story_date[index] = "11"
+			elif (story_date[index] == "Dec"):
+				story_date[index] = "12"
+			
+		if (index == 1):
+			if (int(story_date[index]) < 10):
+				story_date[index] = "0" + story_date[index]
+
+	for entry in story_date:
+		date += entry
+
 	content = soup.find("div", id="story")
 
 	if (str(content) == "None"):
@@ -35,64 +87,76 @@ def script_main(driver):
 	errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
 	fix_all(content, errors)
 
-	title = driver.title
+	if (content.find("p") or content.find("img") or content.find(re.compile(r"^h?\d+$"))):
+		title = driver.title
 
-	cas_username_xpath = "//*[@id='username']"
-	cas_password_xpath = "//*[@id='password']"
-	cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-	article_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/node/add/article"
-	first = True
+		cas_username_xpath = "//*[@id='username']"
+		cas_password_xpath = "//*[@id='password']"
+		cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
+		article_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/node/add/article"
 
-	output = ""
+		output = ""
 
-	for tag in content:
-		line = str(tag.encode("utf-8"))
-		line = line.strip()
-		output += line
+		for tag in content:
+			line = str(tag.encode("utf-8"))
+			line = line.strip()
+			output += line
 
-	output = re.sub(r"'", "\\'", output)
-	output = re.sub(r"\n", "", output)
+		output = re.sub(r"'", "\\'", output)
+		output = re.sub(r"\n", "", output)
 
-	driver.get(article_page_url)
+		driver.get(article_page_url)
 
-	if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-		username = raw_input("Enter OHIO username: ")
-		password = getpass.getpass("Enter OHIO password: ")
+		if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
+			username = raw_input("Enter OHIO username: ")
+			password = getpass.getpass("Enter OHIO password: ")
 
-		element = driver.find_element_by_xpath(cas_username_xpath)
-		element.send_keys(username)
-		element = driver.find_element_by_xpath(cas_password_xpath)
-		element.send_keys(password)
-		element = driver.find_element_by_xpath(cas_login_button_xpath)
+			element = driver.find_element_by_xpath(cas_username_xpath)
+			element.send_keys(username)
+			element = driver.find_element_by_xpath(cas_password_xpath)
+			element.send_keys(password)
+			element = driver.find_element_by_xpath(cas_login_button_xpath)
+			element.click()
+
+		#driver.get(article_page_url)
+		time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
+
+		title_xpath = "//*[@id='edit-title-0-value']"
+		author_xpath = "//*[@id='edit-field-author-0-value']"
+		date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
+		select_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
+		body_textarea_xpath = "//textarea[@data-editor-value-original]"
+		body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
+		save_xpath = "//*[@id='edit-submit']"
+		first = True
+
+		if (title != ""):
+			element = driver.find_element_by_xpath(title_xpath)
+			element.send_keys(title)
+		if (author != ""):
+			element = driver.find_element_by_xpath(author_xpath)
+			element.send_keys(author)
+		if (date != ""):
+			element = driver.find_element_by_xpath(date_xpath)
+			element.send_keys(date)
+
+		driver.execute_script(body_textarea_script)
+
+		if len(tags) > 0:
+			for tag in tags:
+				if (tag != "CoFA"):
+					element = Select(driver.find_element_by_xpath(select_xpath))
+
+					if (first == True):
+						element.deselect_all()
+						first = False
+
+					element.select_by_visible_text('-' + tag)
+
+		element = driver.find_element_by_xpath(save_xpath)
 		element.click()
 
-	#driver.get(article_page_url)
-	time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
+		alert = driver.switch_to.alert
+		alert.accept()
 
-	title_xpath = "//*[@id='edit-title-0-value']"
-	select_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
-	body_textarea_xpath = "//textarea[@data-editor-value-original]"
-	body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
-	save_xpath = "//*[@id='edit-submit']"
-
-
-	element = driver.find_element_by_xpath(title_xpath)
-	element.send_keys(title)
-	
-	driver.execute_script(body_textarea_script)
-	
-	for tag in tags:
-		if (tag != "CoFA"):
-			element = Select(driver.find_element_by_xpath(select_xpath))
-
-			if (first == True):
-				element.deselect_all()
-				first = False
-
-			element.select_by_visible_text('-' + tag)
-
-	element = driver.find_element_by_xpath(save_xpath)
-	element.click()
-
-	alert = driver.switch_to.alert
-	alert.accept()
+		time.sleep(0.5)
