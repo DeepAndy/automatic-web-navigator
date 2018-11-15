@@ -10,7 +10,7 @@ from pyexcel import *
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
-def script_main(driver):
+def script_main(driver, url):
 	cas_username_xpath = "//*[@id='username']"
 	cas_password_xpath = "//*[@id='password']"
 	cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
@@ -25,6 +25,8 @@ def script_main(driver):
 		element.send_keys(password)
 		element = driver.find_element_by_xpath(cas_login_button_xpath)
 		element.click()
+
+	driver.get(url)
 	
 	title_xpath = "//*[@id='edit-title-0-value']"
 	element = driver.find_element_by_xpath(title_xpath)
@@ -34,9 +36,30 @@ def script_main(driver):
 
 	driver.get(mod_page_url)
 
+	element = driver.find_element_by_xpath(title_xpath)
+	element.send_keys(title)
+
 	page_container_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-page-content-row']"
-	element = Select(driver.find_element_by_xpath(page_container_xpath))
-	element.select_by_visible_text("Add Page Content Row [Advanced]")
+	page_content_row_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-page-content-row']"
+	large_image_with_text_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-large-image-text']"
+	photo_gallery_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-photo-gallery']"
+	video_gallery_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-video-gallery']"
+	page_container_button_xpath = "//*[@id='edit-field-page-container']/div[3]/div/ul/li[2]/button"
+
+	button = driver.find_element_by_xpath(page_container_button_xpath)
+
+	element = driver.find_element_by_xpath(page_content_row_xpath)
+	element.click()
+	button.click()
+	element = driver.find_element_by_xpath(large_image_with_text_xpath)
+	element.click()
+	element = driver.find_element_by_xpath(photo_gallery_xpath)
+	element.click()
+	element = driver.find_element_by_xpath(video_gallery_xpath)
+	element.click()
+	element = driver.find_element_by_xpath(page_content_row_xpath)
+	element.click()
+
 	time.sleep(30)
 
 	'''
