@@ -259,7 +259,6 @@ def fix_all(soup, errors):
 	if (order_correct == False):
 		first_header = True
 		header_lookup = dict()
-		num_in_dict = False
 
 		for header in soup.find_all(re.compile(r"^h?\d+$")):
 			header_num = int(re.findall(r"^h?(\d+)$", header.name)[0])
@@ -327,8 +326,8 @@ def fix_all(soup, errors):
 		elif (tag.name == "span"):
 			tag.unwrap()
 		elif (tag.name == "p"):
-			if (re.findall("^\s*$", tag.text)):
-				tag.unwrap()
+			if (re.findall(r"^\s*$", tag.text)):
+				tag.decompose()
 		try:
 			if (tag.has_attr("class")):
 				del tag["class"]
