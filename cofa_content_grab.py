@@ -12,8 +12,9 @@ from selenium.webdriver.support.ui import Select
 
 def script_main(driver):
 	sheet = get_sheet(file_name="CoFA News.xlsx")
-	school_names = sheet.column[2];
-	urls = sheet.column[3];
+	school_names = sheet.column[2]
+	urls = sheet.column[3]
+	f = open("write_out.html", "w+")
 
 	for i in range(len(urls)):
 		if (urls[i] == driver.current_url):
@@ -30,7 +31,6 @@ def script_main(driver):
 	author = ""
 	story_date = ""
 	date = ""
-	empty_page = True
 
 	article_data = soup.find("div", id="articleData")
 	for data in article_data.find_all():
@@ -80,14 +80,10 @@ def script_main(driver):
 
 	content = soup.find("div", id="story")
 
-	if (str(content) == "None"):
-		f.write(str(driver.current_url) + "\n")
-		return
-
 	errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
 	fix_all(content, errors)
 
-	if (content.find("p") or content.find("img") or content.find(re.compile(r"^h?\d+$"))):
+	if (not re.findall(r"^\s*$", str(content))):
 		title = driver.title
 
 		cas_username_xpath = "//*[@id='username']"
@@ -105,6 +101,9 @@ def script_main(driver):
 		output = re.sub(r"'", "\\'", output)
 		output = re.sub(r"\n", "", output)
 
+		f.write(output)
+
+		'''
 		driver.get(article_page_url)
 
 		if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
@@ -125,7 +124,6 @@ def script_main(driver):
 		author_xpath = "//*[@id='edit-field-author-0-value']"
 		date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
 		select_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
-		body_textarea_xpath = "//textarea[@data-editor-value-original]"
 		body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
 		save_xpath = "//*[@id='edit-submit']"
 		first = True
@@ -160,3 +158,4 @@ def script_main(driver):
 		alert.accept()
 
 		time.sleep(0.5)
+		'''
