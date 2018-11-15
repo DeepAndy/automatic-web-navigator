@@ -3,6 +3,7 @@ import ConfigParser
 from selenium import webdriver
 from collections import OrderedDict
 import getpass
+from bs4 import BeautifulSoup
 
 class web_driver:
     def __init__(self, driver_type, driver_path):
@@ -280,8 +281,34 @@ def main(the_driver, pull_urls_config):
         element = driver.find_element_by_xpath(cas_login_button_xpath)
         element.click()
 
+    urls = []
     html = driver.page_source
-    urls = re.findall(r'.*?href\s*=\s*"(.*?edit\?destination.*?)"', html)
+    soup = BeautifulSoup(html, "html.parser")
+    for tag in soup.find_all("a"):
+        if (tag.has_attr("href")):
+            if (re.findall(r"edit\?destination=/", tag["href"])):
+                urls.append(tag["href"])
+
+    if (url.find(".com") != -1):
+        new_url = re.split(r'\.com', url)[0] + ".com"
+    elif (url.find(".org") != -1):
+        new_url = re.split(r'\.org', url)[0] + ".org"
+    elif (url.find(".edu") != -1):
+        new_url = re.split(r'\.edu', url)[0] + ".edu"
+    elif (url.find(".gov") != -1):
+        new_url = re.split(r'\.gov', url)[0] + ".gov"
+    elif (url.find(".net") != -1):
+        new_url = re.split(r'\.net', url)[0] + ".net"
+    elif (url.find(".html") != -1):
+        new_url = re.split(r'\.html', url)[0] + ".html"
+
+    for index in range(len(urls)):
+        if (urls[index].find("/") == 0):
+            urls[index] = new_url + urls[index]
+        elif (urls[index].find("http://") == -1 and urls[index].find("https://") == -1 and urls [index].find("www.") == -1 and urls[index].find("file://") == -1):
+            if (re.findall(r'(.*?)/[\w+|-]+\.\w+$', url)):
+                new_url = re.findall(r'(.*?)/[\w+|-]+\.\w+$', url)[0]
+                urls[index] = new_url + "/" + urls[index]
 
     select_urls(urls)
 
