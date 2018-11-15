@@ -11,10 +11,9 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
 def script_main(driver):
-	sheet = get_sheet(file_name="CoFA News.xlsx")
+	sheet = get_sheet(file_name="CoFA News-selections-edits.xlsx")
 	school_names = sheet.column[2]
 	urls = sheet.column[3]
-	f = open("write_out.html", "w+")
 
 	for i in range(len(urls)):
 		if (urls[i] == driver.current_url):
@@ -83,79 +82,92 @@ def script_main(driver):
 	errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
 	fix_all(content, errors)
 
-	if (not re.findall(r"^\s*$", str(content))):
-		title = driver.title
+	title = driver.title
 
-		cas_username_xpath = "//*[@id='username']"
-		cas_password_xpath = "//*[@id='password']"
-		cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-		article_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/node/add/article"
+	cas_username_xpath = "//*[@id='username']"
+	cas_password_xpath = "//*[@id='password']"
+	cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
+	article_page_url = "https://webcms.ohio.edu/fine-arts/group/1/content/create/group_node%3Aarticle"
 
-		output = ""
+	output = ""
 
-		for tag in content:
-			line = str(tag.encode("utf-8"))
-			line = line.strip()
-			output += line
+	for tag in content:
+		line = str(tag.encode("utf-8"))
+		line = line.strip()
+		output += line
 
-		output = re.sub(r"'", "\\'", output)
-		output = re.sub(r"\n", "", output)
+	output = re.sub(r"'", "\\'", output)
+	output = re.sub(r"\n", "", output)
 
-		f.write(output)
+	driver.get(article_page_url)
 
-		'''
-		driver.get(article_page_url)
+	if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
+		username = raw_input("Enter OHIO username: ")
+		password = getpass.getpass("Enter OHIO password: ")
 
-		if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-			username = raw_input("Enter OHIO username: ")
-			password = getpass.getpass("Enter OHIO password: ")
-
-			element = driver.find_element_by_xpath(cas_username_xpath)
-			element.send_keys(username)
-			element = driver.find_element_by_xpath(cas_password_xpath)
-			element.send_keys(password)
-			element = driver.find_element_by_xpath(cas_login_button_xpath)
-			element.click()
-
-		#driver.get(article_page_url)
-		time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
-
-		title_xpath = "//*[@id='edit-title-0-value']"
-		author_xpath = "//*[@id='edit-field-author-0-value']"
-		date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
-		select_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
-		body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
-		save_xpath = "//*[@id='edit-submit']"
-		first = True
-
-		if (title != ""):
-			element = driver.find_element_by_xpath(title_xpath)
-			element.send_keys(title)
-		if (author != ""):
-			element = driver.find_element_by_xpath(author_xpath)
-			element.send_keys(author)
-		if (date != ""):
-			element = driver.find_element_by_xpath(date_xpath)
-			element.send_keys(date)
-
-		driver.execute_script(body_textarea_script)
-
-		if len(tags) > 0:
-			for tag in tags:
-				if (tag != "CoFA"):
-					element = Select(driver.find_element_by_xpath(select_xpath))
-
-					if (first == True):
-						element.deselect_all()
-						first = False
-
-					element.select_by_visible_text('-' + tag)
-
-		element = driver.find_element_by_xpath(save_xpath)
+		element = driver.find_element_by_xpath(cas_username_xpath)
+		element.send_keys(username)
+		element = driver.find_element_by_xpath(cas_password_xpath)
+		element.send_keys(password)
+		element = driver.find_element_by_xpath(cas_login_button_xpath)
 		element.click()
 
-		alert = driver.switch_to.alert
-		alert.accept()
+	time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
 
-		time.sleep(0.5)
-		'''
+	title_xpath = "//*[@id='edit-title-0-value']"
+	author_xpath = "//*[@id='edit-field-author-0-value']"
+	date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
+	tag_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
+	navigation_xpath = "//*[@id='edit-menu-parent']"
+	display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
+	column_xpath = "//*[@id='edit-column-number']"
+	body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
+	save_xpath = "//*[@id='edit-submit']"
+	create_content_xpath = "//*[@id='edit-submit']"
+	first = True
+
+	if (title != ""):
+		element = driver.find_element_by_xpath(title_xpath)
+		element.send_keys(title)
+	if (author != ""):
+		element = driver.find_element_by_xpath(author_xpath)
+		element.send_keys(author)
+	if (date != ""):
+		element = driver.find_element_by_xpath(date_xpath)
+		element.send_keys(date)
+
+	driver.execute_script(body_textarea_script)
+
+	num_columns = "1"
+	nav = "</news/ | Left>"
+
+	if len(tags) > 0:
+		for tag in tags:
+			element = Select(driver.find_element_by_xpath(tag_xpath))
+
+			if (first == True):
+				element.deselect_all()
+				first = False
+
+			if (tag != "CoFA"):	
+				element.select_by_visible_text('-' + tag)
+			else:
+				element.select_by_visible_text(tag)
+
+	element = Select(driver.find_element_by_xpath(navigation_xpath))
+	element.select_by_visible_text(nav)
+	element = driver.find_element_by_xpath(display_settings_xpath)
+	element.click()
+	element = Select(driver.find_element_by_xpath(column_xpath))
+	element.select_by_visible_text(num_columns)
+
+	element = driver.find_element_by_xpath(save_xpath)
+	element.click()
+
+	alert = driver.switch_to.alert
+	alert.accept()
+
+	element = driver.find_element_by_xpath(create_content_xpath)
+	element.click()
+
+	time.sleep(0.5)
