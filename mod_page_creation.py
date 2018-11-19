@@ -35,32 +35,45 @@ def script_main(driver, url):
 	mod_page_url = "https://webcms.ohio.edu/fine-arts/node/add/modular_page"
 
 	driver.get(mod_page_url)
+	soup = BeautifulSoup(driver.page_source, "html.parser")
 
 	element = driver.find_element_by_xpath(title_xpath)
 	element.send_keys(title)
 
 	page_container_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-page-content-row']"
-	page_content_row_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-page-content-row']"
-	large_image_with_text_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-large-image-text']"
-	photo_gallery_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-photo-gallery']"
-	video_gallery_xpath = "//*[@id='edit-field-page-container-add-more-add-more-button-video-gallery']"
-	page_container_button_xpath = "//*[@id='edit-field-page-container']/div[3]/div/ul/li[2]/button"
+	explore_tabs_xpath = "//*[@value='Add Explore Tabs']"
+	large_image_with_text_xpath = "//*[@value='Add Large Image with Text Callout']"
+	page_container_button_first_xpath = '//*[@id="edit-field-page-container"]/div[3]/div/ul/li[2]/button'
+	page_container_button_xpath = '//div/div[4]/div/div/ul/li[2]/button'
+	#//*[@id="field-page-container-add-more-wrapper--CFZet-ihssg"]/div/div[4]/div/div/ul/li[2]/button
+	# Explore, large image, advanced, advanced
 
-	button = driver.find_element_by_xpath(page_container_button_xpath)
-
-	element = driver.find_element_by_xpath(page_content_row_xpath)
-	element.click()
+	button = driver.find_element_by_xpath(page_container_button_first_xpath)
 	button.click()
+
+	element = driver.find_element_by_xpath(explore_tabs_xpath)
+	element.click()
+
+	time.sleep(1)
+	button2 = driver.find_element_by_xpath(page_container_button_xpath)
+	button2.click()
+
 	element = driver.find_element_by_xpath(large_image_with_text_xpath)
 	element.click()
-	element = driver.find_element_by_xpath(photo_gallery_xpath)
-	element.click()
-	element = driver.find_element_by_xpath(video_gallery_xpath)
-	element.click()
-	element = driver.find_element_by_xpath(page_content_row_xpath)
+
+	time.sleep(1)
+	button2 = driver.find_element_by_xpath(page_container_button_xpath)
+	button2.click()
+
+	element = driver.find_element_by_xpath(page_container_xpath)
 	element.click()
 
-	time.sleep(30)
+	time.sleep(1)
+	button2 = driver.find_element_by_xpath(page_container_button_xpath)
+	button2.click()
+
+	element = driver.find_element_by_xpath(page_content_row_xpath)
+	element.click()
 
 	'''
 	element = driver.find_element_by_xpath(save_xpath)
