@@ -84,7 +84,6 @@ def script_main(driver, received_url):
 
     title = driver.title
 
-    '''
     cas_username_xpath = "//*[@id='username']"
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
@@ -172,4 +171,3 @@ def script_main(driver, received_url):
     element.click()
 
     time.sleep(0.5)
-    '''
