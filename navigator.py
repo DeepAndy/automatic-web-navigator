@@ -152,6 +152,21 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             return queues.action_queue
     elif (option == 4):
         print
+        js_line = raw_input("Enter line of JavaScript: ")
+        action = "js_line`" + js_line
+
+        if (pos < 0):
+            queues.action_queue.append(action)
+        else:
+            if (from_web_action == False):
+                queues.action_queue.insert(pos, action)
+            else:
+                queues.web_action_queue[pos].insert(pos2, action)
+
+        return queues.action_queue
+
+    elif (option == 6):
+        print
         dirs = os.listdir(".")
         for file in dirs:
             if (re.findall(r'[^\.].*?(\.py)$', str(file))):
@@ -183,7 +198,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 queues.web_action_queue[pos].insert(pos2, action)
 
         return queues.action_queue
-    elif (option == 5):
+    elif (option == 7):
         menu(queues, the_driver)
     else:
         print
@@ -201,8 +216,10 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
         print("1. Connect to page in new tab")
         print("2. Click an element")
         print("3. Fill out a form")
-        print("4. Add Python script")
-        print("5. Back to menu")
+        print("4. Execute line of JavaScript")
+        print("5. Add JavaScript file")
+        print("6. Add Python script")
+        print("7. Back to menu")
         print("----------------------------------------------------")
 
         try:
@@ -816,6 +833,10 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                         first_time_connect = False
 
                     driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
+                elif (action.find("js_line") == 0):
+                    order = re.split(r'`', action)
+                    driver.get(web_action_queue[index][0])
+                    driver.execute_script(order[1])
                 elif (action.find("script") == 0):
                     order = re.split(r'`', action)
                     import_module = order[len(order) - 1]
