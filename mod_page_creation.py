@@ -9,7 +9,7 @@ from pyexcel import *
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
-def script_main(driver, url):
+def script_main(driver, url, pos):
     cas_username_xpath = "//*[@id='username']"
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"

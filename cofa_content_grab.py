@@ -10,7 +10,7 @@ from pyexcel import *
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
-def script_main(driver, received_url):
+def script_main(driver, received_url, pos):
     sheet = get_sheet(file_name="CoFA News-selections-edits.xlsx")
     school_names = sheet.column[2]
     urls = sheet.column[3]
