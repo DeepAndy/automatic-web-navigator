@@ -380,7 +380,7 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
             arg2 = -1
             edit_print(queues, queue_type, edit_type)
             print
-            option = raw_input("Enter the position to insert: ")
+            option = raw_input("Enter the position to remove: ")
             options = re.split(r' ', option)
 
             if (len(options) > 2):
