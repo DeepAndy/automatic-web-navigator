@@ -7,17 +7,21 @@ Since the software is incomplete, it can cause a large amount of damage if not
 used with proper care. Use at your own risk.
 
 ## Required Software
-* Python 2
-https://www.python.org/downloads
+* [Python 2](https://www.python.org/downloads)
 
-* Python 2 pip
-https://www.makeusof.com/tag/install-pip-for-python/
+* [Python 2 pip](https://www.makeusof.com/tag/install-pip-for-python/)
 
 * Python 2 selenium module
+
 `pip install selenium`
 
-* Chrome Driver
-https://sites.google.com/a/chromium.org/chromedriver/downloads
+`pip install bs4`
+
+* Web Driver
+
+[Chrome Driver](https://sites.google.com/a/chromium.org/chromedriver/downloads)
+
+[Firefox Driver](https://github.com/mozilla/geckodriver/releases)
 
 ## How to use
 Using a terminal, type this command
