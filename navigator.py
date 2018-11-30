@@ -132,6 +132,8 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 else:
                         queues.web_action_queue[pos].insert(pos2, action)
 
+        print
+        print("Added element to action queue")
         return queues.action_queue
     elif (option == 3):
         print
@@ -149,8 +151,61 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, action)
 
+            print
+            print("Added element to action queue")
             return queues.action_queue
     elif (option == 4):
+        print
+        js_line = raw_input("Enter line of JavaScript: ")
+        action = "js_line`" + js_line
+
+        if (pos < 0):
+            queues.action_queue.append(action)
+        else:
+            if (from_web_action == False):
+                queues.action_queue.insert(pos, action)
+            else:
+                queues.web_action_queue[pos].insert(pos2, action)
+
+        print
+        print("Added JS line to action queue")
+        return queues.action_queue
+    elif (option == 5):
+        print
+        dirs = os.listdir("javascript")
+        for file in dirs:
+            if (re.findall(r'[^\.].*?(\.js)$', str(file))):
+                print(str(file.split(".js")[0]))
+
+        print
+        exists = False
+
+        while (exists == False):
+            script = raw_input("Enter name of the JavaScript file: ")
+            script_file = "javascript/" + script + ".js"
+
+            try:
+                open(script_file)
+                exists = True
+            except:
+                exists = False
+                print
+                print("Could not find the script")
+
+        action = "js_script`" + script
+
+        if (pos < 0):
+            queues.action_queue.append(action)
+        else:
+            if (from_web_action == False):
+                queues.action_queue.insert(pos, action)
+            else:
+                queues.web_action_queue[pos].insert(pos2, action)
+
+        print
+        print("Added \"" + script_file + "\" to action queue")
+        return queues.action_queue
+    elif (option == 6):
         print
         dirs = os.listdir(".")
         for file in dirs:
@@ -172,7 +227,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 print
                 print("Could not find the script")
 
-        action = "script`" + script
+        action = "py_script`" + script
 
         if (pos < 0):
             queues.action_queue.append(action)
@@ -182,8 +237,10 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, action)
 
+        print
+        print("Added " + script_file + " to the action queue")
         return queues.action_queue
-    elif (option == 5):
+    elif (option == 7):
         menu(queues, the_driver)
     else:
         print
@@ -198,11 +255,13 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
         print("----------------------------------------------------")
         print("WARNING: MAKE SURE YOUR ACTION IS UNIQUE")
         print("----------------------------------------------------")
-        print("1. Connect to page in new tab")
-        print("2. Click an element")
-        print("3. Fill out a form")
-        print("4. Add Python script")
-        print("5. Back to menu")
+        print("1.  Connect to page in new tab")
+        print("2.  Click an element")
+        print("3.  Fill out a form")
+        print("4.  Execute line of JavaScript")
+        print("5.  Add JavaScript file")
+        print("6.  Add Python script")
+        print("7.  Back to menu")
         print("----------------------------------------------------")
 
         try:
@@ -463,18 +522,18 @@ def edit_queue_menu(queues, the_driver, edit_type):
         if (edit_type == "insert"):
             print
             print("----------------------------------------------------")
-            print("1. Insert into website queue")
-            print("2. Insert into action queue")
-            print("3. Insert into website-action queue")
-            print("4. Back")
+            print("1.  Insert into website queue")
+            print("2.  Insert into action queue")
+            print("3.  Insert into website-action queue")
+            print("4.  Back")
             print("----------------------------------------------------")
         elif (edit_type == "remove"):
             print
             print("----------------------------------------------------")
-            print("1. Remove from website queue")
-            print("2. Remove from action queue")
-            print("3. Remove from website-action queue")
-            print("4. Back")
+            print("1.  Remove from website queue")
+            print("2.  Remove from action queue")
+            print("3.  Remove from website-action queue")
+            print("4.  Back")
             print("----------------------------------------------------")
 
         try:
@@ -789,15 +848,14 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
         cycle_start_time = time.time()
 
         for action in web_action_queue[index]:
-
             if (web_check == False):
+                order = re.split('`', action)
                 if (action == "connect"):
                     if (index == 0):
                         driver.get(web_action_queue[index][0])
                     else:
                         driver.execute_script("window.open('" + web_action_queue[index][0] + "');")
                 elif (action.find("click") == 0):
-                    order = re.split(r'`', action)
                     xpath = order[len(order) - 1]
 
                     if (first_time_connect == True and key != index):
@@ -807,7 +865,6 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 
                     driver.find_element_by_xpath(xpath).click()
                 elif (action.find("fill") == 0):
-                    order = re.split(r'`', action)
                     xpath = order[len(order) - 2]
 
                     if (first_time_connect == True and key != index):
@@ -816,8 +873,14 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                         first_time_connect = False
 
                     driver.find_element_by_xpath(xpath).send_keys(order[len(order) - 1])
-                elif (action.find("script") == 0):
-                    order = re.split(r'`', action)
+                elif (action.find("js_line") == 0):
+                    driver.get(web_action_queue[index][0])
+                    driver.execute_script(order[1])
+                elif (action.find("js_script") == 0):
+                    f = open("javascript/" + order[1] + ".js", "r+")
+                    driver.get(web_action_queue[index][0])
+                    driver.execute_script(f.read())
+                elif (action.find("py_script") == 0):
                     import_module = order[len(order) - 1]
                     func = importlib.import_module(import_module).__getattribute__("script_main")
                     driver.get(web_action_queue[index][0])
@@ -860,10 +923,10 @@ def save_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Save website queue")
-        print("2. Save action queue")
-        print("3. Save website-action queue")
-        print("4. Back")
+        print("1.  Save website queue")
+        print("2.  Save action queue")
+        print("3.  Save website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -891,10 +954,10 @@ def load_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Load website queue")
-        print("2. Load action queue")
-        print("3. Load website-action queue")
-        print("4. Back")
+        print("1.  Load website queue")
+        print("2.  Load action queue")
+        print("3.  Load website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -922,10 +985,10 @@ def print_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Print website queue")
-        print("2. Print action queue")
-        print("3. Print website-action queue")
-        print("4. Back")
+        print("1.  Print website queue")
+        print("2.  Print action queue")
+        print("3.  Print website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -953,10 +1016,10 @@ def clear_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Clear website queue")
-        print("2. Clear action queue")
-        print("3. Clear website-action queue")
-        print("4. Back")
+        print("1.  Clear website queue")
+        print("2.  Clear action queue")
+        print("3.  Clear website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -984,15 +1047,15 @@ def menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Add site to website queue")
-        print("2. Add action to action queue")
-        print("3. Apply action queue to all sites in website queue")
-        print("4. Insert into a queue")
-        print("5. Remove from a queue") 
-        print("6. Save a queue")
-        print("7. Load a queue")
-        print("8. Print a queue")
-        print("9. Clear a queue")
+        print("1.  Add site to website queue")
+        print("2.  Add action to action queue")
+        print("3.  Apply action queue to all sites in website queue")
+        print("4.  Insert into a queue")
+        print("5.  Remove from a queue") 
+        print("6.  Save a queue")
+        print("7.  Load a queue")
+        print("8.  Clear a queue")
+        print("9.  Print a queue")
         print("10. Run website-action queue")
         print("11. Quit")
         print("----------------------------------------------------")
@@ -1025,10 +1088,10 @@ def menu(queues, the_driver):
             load_queue_menu(queues, the_driver)
             menu(queues, the_driver)
         elif (option == 8):
-            print_queue_menu(queues, the_driver)
+            clear_queue_menu(queues, the_driver)
             menu(queues, the_driver)
         elif (option == 9):
-            clear_queue_menu(queues, the_driver)
+            print_queue_menu(queues, the_driver)
             menu(queues, the_driver)
         elif (option == 10):
             run_web_action_queue(queues, queues.web_action_queue, the_driver)
