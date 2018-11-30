@@ -255,13 +255,13 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
         print("----------------------------------------------------")
         print("WARNING: MAKE SURE YOUR ACTION IS UNIQUE")
         print("----------------------------------------------------")
-        print("1. Connect to page in new tab")
-        print("2. Click an element")
-        print("3. Fill out a form")
-        print("4. Execute line of JavaScript")
-        print("5. Add JavaScript file")
-        print("6. Add Python script")
-        print("7. Back to menu")
+        print("1.  Connect to page in new tab")
+        print("2.  Click an element")
+        print("3.  Fill out a form")
+        print("4.  Execute line of JavaScript")
+        print("5.  Add JavaScript file")
+        print("6.  Add Python script")
+        print("7.  Back to menu")
         print("----------------------------------------------------")
 
         try:
@@ -522,18 +522,18 @@ def edit_queue_menu(queues, the_driver, edit_type):
         if (edit_type == "insert"):
             print
             print("----------------------------------------------------")
-            print("1. Insert into website queue")
-            print("2. Insert into action queue")
-            print("3. Insert into website-action queue")
-            print("4. Back")
+            print("1.  Insert into website queue")
+            print("2.  Insert into action queue")
+            print("3.  Insert into website-action queue")
+            print("4.  Back")
             print("----------------------------------------------------")
         elif (edit_type == "remove"):
             print
             print("----------------------------------------------------")
-            print("1. Remove from website queue")
-            print("2. Remove from action queue")
-            print("3. Remove from website-action queue")
-            print("4. Back")
+            print("1.  Remove from website queue")
+            print("2.  Remove from action queue")
+            print("3.  Remove from website-action queue")
+            print("4.  Back")
             print("----------------------------------------------------")
 
         try:
@@ -923,10 +923,10 @@ def save_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Save website queue")
-        print("2. Save action queue")
-        print("3. Save website-action queue")
-        print("4. Back")
+        print("1.  Save website queue")
+        print("2.  Save action queue")
+        print("3.  Save website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -954,10 +954,10 @@ def load_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Load website queue")
-        print("2. Load action queue")
-        print("3. Load website-action queue")
-        print("4. Back")
+        print("1.  Load website queue")
+        print("2.  Load action queue")
+        print("3.  Load website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -985,10 +985,10 @@ def print_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Print website queue")
-        print("2. Print action queue")
-        print("3. Print website-action queue")
-        print("4. Back")
+        print("1.  Print website queue")
+        print("2.  Print action queue")
+        print("3.  Print website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
@@ -1016,10 +1016,10 @@ def clear_queue_menu(queues, the_driver):
     while (option == ""):
         print
         print("----------------------------------------------------")
-        print("1. Clear website queue")
-        print("2. Clear action queue")
-        print("3. Clear website-action queue")
-        print("4. Back")
+        print("1.  Clear website queue")
+        print("2.  Clear action queue")
+        print("3.  Clear website-action queue")
+        print("4.  Back")
         print("----------------------------------------------------")
         try:
             print
