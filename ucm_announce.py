@@ -1,3 +1,11 @@
+'''
+Author:         Austin Moore
+Script Type:    Companion Script
+Description:    Creates pages for Ohio University's UCM site based on an HTML
+                file. Used in conjunction with navigator.py
+'''
+
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
