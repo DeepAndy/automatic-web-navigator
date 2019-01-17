@@ -294,7 +294,6 @@ def fix_all(soup, errors):
             elif (header_num == last_header_num):
                 last_header_num = header_num
                 header.name = "h" + str(correct_last_header)
-                correct_last_header = header_num
 
                 continue
             elif (header_num == correct_last_header + 1):
