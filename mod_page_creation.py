@@ -1,3 +1,11 @@
+'''
+Author:         Austin Moore
+Script Type:    Companion Script
+Description:    This script creates modular pages for Ohio University's
+                College of Fine Arts given a website input from navigator.py.
+                Used in conjunction with navigator.py
+'''
+
 from bs4 import BeautifulSoup
 import HTMLParser
 import StringIO

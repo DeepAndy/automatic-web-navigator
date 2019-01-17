@@ -13,15 +13,15 @@ used with proper care. Use at your own risk.
 
 * Python 2 selenium module
 
-`pip install selenium`
+    * `pip install selenium`
 
-`pip install bs4`
+    * `pip install bs4`
 
 * Web Driver
 
-[Chrome Driver](https://sites.google.com/a/chromium.org/chromedriver/downloads)
+    * [Chrome Driver](https://sites.google.com/a/chromium.org/chromedriver/downloads)
 
-[Firefox Driver](https://github.com/mozilla/geckodriver/releases)
+    * [Firefox Driver](https://github.com/mozilla/geckodriver/releases)
 
 ## How to use
 Using a terminal, type this command
