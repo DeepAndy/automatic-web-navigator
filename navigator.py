@@ -1,5 +1,9 @@
-# Initial Author: Austin Moore
-# Description: Provides interface for adding websites and actions in a queue
+'''
+Author:         Austin Moore
+Script Type:    Main Script
+Description:    A queue system for queueing websites and specific actions to be
+                performed on them
+'''
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select

@@ -1,8 +1,8 @@
 '''
-Author: Austin Moore
-Date Created: 10-29-18
-Description: Script for cleaning up HTML files during migration from CommonSpot
-             to Drupal
+Author:         Austin Moore
+Script Type:    Helper Script
+Description:    Script for cleaning up HTML files during migration from CommonSpot
+                to Drupal
 '''
 
 import re
