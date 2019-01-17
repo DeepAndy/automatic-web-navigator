@@ -3,6 +3,7 @@ import re
 import getpass
 import time
 import os
+from ohio_login import ohio_login
 from bs4 import BeautifulSoup
 
 def script_main(driver, url, pos):                                               
@@ -37,20 +38,7 @@ def script_main(driver, url, pos):
 
     driver.get(basic_page_url)
 
-    cas_username_xpath = "//*[@id='username']"
-    cas_password_xpath = "//*[@id='password']"
-    cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-
-    if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = raw_input("Enter OHIO username: ")
-        password = getpass.getpass("Enter OHIO password: ")
-
-        element = driver.find_element_by_xpath(cas_username_xpath)
-        element.send_keys(username)
-        element = driver.find_element_by_xpath(cas_password_xpath)
-        element.send_keys(password)
-        element = driver.find_element_by_xpath(cas_login_button_xpath)
-        element.click()
+    ohio_login(driver)
 
     driver.get(basic_page_url)
 
