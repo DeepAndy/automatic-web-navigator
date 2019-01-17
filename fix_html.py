@@ -1,8 +1,8 @@
 '''
-Author: Austin Moore
-Date Created: 10-29-18
-Description: Script for cleaning up HTML files during migration from CommonSpot
-             to Drupal
+Author:         Austin Moore
+Script Type:    Helper Script
+Description:    Script for cleaning up HTML files during migration from CommonSpot
+                to Drupal
 '''
 
 import re
@@ -294,7 +294,6 @@ def fix_all(soup, errors):
             elif (header_num == last_header_num):
                 last_header_num = header_num
                 header.name = "h" + str(correct_last_header)
-                correct_last_header = header_num
 
                 continue
             elif (header_num == correct_last_header + 1):

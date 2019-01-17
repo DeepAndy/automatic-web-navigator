@@ -1,3 +1,11 @@
+'''
+Author:         Austin Moore
+Script Type:    Companion Script
+Description:    This script finds all box and sharepoint links on Ohio
+                University's Medicine site and outputs to an Excel file. Used
+                in conjunction with navigator.py
+'''
+
 import pyexcel
 import re
 from bs4 import BeautifulSoup

@@ -1,3 +1,11 @@
+'''
+Author:         Austin Moore
+Script Type:    Companion Script
+Description:    This script migrates websites from Ohio University's
+                College of Fine Arts site into Drupal. Used in conjunction
+                with navigator.py
+'''
+
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import HTMLParser
