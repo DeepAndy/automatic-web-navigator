@@ -83,6 +83,10 @@ def find_errors(soup):
                 warnings.append("empty")
                 print_friendly_errors.append("WARNING: empty tag found")
                 #error_line_string.append(lines[i])
+        if (re.findall(r"h\d", str(tag.name))):
+            if (re.findall(r"^\s*$", tag.text)):
+                errors.append("empty header")
+                print_friendly_errors.append("ERROR: empty header tag found")
         if (tag.name == "hr"):
             errors.append("<hr />")
             print_friendly_errors.append("ERROR: <hr /> tag found")
@@ -171,6 +175,11 @@ def find_errors(soup):
                 errors.append("xls")
                 print_friendly_errors.append("ERROR: XLS link found. Will add brackets but this still needs Drupal embedded")
                 #error_line_string.append(lines[i])
+            elif (re.findall(r'\.zip', tag["href"])):
+                errors.append("zip")
+                print_friendly_errors.append("ERROR: ZIP link found. Will add brackets but this still needs Drupal embedded")
+                #error_line_string.append(lines[i]))
+
         if (tag.has_attr("style")):
             errors.append("style=")
             print_friendly_errors.append("ERROR: inline style found")
@@ -294,7 +303,6 @@ def fix_all(soup, errors):
             elif (header_num == last_header_num):
                 last_header_num = header_num
                 header.name = "h" + str(correct_last_header)
-                correct_last_header = header_num
 
                 continue
             elif (header_num == correct_last_header + 1):
@@ -328,6 +336,9 @@ def fix_all(soup, errors):
         elif (tag.name == "p"):
             if (re.findall(r"^\s*$", tag.text)):
                 tag.decompose()
+        elif (re.findall(r"h\d", str(tag.name))):
+            if (re.findall(r"^\s*$", tag.text)):
+                tag.decompose()
         try:
             if (tag.has_attr("class")):
                 del tag["class"]
@@ -351,6 +362,9 @@ def fix_all(soup, errors):
                 if (re.findall("\.xlsx?", tag["href"])):
                     if (not re.findall("\[Excel\]", tag.text)):
                         tag.string += " [Excel]"
+                if (re.findall(r'\.zip', tag["href"])):
+                    if (not re.findall(r'\[ZIP]', tag.text)):
+                        tag.string += " [ZIP]"
         except:
             continue
 
