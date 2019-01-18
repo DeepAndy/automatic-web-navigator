@@ -26,6 +26,94 @@ class web_driver:
         self.driver_type = driver_type
         self.driver_path = driver_path
 
+'''
+Function:       load_last_queue()
+Arguments:      list
+Return Type:    void
+Description:    Reads last_queue.txt and loads the web-action-queue that was
+                saved there
+'''
+def load_last_queue(queues):
+    web_queue_found = False
+    action_queue_found = False
+    web_action_queue_found = False
+
+    web_queue_name = "last_web_queue.txt"
+    action_queue_name = "last_action_queue.txt"
+    web_action_queue_name = "last_web_action_queue.txt"
+
+    try:
+        f1 = open(web_queue_name, "r")
+        web_queue_found = True
+    except:
+        print("No web queue used last")
+
+    try:
+        f2 = open(action_queue_name, "r")
+        action_queue_found = True
+    except:
+        print("No action queue used last")
+
+    try:
+        f3 = open(web_action_queue_name, "r")
+        web_action_queue_found = True
+    except:
+        print("No web action queue used last")
+
+    if (web_queue_found == True):
+        web_queue_text = f1.read()
+        web_queue_text = web_queue_text.strip()
+        f1.close()
+
+        if (not re.match(r"^\s*$", web_queue_text)):
+            f = open(web_queue_text)
+            lines = f.readlines()
+            queues.web_queue = []
+
+            for line in lines:
+                queues.web_queue.append(line.strip())
+
+            print
+            print('"' + web_queue_text + '"' + " has been loaded automatically")
+
+    if (action_queue_found == True):
+        action_queue_text = f2.read()
+        action_queue_text = action_queue_text.strip()
+        f2.close()
+
+        if (not re.match(r"^\s*$", action_queue_text)):
+            f = open(action_queue_text)
+            lines = f.readlines()
+            queues.action_queue = []
+
+            for line in lines:
+                queues.action_queue.append(line.strip())
+
+            print('"' + action_queue_text + '"' + " has been loaded automatically")
+
+    if (web_action_queue_found == True):
+        web_action_queue_text = f3.read()
+        web_action_queue_text = web_action_queue_text.strip()
+        f3.close()
+
+        if (not re.match(r"^\s*$", web_action_queue_text)):
+            f = open(web_action_queue_text)
+            lines = f.readlines()
+            queues.web_action_queue = [[]]
+
+            # Create the columns for our actions
+            index = 0
+
+            for line in lines:
+                if (line != "\n"):
+                    queues.web_action_queue[index].append(line.replace("\n", ""))
+                else:
+                    queues.web_action_queue.append([])
+                    index += 1
+                    continue
+
+            print('"' + web_action_queue_text + '"' + " has been loaded automatically")
+
 def initialization():
     queues = queue([], [], [[]])
     config = ConfigParser.ConfigParser()
@@ -95,6 +183,8 @@ def initialization():
         quit()
     else:
         the_driver = web_driver(driver_type, driver_path)
+
+    load_last_queue(queues)
     menu(queues, the_driver)
 
 def add_web_queue(queues):
@@ -604,6 +694,28 @@ def write_queue(queue_name, queues, queue_type):
         print("Saved web queue to \"" + queue_name + "\"")
         f.close()
 
+'''
+Function:       save_last_queue(web_action_queue_name)
+Arguments:      string
+Return:         void
+Description:    Saves the file name of the current web action queue loaded by
+                this program
+'''
+def save_last_queue(queue_name, queue_type):
+    web_queue_name = "last_web_queue.txt"
+    action_queue_name = "last_action_queue.txt"
+    web_action_queue_name = "last_web_action_queue.txt"
+
+    if (queue_type == "web_queue"):
+        f = open(web_queue_name, "w")
+        f.write(queue_name + "\n")
+    elif (queue_type == "action_queue"):
+        f = open(action_queue_name, "w")
+        f.write(queue_name + "\n")
+    elif (queue_type == "web_action_queue"):
+        f = open(web_action_queue_name, "w")
+        f.write(queue_name + "\n")
+
 def save_queue(queues, queue_type):
     exists = True
     answer = ""
@@ -690,6 +802,11 @@ def load_queue(queues, queue_type):
         exists = False
 
     if (exists == True):
+        if (queue_type == "web_queue"):
+            queues.web_queue = []
+        elif (queue_type == "action_queue"):
+            queues.action_queue = []
+
         f = open(queue_name)
         lines = f.readlines()
 
@@ -699,6 +816,11 @@ def load_queue(queues, queue_type):
                     queues.web_queue.append(line.replace("\n", ""))
                 elif (queue_type == "action_queue"):
                     queues.action_queue.append(line.replace("\n", ""))
+
+            if (queue_type == "web_queue"):
+                save_last_queue(queue_name, "web_queue")
+            elif (queue_type == "action_queue"):
+                save_last_queue(queue_name, "action_queue")
         else:
             queues.web_action_queue = [[]]
             # Create the columns for our actions
@@ -712,8 +834,11 @@ def load_queue(queues, queue_type):
                     index += 1
                     continue
 
+            save_last_queue(queue_name, "web_action_queue")
         print
         print("\"" + queue_name + "\" has been loaded")
+        print
+        print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
     else:
         print
         print("A file of that name does not exist in this directory.")
