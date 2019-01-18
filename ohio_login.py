@@ -17,9 +17,13 @@ Description:    Asks user for OHIO login ID and password. Completes the login
                 by Selenium
 '''
 def ohio_login(driver):
+    print
+
     cas_username_xpath = "//*[@id='username']"
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
+
+    login_complete = False
 
     if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
         username = raw_input("Enter OHIO username: ")
