@@ -35,6 +35,7 @@ def script_main(driver, received_url, pos):
                 author = author.strip()
             elif (data["id"] == "storyDate"):
                 story_date = data.text
+
     story_date = re.findall(r"(\S+)", story_date)
 
     for index in range(len(story_date)):
@@ -72,6 +73,10 @@ def script_main(driver, received_url, pos):
     for entry in story_date:
         date += entry
 
+    all_tags = soup.find("div", class_="groupings").text
+    all_tags = all_tags.strip()
+    tags = re.split(", ", all_tags)
+
     content = soup.find("div", id="story")
 
     errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
@@ -82,7 +87,8 @@ def script_main(driver, received_url, pos):
     cas_username_xpath = "//*[@id='username']"
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-    article_page_url = "https://webcms.ohio.edu/fine-arts/group/1/content/create/group_node%3Aarticle"
+    compare_page_url = "https://webcms.ohio.edu/group/461/nodes?status=All&type=article&combine="
+    article_page_url = "https://webcms.ohio.edu/group/461/content/create/group_node%3Aarticle"
 
     output = ""
 
@@ -103,12 +109,25 @@ def script_main(driver, received_url, pos):
     title_xpath = "//*[@id='edit-title-0-value']"
     author_xpath = "//*[@id='edit-field-author-0-value']"
     date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
-    navigation_xpath = "//*[@id='edit-menu-parent']"
-    display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
-    column_xpath = "//*[@id='edit-column-number']"
+    tag_xpath = '//*[@id="edit-field-scripps-college-article-ta"]'
+    page_location_xpath = '//*[@id="edit-page-location"]/summary'
+    parent_page_xpath = '//*[@id="edit-parent-page"]'
+    page_url_slug_xpath = '//*[@id="edit-slug"]'
+    #navigation_xpath = "//*[@id='edit-menu-parent']"
+    #display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
+    #column_xpath = "//*[@id='edit-column-number']"
     body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
+    parent_page = "- News"
+    first = True
+
+    driver.find_element_by_xpath(page_location_xpath).click()
+    time.sleep(1)
+
+    element = Select(driver.find_element_by_xpath(parent_page_xpath))
+    element.select_by_visible_text(parent_page)
+    driver.find_element_by_xpath(page_url_slug_xpath).send_keys(title)
 
     if (title != ""):
         element = driver.find_element_by_xpath(title_xpath)
@@ -121,6 +140,16 @@ def script_main(driver, received_url, pos):
         element.send_keys(date)
 
     driver.execute_script(body_textarea_script)
+
+    if len(tags) > 0:
+        for tag in tags:
+            element = Select(driver.find_element_by_xpath(tag_xpath))
+
+            if (first == True):
+                element.deselect_all()
+                first = False
+
+            element.select_by_visible_text(tag)
 
     time.sleep(10)
     '''
