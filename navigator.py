@@ -22,9 +22,11 @@ class queue:
         self.web_action_queue = web_action_queue
 
 class web_driver:
-    def __init__(self, driver_type, driver_path):
+    def __init__(self, driver_type, driver_path, chrome_profile, firefox_profile):
         self.driver_type = driver_type
         self.driver_path = driver_path
+        self.chrome_profile = chrome_profile
+        self.firefox_profile = firefox_profile
 
 '''
 Function:       load_last_queue()
@@ -144,9 +146,13 @@ def initialization():
 
     driver_option_type = "driver_type"
     driver_option_path = "driver_path"
+    driver_option_chrome_profile = "chrome_profile"
+    driver_option_firefox_profile = "firefox_profile"
     found_driver_type = False
     found_correct_driver_type = False
     found_driver_path = False
+    found_chrome_profile = False
+    found_firefox_profile = False
 
     for option in config.options(driver_section):
         if (option == driver_option_type):
@@ -159,6 +165,16 @@ def initialization():
         if (option == driver_option_path):
             found_driver_path = True
             driver_path = config.get(driver_section, driver_option_path)
+
+        if (option == driver_option_chrome_profile):
+            chrome_profile = config.get(driver_section, driver_option_chrome_profile)
+        else:
+            found_chrome_profile = True
+
+        if (option == driver_option_firefox_profile):
+            firefox_profile = config.get(driver_section, driver_option_firefox_profile)
+        else:
+            found_firefox_profile = True
 
     if (found_driver_type == False):
         print
@@ -178,11 +194,17 @@ def initialization():
         print("Make sure a \"" + driver_option_path + "\" option is included under the \"[" + driver_section + "]\" section.")
         complete_config = False
 
+    if (found_chrome_profile == False):
+        chrome_profile = ""
+
+    if (found_firefox_profile == False):
+        firefox_profile = ""
+
     if (complete_config == False):
         print
         quit()
     else:
-        the_driver = web_driver(driver_type, driver_path)
+        the_driver = web_driver(driver_type, driver_path, chrome_profile, firefox_profile)
 
     load_last_queue(queues)
     menu(queues, the_driver)
@@ -911,7 +933,12 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
         return
     if (the_driver.driver_type == "chrome"):
         try:
-            driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+            if (re.match("^\s*$", the_driver.chrome_profile)):
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+            else:
+                options = webdriver.ChromeOptions()
+                options.add_argument("--user-data-dir=" + the_driver.chrome_profile)
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options=options)
         except:
             print
             print("Could not open the chromedriver")
@@ -924,7 +951,13 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
             menu(queues, the_driver)
     elif (the_driver.driver_type == "firefox"):
             try:
-                driver = webdriver.Firefox(executable_path=the_driver.driver_path)
+                if (re.match("^\s*$", the_driver.firefox_profile)):
+                    print("TRUE")
+                    driver = webdriver.Firefox(executable_path=the_driver.driver_path)
+                else:
+                    profile = webdriver.FirefoxProfile(the_driver.firefox_profile)
+                    driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_profile=profile)
+
             except:
                 print
                 print("Could not open the geckodriver")
