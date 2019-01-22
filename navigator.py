@@ -695,8 +695,8 @@ def write_queue(queue_name, queues, queue_type):
         f.close()
 
 '''
-Function:       save_last_queue(web_action_queue_name)
-Arguments:      string
+Function:       save_last_queue(queue_name, queue_type)
+Arguments:      string, string
 Return:         void
 Description:    Saves the file name of the current web action queue loaded by
                 this program
@@ -740,7 +740,6 @@ def save_queue(queues, queue_type):
             print
             print("The website-action queue is empty.")
             return
-
     try:
         open(queue_name)
         exists = True
@@ -756,10 +755,16 @@ def save_queue(queues, queue_type):
 
         if (answer == "y"):
             write_queue(queue_name, queues, queue_type)
+            save_last_queue(queue_name, queue_type)
+            print
+            print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
         else:
             return
     else:
         write_queue(queue_name, queues, queue_type)
+        save_last_queue(queue_name, queue_type)
+        print
+        print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
 
 def load_queue(queues, queue_type):
     exists = True
