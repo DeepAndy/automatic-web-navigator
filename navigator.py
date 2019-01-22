@@ -66,7 +66,14 @@ def load_last_queue(queues):
         f1.close()
 
         if (not re.match(r"^\s*$", web_queue_text)):
-            f = open(web_queue_text)
+            try:
+                f = open(web_queue_text)
+            except:
+                print
+                print("Not able to find \"" + web_queue_text + "\"")
+                print("Will not load the file")
+                return
+
             lines = f.readlines()
             queues.web_queue = []
 
@@ -82,7 +89,14 @@ def load_last_queue(queues):
         f2.close()
 
         if (not re.match(r"^\s*$", action_queue_text)):
-            f = open(action_queue_text)
+            try:
+                f = open(action_queue_text)
+            except:
+                print
+                print("Not able to find \"" + action_queue_text + "\"")
+                print("Will not load the file")
+                return
+
             lines = f.readlines()
             queues.action_queue = []
 
@@ -97,7 +111,14 @@ def load_last_queue(queues):
         f3.close()
 
         if (not re.match(r"^\s*$", web_action_queue_text)):
-            f = open(web_action_queue_text)
+            try:
+                f = open(web_action_queue_text)
+            except:
+                print
+                print("Not able to find \"" + action_queue_text + "\"")
+                print("Will not load the file")
+                return
+
             lines = f.readlines()
             queues.web_action_queue = [[]]
 
