@@ -1,3 +1,10 @@
+'''
+Author:         Austin Moore
+Script Type:    Main Script
+Description:    Used to create a website queue (.wq) of all URLs on a specified
+                page
+'''
+
 import re
 import ConfigParser
 from selenium import webdriver
