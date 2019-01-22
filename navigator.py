@@ -64,76 +64,84 @@ def load_last_queue(queues):
         web_queue_text = f1.read()
         web_queue_text = web_queue_text.strip()
         f1.close()
+        check = False
 
         if (not re.match(r"^\s*$", web_queue_text)):
             try:
                 f = open(web_queue_text)
+                check = True
             except:
                 print
                 print("Not able to find \"" + web_queue_text + "\"")
                 print("Will not load the file")
-                return
 
-            lines = f.readlines()
-            queues.web_queue = []
+            if (check == True):
+                lines = f.readlines()
+                queues.web_queue = []
 
-            for line in lines:
-                queues.web_queue.append(line.strip())
+                for line in lines:
+                    queues.web_queue.append(line.strip())
 
-            print
-            print('"' + web_queue_text + '"' + " has been loaded automatically")
+                print
+                print('"' + web_queue_text + '"' + " has been loaded automatically")
 
     if (action_queue_found == True):
         action_queue_text = f2.read()
         action_queue_text = action_queue_text.strip()
         f2.close()
+        check = False
 
         if (not re.match(r"^\s*$", action_queue_text)):
             try:
                 f = open(action_queue_text)
+                check = True
             except:
                 print
                 print("Not able to find \"" + action_queue_text + "\"")
                 print("Will not load the file")
-                return
 
-            lines = f.readlines()
-            queues.action_queue = []
+            if (check == True):
+                lines = f.readlines()
+                queues.action_queue = []
 
-            for line in lines:
-                queues.action_queue.append(line.strip())
+                for line in lines:
+                    queues.action_queue.append(line.strip())
 
-            print('"' + action_queue_text + '"' + " has been loaded automatically")
+                print
+                print('"' + action_queue_text + '"' + " has been loaded automatically")
 
     if (web_action_queue_found == True):
         web_action_queue_text = f3.read()
         web_action_queue_text = web_action_queue_text.strip()
         f3.close()
+        check = False
 
         if (not re.match(r"^\s*$", web_action_queue_text)):
             try:
                 f = open(web_action_queue_text)
+                check = True
             except:
                 print
                 print("Not able to find \"" + action_queue_text + "\"")
                 print("Will not load the file")
-                return
 
-            lines = f.readlines()
-            queues.web_action_queue = [[]]
+            if (check == True):
+                lines = f.readlines()
+                queues.web_action_queue = [[]]
 
-            # Create the columns for our actions
-            index = 0
+                # Create the columns for our actions
+                index = 0
 
-            for line in lines:
-                if (line != "\n"):
-                    queues.web_action_queue[index].append(line.replace("\n", ""))
-                else:
-                    queues.web_action_queue.append([])
-                    index += 1
-                    continue
+                for line in lines:
+                    if (line != "\n"):
+                        queues.web_action_queue[index].append(line.replace("\n", ""))
+                    else:
+                        queues.web_action_queue.append([])
+                        index += 1
+                        continue
 
-            print('"' + web_action_queue_text + '"' + " has been loaded automatically")
+                print
+                print('"' + web_action_queue_text + '"' + " has been loaded automatically")
 
 def initialization():
     queues = queue([], [], [[]])
