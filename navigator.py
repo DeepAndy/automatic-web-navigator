@@ -812,12 +812,12 @@ def load_queue(queues, queue_type):
     dirs = os.listdir(path)
 
     for file in dirs:
-            if (queue_type == "web_queue"):
-                    print(str(file.split(".wq")[0]))
-            elif (queue_type == "action_queue"):
-                    print(str(file.split(".aq")[0]))
-            elif (queue_type == "web_action_queue"):
-                    print(str(file.split(".waq")[0]))
+        if (queue_type == "web_queue"):
+            print(str(file.split(".wq")[0]))
+        elif (queue_type == "action_queue"):
+            print(str(file.split(".aq")[0]))
+        elif (queue_type == "web_action_queue"):
+            print(str(file.split(".waq")[0]))
                     
     print
     queue_name = raw_input("Enter name of the queue file: ")

@@ -100,7 +100,7 @@ def script_main(driver, received_url, pos):
     output = re.sub(r"'", "\\'", output)
     output = re.sub(r"\n", "", output)
 
-    driver.get(article_page_url)
+    driver.get(compare_page_url)
 
     ohio_login(driver)
 
