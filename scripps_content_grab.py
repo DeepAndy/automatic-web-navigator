@@ -6,17 +6,13 @@ Description:    This script migrates websites from Ohio University's
                 with navigator.py
 '''
 
+import re
+import time
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import HTMLParser
-import StringIO
-import re
-from fix_html import *
-import getpass
-import time
-from pyexcel import *
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+from fix_html import *
 from ohio_login import ohio_login
 
 def script_main(driver, received_url, pos):
@@ -107,14 +103,12 @@ def script_main(driver, received_url, pos):
     title_xpath = "//*[@id='edit-title-0-value']"
     author_xpath = "//*[@id='edit-field-author-0-value']"
     date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
-    tag_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
     navigation_xpath = "//*[@id='edit-menu-parent']"
     display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
     column_xpath = "//*[@id='edit-column-number']"
     body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
-    first = True
 
     if (title != ""):
         element = driver.find_element_by_xpath(title_xpath)
@@ -128,29 +122,8 @@ def script_main(driver, received_url, pos):
 
     driver.execute_script(body_textarea_script)
 
-    num_columns = "1"
-    nav = "</news/ | Left>"
-
-    if len(tags) > 0:
-        for tag in tags:
-            element = Select(driver.find_element_by_xpath(tag_xpath))
-
-            if (first == True):
-                element.deselect_all()
-                first = False
-
-            if (tag != "CoFA"): 
-                element.select_by_visible_text('-' + tag)
-            else:
-                element.select_by_visible_text(tag)
-
-    element = Select(driver.find_element_by_xpath(navigation_xpath))
-    element.select_by_visible_text(nav)
-    element = driver.find_element_by_xpath(display_settings_xpath)
-    element.click()
-    element = Select(driver.find_element_by_xpath(column_xpath))
-    element.select_by_visible_text(num_columns)
-
+    time.sleep(10)
+    '''
     element = driver.find_element_by_xpath(save_xpath)
     element.click()
 
@@ -161,3 +134,4 @@ def script_main(driver, received_url, pos):
     element.click()
 
     time.sleep(0.5)
+    '''
