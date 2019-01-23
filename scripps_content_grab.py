@@ -8,6 +8,7 @@ Description:    This script migrates websites from Ohio University's
 
 import re
 import time
+import io
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -25,6 +26,19 @@ def script_main(driver, received_url, pos):
     author = ""
     story_date = ""
     date = ""
+
+    title = driver.title
+
+    print("title = " + title)
+
+    f = io.open("title.txt", "r", encoding="utf-8")
+    all_sites = f.readlines()
+
+    for site in all_sites:
+        site = site.strip()
+        if (title == site):
+            print("SKIPPED")
+            return
 
     article_data = soup.find("div", id="articleData")
     for data in article_data.find_all():
@@ -80,14 +94,14 @@ def script_main(driver, received_url, pos):
     content = soup.find("div", id="story")
 
     errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
-    fix_all(content, errors)
-
-    title = driver.title
+    try:
+        fix_all(content, errors)
+    except:
+        print("Skipping HTML cleanup")
 
     cas_username_xpath = "//*[@id='username']"
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-    compare_page_url = "https://webcms.ohio.edu/group/461/nodes?status=All&type=article&combine="
     article_page_url = "https://webcms.ohio.edu/group/461/content/create/group_node%3Aarticle"
 
     output = ""
@@ -100,11 +114,11 @@ def script_main(driver, received_url, pos):
     output = re.sub(r"'", "\\'", output)
     output = re.sub(r"\n", "", output)
 
-    driver.get(compare_page_url)
+    driver.get(article_page_url)
 
     ohio_login(driver)
 
-    time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
+    time.sleep(2) # NEED TO WAIT FOR TEXTAREA TO LOAD
 
     title_xpath = "//*[@id='edit-title-0-value']"
     author_xpath = "//*[@id='edit-field-author-0-value']"
@@ -123,7 +137,7 @@ def script_main(driver, received_url, pos):
     first = True
 
     driver.find_element_by_xpath(page_location_xpath).click()
-    time.sleep(1)
+    time.sleep(2)
 
     element = Select(driver.find_element_by_xpath(parent_page_xpath))
     element.select_by_visible_text(parent_page)
@@ -151,16 +165,15 @@ def script_main(driver, received_url, pos):
 
             element.select_by_visible_text(tag)
 
-    time.sleep(10)
-    '''
     element = driver.find_element_by_xpath(save_xpath)
     element.click()
 
     alert = driver.switch_to.alert
     alert.accept()
 
+    '''
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
+    '''
 
     time.sleep(0.5)
-    '''
