@@ -1,3 +1,10 @@
+'''
+Author:         Austin Moore
+Script Type:    Main Script
+Description:    Quick script to create a web queue from a list of URL IDs given
+                to me
+'''
+
 import re
 
 f = open("scrippsids.txt", "r")
