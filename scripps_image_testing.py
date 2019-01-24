@@ -22,6 +22,7 @@ def script_main(driver, received_url, pos):
     page_source = page_source.replace(u"\xa0", u" ")
     page_source = page_source.replace(u"\xc2", u" ")
     soup = BeautifulSoup(page_source, features="html.parser")
+    article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Apage"
 
     title = ""
     author = ""
@@ -94,27 +95,27 @@ def script_main(driver, received_url, pos):
 
     content = soup.find("div", id="story")
 
-    download_image(received_url, content)
-    '''
-
-    errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
-    try:
-        fix_all(content, errors)
-    except:
-        print("Skipping HTML cleanup")
-
-    cas_username_xpath = "//*[@id='username']"
-    cas_password_xpath = "//*[@id='password']"
-    cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-    article_page_url = "https://webcms.ohio.edu/group/461/content/create/group_node%3Aarticle"
-
     output = ""
+
+    image_index = 0
 
     for tag in content:
         line = str(tag.encode("utf-8"))
         line = line.strip()
+        if (tag == "img"):
+            download_image(received_url, content, image_index)
+            image_index += 1
+
+        errors = []
+
+        try:
+            fix_all(line, errors)
+        except:
+            print("Skipping HTML cleanup")
+
         output += line
 
+    # For JavaScript code in Drupal
     output = re.sub(r"'", "\\'", output)
     output = re.sub(r"\n", "", output)
 
@@ -131,34 +132,39 @@ def script_main(driver, received_url, pos):
     page_location_xpath = '//*[@id="edit-page-location"]/summary'
     parent_page_xpath = '//*[@id="edit-parent-page"]'
     page_url_slug_xpath = '//*[@id="edit-slug"]'
-    #navigation_xpath = "//*[@id='edit-menu-parent']"
-    #display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
-    #column_xpath = "//*[@id='edit-column-number']"
     body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
     parent_page = "- News"
     first = True
 
+    '''
     driver.find_element_by_xpath(page_location_xpath).click()
     time.sleep(2)
 
     element = Select(driver.find_element_by_xpath(parent_page_xpath))
     element.select_by_visible_text(parent_page)
     driver.find_element_by_xpath(page_url_slug_xpath).send_keys(title)
+    '''
 
     if (title != ""):
         element = driver.find_element_by_xpath(title_xpath)
         element.send_keys(title)
+
+    '''
     if (author != ""):
         element = driver.find_element_by_xpath(author_xpath)
         element.send_keys(author)
     if (date != ""):
         element = driver.find_element_by_xpath(date_xpath)
         element.send_keys(date)
+    '''
 
     driver.execute_script(body_textarea_script)
 
+    time.sleep(30)
+
+    '''
     if len(tags) > 0:
         for tag in tags:
             element = Select(driver.find_element_by_xpath(tag_xpath))
