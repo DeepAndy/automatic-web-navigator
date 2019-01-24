@@ -18,11 +18,12 @@ def script_main(driver, url, pos):
     add_new_image_xpath = '//*[@id="entity-browser-media-embed2-form"]/nav/ul/li[2]/a'
     image_upload_xpath = '//*[@id="edit-inline-entity-form-field-media-image-0-upload"]'
     name_xpath = '//*[@id="edit-inline-entity-form-name-0-value"]'
-    alternative_text_xpath = '//*[@id="edit-inline-entity-form-field-media-image-0"]' 
+    alternative_text_xpath = '//*[contains(@id, "edit-inline-entity-form-field-media-image-0-alt")]'
+    #//*[@id="edit-inline-entity-form-field-media-image-0-alt--tEgL067TBlQ"]
     save_image_xpath = '//*[@id="edit-submit"]'
     embed_xpath = '/html/body/div[6]/div[3]/div/button[2]'
 
-    i = 1                                                                        
+    i = 1
 
     for image in images:                                                         
         try:                                                                     
@@ -42,42 +43,44 @@ def script_main(driver, url, pos):
 
     driver.get(basic_page_url)
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(image_embed_xpath)
     element.click()
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(iframe_xpath)
     driver.switch_to.frame(element)
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(add_new_image_xpath)
     element.click()
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(image_upload_xpath)
     element.send_keys(os.getcwd() + "/images/1.jpg")
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(name_xpath)
     element.send_keys("Testing")
 
-    time.sleep(3)
+    time.sleep(2)
 
-    element = driver.find_element_by_xpath(re.findall(alternative_text_xpath, alternative_text_xpath)[0])
+    element = driver.find_element_by_xpath(alternative_text_xpath)
     element.send_keys("Testing")
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(save_image_xpath)
     element.click()
 
-    time.sleep(3)
+    time.sleep(2)
 
     element = driver.find_element_by_xpath(embed_xpath)
     element.click()
+
+    time.sleep(20)
