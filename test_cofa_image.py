@@ -35,7 +35,10 @@ def script_main(driver, url, pos):
         except:                                                                  
             continue
 
-    basic_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/group/1/content/create/group_node%3Apage"
+    # FINE ARTS
+    # basic_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/group/1/content/create/group_node%3Apage"
+    # OIT
+    basic_page_url = "https://webcmsdev.oit.ohio.edu/group/286/content/create/group_node%3Apage"
 
     driver.get(basic_page_url)
 
@@ -61,7 +64,7 @@ def script_main(driver, url, pos):
     time.sleep(2)
 
     element = driver.find_element_by_xpath(image_upload_xpath)
-    element.send_keys(os.getcwd() + "/images/1.jpg")
+    element.send_keys(os.getcwd() + "/images/2.jpg")
 
     time.sleep(2)
 
