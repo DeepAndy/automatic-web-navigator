@@ -327,8 +327,6 @@ def fix_all(soup, errors):
             tag.name = "em"
         elif (tag.name == "u"):
             tag.unwrap()
-        elif (tag.name == "img"):
-            tag.unwrap()
         elif (tag.name == "div"):
             tag.unwrap()
         elif (tag.name == "span"):

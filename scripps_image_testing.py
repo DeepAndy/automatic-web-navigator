@@ -91,28 +91,22 @@ def script_main(driver, received_url, pos):
 
     all_tags = soup.find("div", class_="groupings").text
     all_tags = all_tags.strip()
+
     tags = re.split(", ", all_tags)
 
     content = soup.find("div", id="story")
 
-    output = ""
+    errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
+    try:
+        fix_all(content, errors)
+    except:
+        print("Skipping HTML cleanup")
 
-    image_index = 0
+    output = ""
 
     for tag in content:
         line = str(tag.encode("utf-8"))
         line = line.strip()
-        if (tag == "img"):
-            download_image(received_url, content, image_index)
-            image_index += 1
-
-        errors = []
-
-        try:
-            fix_all(line, errors)
-        except:
-            print("Skipping HTML cleanup")
-
         output += line
 
     # For JavaScript code in Drupal
