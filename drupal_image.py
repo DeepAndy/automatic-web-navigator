@@ -22,8 +22,16 @@ def download_image(url, content, image_index):
             continue
         else:
             # print(image)
-            image_source = image["src"] 
-            alt_text = image["alt"]
+            try:
+                image_source = image["src"] 
+            except:
+                return
+
+            if (image.has_attr("alt")):
+                alt_text = image["alt"]
+            else:
+                alt_text = "No alternative text available"
+
             file_name = re.findall(r"/([^/]+\.\w+)$", image_source)[0]
             image_title = re.findall(r"(.+?)\.", file_name)[0]
 

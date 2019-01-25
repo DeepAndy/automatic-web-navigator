@@ -33,6 +33,7 @@ def script_main(driver, received_url, pos):
 
     print("title = " + title)
 
+    '''
     f = io.open("title.txt", "r", encoding="utf-8")
     all_sites = f.readlines()
 
@@ -41,6 +42,7 @@ def script_main(driver, received_url, pos):
         if (title == site):
             print("SKIPPED")
             return
+    '''
 
     article_data = soup.find("div", id="articleData")
     for data in article_data.find_all():
@@ -102,23 +104,16 @@ def script_main(driver, received_url, pos):
     except:
         print("Skipping HTML cleanup")
 
-    output = ""
-
-    for tag in content:
-        line = str(tag.encode("utf-8"))
-        line = line.strip()
-        output += line
-
-    # For JavaScript code in Drupal
-    output = re.sub(r"'", "\\'", output)
-    output = re.sub(r"\n", "", output)
-
     driver.get(article_page_url)
 
     ohio_login(driver)
 
     time.sleep(2) # NEED TO WAIT FOR TEXTAREA TO LOAD
 
+    rich_text_xpath = '//*[@id="cke_1_contents"]/iframe'
+    rich_text_body_xpath = '/html/body'
+    rich_text_source_xpath = '//*[@id="cke_12_label"]'
+    rich_text_textarea_xpath = '//*[@id="cke_1_contents"]/textarea'
     title_xpath = "//*[@id='edit-title-0-value']"
     author_xpath = "//*[@id='edit-field-author-0-value']"
     date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
@@ -126,10 +121,8 @@ def script_main(driver, received_url, pos):
     page_location_xpath = '//*[@id="edit-page-location"]/summary'
     parent_page_xpath = '//*[@id="edit-parent-page"]'
     page_url_slug_xpath = '//*[@id="edit-slug"]'
-    body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
-    parent_page = "- News"
     first = True
 
     '''
@@ -154,7 +147,36 @@ def script_main(driver, received_url, pos):
         element.send_keys(date)
     '''
 
-    driver.execute_script(body_textarea_script)
+    output = ""
+
+    driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
+
+    for tag in content:
+        line = str(tag.encode("utf-8"))
+        line = line.strip()
+
+        # For JavaScript code in Drupal
+        line = line.replace('"', '\\"')
+        line = line.replace("\n", "")
+
+        if (re.findall("^\s*$", line)):
+            continue
+
+        print("line = " + line)
+
+        element = driver.find_element_by_xpath(rich_text_body_xpath)
+        html_backup = element.get_attribute("innerHTML")
+
+        html_backup = html_backup.replace(u"\xa0", u" ")
+        html_backup = html_backup.replace(u"\xc2", u" ")
+        html_backup = str(html_backup.encode("utf-8"))
+        html_backup = html_backup.replace('"', '\\"')
+
+        print("html_backup = " + html_backup)
+
+        if (not re.findall("^\s*$", html_backup)):
+            body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + html_backup + line + '";'
+            driver.execute_script(body_textarea_script)
 
     time.sleep(30)
 
