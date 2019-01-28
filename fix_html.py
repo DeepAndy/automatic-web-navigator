@@ -1,14 +1,15 @@
 '''
-Author:         Austin Moore
-Script Type:    Helper Script
-Description:    Script for cleaning up HTML files during migration from CommonSpot
-                to Drupal
+Author: Austin Moore
+Date Created: 10-29-18
+Description: Script for cleaning up HTML files during migration from CommonSpot
+             to Drupal
 '''
 
 import re
 import urllib2
 import StringIO
 import getpass
+import bs4
 from HTMLParser import HTMLParser
 from htmlentitydefs import name2codepoint
 from bs4 import BeautifulSoup
@@ -327,8 +328,10 @@ def fix_all(soup, errors):
             tag.name = "em"
         elif (tag.name == "u"):
             tag.unwrap()
-        elif (tag.name == "div"):
+        '''
+        elif (tag.name == "img"):
             tag.unwrap()
+        '''
         elif (tag.name == "span"):
             tag.unwrap()
         elif (tag.name == "p"):
@@ -336,6 +339,16 @@ def fix_all(soup, errors):
                 tag.decompose()
         elif (re.findall(r"h\d", str(tag.name))):
             if (re.findall(r"^\s*$", tag.text)):
+                tag.decompose()
+        elif (tag.name == "div"):
+            unwrap_tags = False
+            for tag2 in tag:
+                if ((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em")):
+                    unwrap_tags = True
+                    tag.name = "p"
+                elif (unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)):
+                    tag2.unwrap()
+            if (re.findall(r"^\s*$", tag.get_text())):
                 tag.decompose()
         try:
             if (tag.has_attr("class")):
