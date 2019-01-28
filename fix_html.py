@@ -314,6 +314,8 @@ def fix_all(soup, errors):
 
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
+        if (re.findall(r"^\s*$", tag.get_text())):
+            tag.decompose()
         if (tag.name == "hr"):
             tag.decompose()
         elif (tag.name == "script"):
@@ -328,10 +330,6 @@ def fix_all(soup, errors):
             tag.name = "em"
         elif (tag.name == "u"):
             tag.unwrap()
-        '''
-        elif (tag.name == "img"):
-            tag.unwrap()
-        '''
         elif (tag.name == "span"):
             tag.unwrap()
         elif (tag.name == "p"):
@@ -348,6 +346,8 @@ def fix_all(soup, errors):
                     tag.name = "p"
                 elif (unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)):
                     tag2.unwrap()
+                if (unwrap_tags == False):
+                    tag.unwrap()
             if (re.findall(r"^\s*$", tag.get_text())):
                 tag.decompose()
         try:
