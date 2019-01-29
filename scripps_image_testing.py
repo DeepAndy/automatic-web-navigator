@@ -21,7 +21,7 @@ def script_main(driver, received_url, pos):
     page_source = driver.page_source
     page_source = page_source.replace(u"\xa0", u" ")
     page_source = page_source.replace(u"\xc2", u" ")
-    soup = BeautifulSoup(page_source, features="html.parser")
+    soup = BeautifulSoup(page_source, "html5lib")
     article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Apage"
 
     title = ""
@@ -151,7 +151,16 @@ def script_main(driver, received_url, pos):
 
     driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
 
+    image_index = 0
+
     for tag in content:
+        '''
+        if (tag.name == "img"):
+            print("IMAGE")
+            download_image(retrieved_url, content, image_index)
+            tag.decompose()
+        else:
+        '''
         line = str(tag.encode("utf-8"))
         line = line.strip()
 
@@ -162,8 +171,6 @@ def script_main(driver, received_url, pos):
         if (re.findall("^\s*$", line)):
             continue
 
-        print("line = " + line)
-
         element = driver.find_element_by_xpath(rich_text_body_xpath)
         html_backup = element.get_attribute("innerHTML")
 
@@ -171,8 +178,6 @@ def script_main(driver, received_url, pos):
         html_backup = html_backup.replace(u"\xc2", u" ")
         html_backup = str(html_backup.encode("utf-8"))
         html_backup = html_backup.replace('"', '\\"')
-
-        print("html_backup = " + html_backup)
 
         if (not re.findall("^\s*$", html_backup)):
             body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + html_backup + line + '";'
