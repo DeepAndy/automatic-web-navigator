@@ -15,13 +15,13 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from fix_html import *
 from ohio_login import ohio_login
-from drupal_image import download_image
+from drupal_image import *
 
 def script_main(driver, received_url, pos):
     page_source = driver.page_source
     page_source = page_source.replace(u"\xa0", u" ")
     page_source = page_source.replace(u"\xc2", u" ")
-    soup = BeautifulSoup(page_source, "html5lib")
+    soup = BeautifulSoup(page_source, "html.parser")
     article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Apage"
 
     title = ""
@@ -30,8 +30,6 @@ def script_main(driver, received_url, pos):
     date = ""
 
     title = driver.title
-
-    print("title = " + title)
 
     '''
     f = io.open("title.txt", "r", encoding="utf-8")
@@ -154,36 +152,45 @@ def script_main(driver, received_url, pos):
     image_index = 0
 
     for tag in content:
-        '''
         if (tag.name == "img"):
-            print("IMAGE")
-            download_image(retrieved_url, content, image_index)
+            try:
+                driver.switch_to.default_content()
+            except:
+                pass
+
+            image_title, alt_text = download_image(received_url, content)
             tag.decompose()
+            embed_image(driver, image_title, alt_text)
+            image_index += 1
         else:
-        '''
-        line = str(tag.encode("utf-8"))
-        line = line.strip()
+            try:
+                driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
+            except:
+                pass
 
-        # For JavaScript code in Drupal
-        line = line.replace('"', '\\"')
-        line = line.replace("\n", "")
+            line = str(tag.encode("utf-8"))
+            line = line.strip()
 
-        if (re.findall("^\s*$", line)):
-            continue
+            # For JavaScript code in Drupal
+            line = line.replace('"', '\\"')
+            line = line.replace("\n", "")
 
-        element = driver.find_element_by_xpath(rich_text_body_xpath)
-        html_backup = element.get_attribute("innerHTML")
+            if (re.findall("^\s*$", line)):
+                continue
 
-        html_backup = html_backup.replace(u"\xa0", u" ")
-        html_backup = html_backup.replace(u"\xc2", u" ")
-        html_backup = str(html_backup.encode("utf-8"))
-        html_backup = html_backup.replace('"', '\\"')
+            element = driver.find_element_by_xpath(rich_text_body_xpath)
+            html_backup = element.get_attribute("innerHTML")
 
-        if (not re.findall("^\s*$", html_backup)):
-            body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + html_backup + line + '";'
-            driver.execute_script(body_textarea_script)
+            html_backup = html_backup.replace(u"\xa0", u" ")
+            html_backup = html_backup.replace(u"\xc2", u" ")
+            html_backup = str(html_backup.encode("utf-8"))
+            html_backup = html_backup.replace('"', '\\"')
 
-    time.sleep(30)
+            if (not re.findall("^\s*$", html_backup)):
+                body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + html_backup + line + '";'
+                driver.execute_script(body_textarea_script)
+
+    time.sleep(5)
 
     '''
     if len(tags) > 0:
