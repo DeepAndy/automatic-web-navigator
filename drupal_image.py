@@ -4,6 +4,9 @@ import os
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 '''
 Author:         Austin Moore
@@ -53,9 +56,11 @@ def download_image(url, content):
     except:
         print("Failed to download image at \"" + image_source + "\"")
 
-    return image_title, alt_text
+    return file_name, image_title, alt_text
 
-def embed_image(driver, image_title, alt_text):
+def embed_image(driver,file_name, image_title, alt_text):
+    wait = WebDriverWait(driver, 10)
+
     image_embed_xpath = '//*[@id="cke_38"]/span[1]'
     iframe_xpath = '//*[@id="entity_browser_iframe_media_embed2"]'
     add_new_image_xpath = '//*[@id="entity-browser-media-embed2-form"]/nav/ul/li[2]/a'
@@ -67,32 +72,21 @@ def embed_image(driver, image_title, alt_text):
 
     driver.find_element_by_xpath(image_embed_xpath).click()
 
-    time.sleep(2)
-
+    wait.until(EC.presence_of_element_located((By.XPATH, iframe_xpath)))
     element = driver.find_element_by_xpath(iframe_xpath)
     driver.switch_to.frame(element)
 
-    time.sleep(2)
-
     driver.find_element_by_xpath(add_new_image_xpath).click()
 
-    time.sleep(2)
-
     element = driver.find_element_by_xpath(image_upload_xpath)
-    element.send_keys(os.getcwd() + "/" + image_title)
-
-    time.sleep(2)
+    element.send_keys(os.getcwd() + "/images/" + file_name)
 
     driver.find_element_by_xpath(name_xpath).send_keys(image_title)
 
-    time.sleep(2)
-
+    wait.until(EC.presence_of_element_located((By.XPATH, alternative_text_xpath)))
     driver.find_element_by_xpath(alternative_text_xpath).send_keys(alt_text)
-
-    time.sleep(2)
 
     driver.find_element_by_xpath(save_image_xpath).click()
 
-    time.sleep(2)
-
+    wait.until(EC.presence_of_element_located((By.XPATH, embed_xpath)))
     driver.find_element_by_xpath(embed_xpath).click()

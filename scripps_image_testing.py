@@ -158,9 +158,9 @@ def script_main(driver, received_url, pos):
             except:
                 pass
 
-            image_title, alt_text = download_image(received_url, content)
+            file_name, image_title, alt_text = download_image(received_url, content)
             tag.decompose()
-            embed_image(driver, image_title, alt_text)
+            embed_image(driver, file_name, image_title, alt_text)
             image_index += 1
         else:
             try:
