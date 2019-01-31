@@ -13,6 +13,9 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from fix_html import *
 from ohio_login import ohio_login
 from drupal_image import *
@@ -22,7 +25,7 @@ def script_main(driver, received_url, pos):
     page_source = page_source.replace(u"\xa0", u" ")
     page_source = page_source.replace(u"\xc2", u" ")
     soup = BeautifulSoup(page_source, "html.parser")
-    article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Apage"
+    article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Aarticle"
 
     title = ""
     author = ""
@@ -106,7 +109,7 @@ def script_main(driver, received_url, pos):
 
     ohio_login(driver)
 
-    time.sleep(2) # NEED TO WAIT FOR TEXTAREA TO LOAD
+    wait = WebDriverWait(driver, 10)
 
     rich_text_xpath = '//*[@id="cke_1_contents"]/iframe'
     rich_text_body_xpath = '/html/body'
@@ -121,29 +124,25 @@ def script_main(driver, received_url, pos):
     page_url_slug_xpath = '//*[@id="edit-slug"]'
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
+    parent_page = "- News"
     first = True
 
-    '''
     driver.find_element_by_xpath(page_location_xpath).click()
-    time.sleep(2)
 
     element = Select(driver.find_element_by_xpath(parent_page_xpath))
     element.select_by_visible_text(parent_page)
     driver.find_element_by_xpath(page_url_slug_xpath).send_keys(title)
-    '''
 
     if (title != ""):
         element = driver.find_element_by_xpath(title_xpath)
         element.send_keys(title)
 
-    '''
     if (author != ""):
         element = driver.find_element_by_xpath(author_xpath)
         element.send_keys(author)
     if (date != ""):
         element = driver.find_element_by_xpath(date_xpath)
         element.send_keys(date)
-    '''
 
     output = ""
 
@@ -158,10 +157,18 @@ def script_main(driver, received_url, pos):
             except:
                 pass
 
-            file_name, image_title, alt_text = download_image(received_url, content)
-            tag.decompose()
-            embed_image(driver, file_name, image_title, alt_text)
-            image_index += 1
+            try:
+                file_name, image_title, alt_text = download_image(received_url, content)
+                tag.decompose()
+            except:
+                image_index += 1
+                continue
+
+            try:
+                embed_image(driver, file_name, image_title, alt_text)
+            except:
+                image_index += 1
+                continue
         else:
             try:
                 driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
@@ -190,9 +197,11 @@ def script_main(driver, received_url, pos):
                 body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + html_backup + line + '";'
                 driver.execute_script(body_textarea_script)
 
-    time.sleep(5)
+    try:
+        driver.switch_to.default_content()
+    except:
+        pass
 
-    '''
     if len(tags) > 0:
         for tag in tags:
             element = Select(driver.find_element_by_xpath(tag_xpath))
@@ -206,11 +215,10 @@ def script_main(driver, received_url, pos):
     element = driver.find_element_by_xpath(save_xpath)
     element.click()
 
+    '''
     alert = driver.switch_to.alert
     alert.accept()
 
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
-
-    time.sleep(0.5)
     '''

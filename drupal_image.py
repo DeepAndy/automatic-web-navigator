@@ -61,14 +61,14 @@ def download_image(url, content):
 def embed_image(driver,file_name, image_title, alt_text):
     wait = WebDriverWait(driver, 10)
 
-    image_embed_xpath = '//*[@id="cke_38"]/span[1]'
+    image_embed_xpath = '//*[@id="cke_42"]/span[1]'
     iframe_xpath = '//*[@id="entity_browser_iframe_media_embed2"]'
     add_new_image_xpath = '//*[@id="entity-browser-media-embed2-form"]/nav/ul/li[2]/a'
     image_upload_xpath = '//*[@id="edit-inline-entity-form-field-media-image-0-upload"]'
     name_xpath = '//*[@id="edit-inline-entity-form-name-0-value"]'
     alternative_text_xpath = '//*[contains(@id, "edit-inline-entity-form-field-media-image-0-alt")]'
     save_image_xpath = '//*[@id="edit-submit"]'
-    embed_xpath = '/html/body/div[6]/div[3]/div/button[2]'
+    embed_xpath = '/html/body/div[5]/div[3]/div/button[2]'
 
     driver.find_element_by_xpath(image_embed_xpath).click()
 
