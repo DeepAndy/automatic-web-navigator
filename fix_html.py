@@ -1,14 +1,15 @@
 '''
-Author:         Austin Moore
-Script Type:    Helper Script
-Description:    Script for cleaning up HTML files during migration from CommonSpot
-                to Drupal
+Author: Austin Moore
+Date Created: 10-29-18
+Description: Script for cleaning up HTML files during migration from CommonSpot
+             to Drupal
 '''
 
 import re
 import urllib2
 import StringIO
 import getpass
+import bs4
 from HTMLParser import HTMLParser
 from htmlentitydefs import name2codepoint
 from bs4 import BeautifulSoup
@@ -83,6 +84,10 @@ def find_errors(soup):
                 warnings.append("empty")
                 print_friendly_errors.append("WARNING: empty tag found")
                 #error_line_string.append(lines[i])
+        if (re.findall(r"h\d", str(tag.name))):
+            if (re.findall(r"^\s*$", tag.text)):
+                errors.append("empty header")
+                print_friendly_errors.append("ERROR: empty header tag found")
         if (tag.name == "hr"):
             errors.append("<hr />")
             print_friendly_errors.append("ERROR: <hr /> tag found")
@@ -171,6 +176,11 @@ def find_errors(soup):
                 errors.append("xls")
                 print_friendly_errors.append("ERROR: XLS link found. Will add brackets but this still needs Drupal embedded")
                 #error_line_string.append(lines[i])
+            elif (re.findall(r'\.zip', tag["href"])):
+                errors.append("zip")
+                print_friendly_errors.append("ERROR: ZIP link found. Will add brackets but this still needs Drupal embedded")
+                #error_line_string.append(lines[i]))
+
         if (tag.has_attr("style")):
             errors.append("style=")
             print_friendly_errors.append("ERROR: inline style found")
@@ -304,6 +314,8 @@ def fix_all(soup, errors):
 
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
+        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "img"):
+            tag.decompose()
         if (tag.name == "hr"):
             tag.decompose()
         elif (tag.name == "script"):
@@ -319,14 +331,31 @@ def fix_all(soup, errors):
         elif (tag.name == "u"):
             tag.unwrap()
         elif (tag.name == "img"):
-            tag.unwrap()
-        elif (tag.name == "div"):
-            tag.unwrap()
+            tag.decompose()
         elif (tag.name == "span"):
             tag.unwrap()
         elif (tag.name == "p"):
             if (re.findall(r"^\s*$", tag.text)):
                 tag.decompose()
+        elif (re.findall(r"h\d", str(tag.name))):
+            if (re.findall(r"^\s*$", tag.text)):
+                tag.decompose()
+        elif (tag.name == "div"):
+            unwrap_tags = False
+            found_special = False
+            for tag2 in tag:
+                if (tag2.name == "img"):
+                    found_special = True
+                    continue
+                if (((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em" or tag2.name == "a")) and (found_special == False)):
+                    unwrap_tags = True
+                    tag.name = "p"
+                elif ((unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)) and (tag2.name != "strong" or tag2.name != "em" or tag2.name != "a")):
+                    tag2.unwrap()
+            if (re.findall(r"^\s*$", tag.get_text()) and found_special == False):
+                tag.decompose()
+            elif (unwrap_tags == False):
+                tag.unwrap()
         try:
             if (tag.has_attr("class")):
                 del tag["class"]
@@ -350,6 +379,9 @@ def fix_all(soup, errors):
                 if (re.findall("\.xlsx?", tag["href"])):
                     if (not re.findall("\[Excel\]", tag.text)):
                         tag.string += " [Excel]"
+                if (re.findall(r'\.zip', tag["href"])):
+                    if (not re.findall(r'\[ZIP]', tag.text)):
+                        tag.string += " [ZIP]"
         except:
             continue
 
