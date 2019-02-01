@@ -30,6 +30,8 @@ def script_main(driver, received_url, pos):
     title = driver.title
 
     '''
+    print("title = " + title)
+
     f = io.open("title.txt", "r", encoding="utf-8")
     all_sites = f.readlines()
 
