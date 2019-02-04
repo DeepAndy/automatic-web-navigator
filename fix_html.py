@@ -314,7 +314,7 @@ def fix_all(soup, errors):
 
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
-        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "img"):
+        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "img" and tag.name != "br"):
             tag.decompose()
         if (tag.name == "hr"):
             tag.decompose()
