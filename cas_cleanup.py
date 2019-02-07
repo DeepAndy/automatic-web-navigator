@@ -75,11 +75,6 @@ def script_main(driver, received_url, pos):
     driver.switch_to.default_content()
     time.sleep(10)
 
-    '''
-    body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
-    driver.execute_script(body_textarea_script)
-    '''
-
     # Click save button
     wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
