@@ -971,37 +971,44 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                 driver = webdriver.Chrome(executable_path=the_driver.driver_path)
             else:
                 options = webdriver.ChromeOptions()
-                options.add_argument("--user-data-dir=" + the_driver.chrome_profile)
-                driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options=options)
+                options.add_argument("user-data-dir=" + the_driver.chrome_profile)
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = options)
         except:
             print
             print("Could not open the chromedriver")
-            print("Check that the driver type and driver path is correct in config.ini")
+            print("Check that the driver type and driver path and browser profile is correct in config.ini")
             print("These are the current driver settings:")
             print
             print("driver_type = " + the_driver.driver_type)
             print("driver_path = " + the_driver.driver_path)
+            print("chrome_profile = " + the_driver.chrome_profile)
+            print("firefox_profile = " + the_driver.firefox_profile)
+            print
+            print("It may also be possible that the set browser profile is already in use")
             print
             menu(queues, the_driver)
     elif (the_driver.driver_type == "firefox"):
-            try:
-                if (re.match("^\s*$", the_driver.firefox_profile)):
-                    print("TRUE")
-                    driver = webdriver.Firefox(executable_path=the_driver.driver_path)
-                else:
-                    profile = webdriver.FirefoxProfile(the_driver.firefox_profile)
-                    driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_profile=profile)
+        try:
+            if (re.match("^\s*$", the_driver.firefox_profile)):
+                driver = webdriver.Firefox(executable_path=the_driver.driver_path)
+            else:
+                profile = webdriver.FirefoxProfile(the_driver.firefox_profile)
+                driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_profile=profile)
 
-            except:
-                print
-                print("Could not open the geckodriver")
-                print("Check that the driver type and driver path is correct in config.ini")
-                print("These are the current driver settings:")
-                print
-                print("driver_type = " + the_driver.driver_type)
-                print("driver_path = " + the_driver.driver_path)
-                print
-                menu(queues, the_driver)
+        except:
+            print
+            print("Could not open the chromedriver")
+            print("Check that the driver type and driver path and browser profile is correct in config.ini")
+            print("These are the current driver settings:")
+            print
+            print("driver_type = " + the_driver.driver_type)
+            print("driver_path = " + the_driver.driver_path)
+            print("chrome_profile = " + the_driver.chrome_profile)
+            print("firefox_profile = " + the_driver.firefox_profile)
+            print
+            print("It may also be possible that the set browser profile is already in use")
+            print
+            menu(queues, the_driver)
 
     web_check = True
     time_left = 0
