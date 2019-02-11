@@ -1046,7 +1046,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
             elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
 
         first_time_connect = True
-        sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+        sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + "h " + str(int(elapsed_time_minutes)) + "m " + str(int(elapsed_time_seconds)) + "s]    " + "Remaining: [" + str(int(time_left_hours)) + "h " + str(int(time_left_minutes)) + "m " + str(int(time_left_seconds)) + "s]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
         sys.stdout.flush()
         cycle_start_time = time.time()
 
@@ -1115,7 +1115,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
     elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
     time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
     elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
-    sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+    sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + "h " + str(int(elapsed_time_minutes)) + "m " + str(int(elapsed_time_seconds)) + "s]    " + "Remaining: [" + str(int(time_left_hours)) + "h " + str(int(time_left_minutes)) + "m " + str(int(time_left_seconds)) + "s]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
     sys.stdout.flush()
     print
 
