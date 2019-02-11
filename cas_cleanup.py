@@ -49,7 +49,7 @@ def script_main(driver, received_url, pos):
     element.select_by_index(1)
 
     # Slug
-    driver.find_element_by_xpath(page_url_slug_xpath).send_keys(title)
+    driver.execute_script("document.getElementById('edit-slug').value='" + title + "';")
 
     # Clean and paste HTML
     driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
@@ -78,8 +78,11 @@ def script_main(driver, received_url, pos):
     element.click()
 
     # Accept alert
-    alert = driver.switch_to.alert
-    alert.accept()
+    try:
+        alert = driver.switch_to.alert
+        alert.accept()
+    except:
+        pass
 
     '''
     # Create content button
