@@ -36,7 +36,7 @@ def script_main(driver, received_url, pos):
     first = True
 
     if (received_url.find("/cas/group/6/nodes")):
-        parent_page = "/cas/sociology-anthropology"
+        parent_page = "- Department of Sociology and Anthropology"
     elif (received_url.find("/cas/group/11/nodes")):
         parent_page = "/cas/political-science"
     elif (received_url.find("/cas/group/16/nodes")):
@@ -114,11 +114,9 @@ def script_main(driver, received_url, pos):
     wait.until(EC.presence_of_element_located((By.XPATH, page_location_xpath)))
     driver.find_element_by_xpath(page_location_xpath).click()
 
-    '''
     # Set parent page in select menu
     element = Select(driver.find_element_by_xpath(parent_page_xpath))
     element.select_by_visible_text(parent_page)
-    '''
 
     # Slug
     driver.find_element_by_xpath(page_url_slug_xpath).send_keys(title)
@@ -143,18 +141,15 @@ def script_main(driver, received_url, pos):
     body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + str(content) + '";'
     driver.execute_script(body_textarea_script)
     driver.switch_to.default_content()
-    time.sleep(10)
 
     # Click save button
     wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
     element.click()
 
-    '''
     # Accept alert
     alert = driver.switch_to.alert
     alert.accept()
-    '''
 
     '''
     # Create content button
