@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from ohio_login import ohio_login
+from drupal_image import *
 
 def script_main(driver, url, pos):
     page_source = driver.page_source
@@ -65,6 +66,8 @@ def script_main(driver, url, pos):
     display_name_xpath = '//*[@id="edit-title-0-value"]'
     first_name_xpath = '//*[@id="edit-field-first-name-0-value"]'
     last_name_xpath = '//*[@id="edit-field-last-name-0-value"]'
+    image_xpath = '//*[@id="edit-field-image-0-upload"]'
+    alt_text_xpath = '//*[contains(@id, "edit-field-image-0-alt")]'
     title_xpath = '//*[@id="edit-field-title-0-value"]'
     department_xpath = '//*[@id="edit-field-department"]'
     profile_type_xpath = '//*[@id="edit-field-profile-type"]'
@@ -87,11 +90,10 @@ def script_main(driver, url, pos):
     except:
         pass
 
-    try:
-        driver.find_element_by_xpath(department_xpath).send_keys(department)
-    except:
-        pass
-
+    '''
+    profile = "Faculty"
+    Select(driver.find_element_by_xpath(profile_type_xpath).select_by_text(profile))
+    '''
 
     driver.find_element_by_xpath(ohio_id_xpath).send_keys(ohio_id)
     driver.find_element_by_xpath(email_xpath).send_keys(email)
@@ -100,6 +102,15 @@ def script_main(driver, url, pos):
         driver.find_element_by_xpath(phone_xpath).send_keys(phone)
     except:
         pass
+
+    try:
+        file_name, image_title, alt_text = download_image(url, soup.find("div", class_="fullProfileImg"))
+        driver.find_element_by_xpath(image_xpath).send_keys(os.getcwd() + "/images/" + file_name)
+        wait.until(EC.presence_of_element_located((By.XPATH, alt_text_xpath)))
+        driver.find_element_by_xpath(alt_text_xpath).send_keys(alt_text)
+    except:
+        pass
+
 
     driver.find_element_by_xpath(save_xpath).click()
 
