@@ -40,6 +40,56 @@ def script_main(driver, url, pos):
     except:
         pass
 
+    if (re.findall(r"-Biological Sciences", department)):
+        department = "-Biology"
+    if (re.findall(r"-Biological Sciences Emeriti", department)):
+        department = "-Biology"
+    if (re.findall(r"-Center for Law, Justice & Culture", department)):
+        department = "-Law Center"
+    if (re.findall(r"-Chemistry & Biochemistry", department)):
+        department = "-Chemistry"
+    if (re.findall(r"-Chemistry & Biochemistry Emeriti", department)):
+        department = "-Chemistry"
+    if (re.findall(r"-Classics & World Religions", department)):
+        department = "-Classics"
+    if (re.findall(r"-Contemporary History Institute", department)):
+        department = "-Contemporary History"
+    if (re.findall(r"-Dean's Office", department)):
+        department = "-Dean"
+    if (re.findall(r"-Economics Emeritus", department)):
+        department = "-Economics"
+    if (re.findall(r"-Environmental & Plant Biology", department)):
+        department = "-Plant Biology"
+    if (re.findall(r"-Environmental & Plant Biology Emeritus", department)):
+        department = "-Plant Biology"
+    if (re.findall(r"-Geological Sciences", department)):
+        department = "-Geology"
+    if (re.findall(r"-History Emeriti", department)):
+        department = "-History"
+    if (re.findall(r"-Mathematics", department)):
+        department = "-Math"
+    if (re.findall(r"-Philosophy Emeritus", department)):
+        department = "-Philosophy"
+    if (re.findall(r"-Physics & Astronomy", department)):
+        department = "-Physics and Astronomy"
+    if (re.findall(r"-Physics & Astronomy Emeriti", department)):
+        department = "-Physics and Astronomy"
+    if (re.findall(r"-Psychology Emeriti", department)):
+        department = "-Psychology"
+    if (re.findall(r"-OPIE", department)):
+        department = "-Ohio Program of Intensive English (OPIE)"
+    if (re.findall(r"-Sociology & Anthropology", department)):
+        department = "-Department of Sociology and Anthropology"
+    if (re.findall(r"-Sociology & Anthropology Emeritus", department)):
+        department = "-Department of Sociology and Anthropology"
+    if (re.findall(r"-Women's, Gender, and Sexuality Studies", department)):
+        department = "-Women's, Gender, and Sexuality Studies (WGSS)"
+
+    try:
+        address = soup.find("span", class_="cas_Office_Address").text
+    except:
+        pass
+
     email = soup.find("span", class_="cas_Email").text
     ohio_id = re.findall("(.*?)@ohio.edu", email)[0]
 
@@ -48,7 +98,8 @@ def script_main(driver, url, pos):
     except:
         pass
 
-    profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)
@@ -70,11 +121,19 @@ def script_main(driver, url, pos):
     alt_text_xpath = '//*[contains(@id, "edit-field-image-0-alt")]'
     title_xpath = '//*[@id="edit-field-title-0-value"]'
     department_xpath = '//*[@id="edit-field-department"]'
+    address_xpath = '//*[@id="edit-field-office-address-0-value"]'
     profile_type_xpath = '//*[@id="edit-field-profile-type"]'
     ohio_id_xpath = '//*[@id="edit-field-ohio-id-0-value"]'
     email_xpath = '//*[@id="edit-field-email-0-value"]'
     phone_xpath = '//*[@id="edit-field-phone-0-value"]'
+    display_settings_xpath = '/html/body/div[2]/div/main/div[4]/div/form/div/div[2]/div/details[6]/summary'
+    view_mode_xpath = '//*[@id="edit-ds-switch"]'
+    columns_xpath = '//*[@id="edit-column-number"]'
     save_xpath = '//*[@id="edit-submit"]'
+
+    driver.find_element_by_xpath(display_settings_xpath).click()
+    Select(driver.find_element_by_xpath(view_mode_xpath)).select_by_visible_text("Full Profile")
+    Select(driver.find_element_by_xpath(columns_xpath)).select_by_visible_text("1")
 
     driver.find_element_by_xpath(display_name_xpath).send_keys(display_name)
     driver.find_element_by_xpath(first_name_xpath).send_keys(first_name)
@@ -86,14 +145,18 @@ def script_main(driver, url, pos):
         pass
 
     try:
-        Select(driver.find_element_by_xpath(department_xpath).select_by_text(department))
+        Select(driver.find_element_by_xpath(department_xpath)).select_by_visible_text(department)
     except:
         pass
 
-    '''
-    profile = "Faculty"
-    Select(driver.find_element_by_xpath(profile_type_xpath).select_by_text(profile))
-    '''
+    # Change this value for whatever web queue you are running
+    profile = "Staff"
+    Select(driver.find_element_by_xpath(profile_type_xpath)).select_by_visible_text(profile)
+
+    try:
+        driver.find_element_by_xpath(address_xpath).send_keys(address)
+    except:
+        pass
 
     driver.find_element_by_xpath(ohio_id_xpath).send_keys(ohio_id)
     driver.find_element_by_xpath(email_xpath).send_keys(email)
