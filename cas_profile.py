@@ -104,8 +104,13 @@ def script_main(driver, url, pos):
     else:
         phone1 = phone
 
-    #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
-    profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    try:
+        bio = soup.find("div", class_="fullProfileBio").text
+    except:
+        pass
+
+    profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)
@@ -114,6 +119,8 @@ def script_main(driver, url, pos):
     print("department = " + department)
     print("email = " + email)
     print("ohio_id = " + ohio_id)
+    print("bio = " + bio)
+
     try:
         print("phone1 = " + phone1)
     except:
@@ -145,6 +152,8 @@ def script_main(driver, url, pos):
     view_mode_xpath = '//*[@id="edit-ds-switch"]'
     columns_xpath = '//*[@id="edit-column-number"]'
     save_xpath = '//*[@id="edit-submit"]'
+    bio_xpath = '/html/body/div[2]/div/main/div[4]/div/form/div/div[1]/div[16]/div/div[1]/div/div/div/div/iframe'
+    bio_js = "document.getElementsByClassName('cke_editable')[0].innerHTML = '" + bio + "';"
 
     try:
         phone1_js = "document.getElementById('edit-field-phone-0-value').value = '" + phone1 + "';"
@@ -192,6 +201,12 @@ def script_main(driver, url, pos):
 
     try:
         driver.find_element_by_xpath(phone2_xpath).send_keys(phone2)
+    except:
+        pass
+
+    try:
+        driver.switch.to.frame(driver.find_element_by_xpath(bio_xpath))
+        driver.execute_script(bio_js)
     except:
         pass
 
