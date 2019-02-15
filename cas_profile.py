@@ -98,6 +98,12 @@ def script_main(driver, url, pos):
     except:
         pass
 
+    if (re.findall(r"\(?\d{3}\)?.+\d{3}.+\d{4}.+\(?\d{3}\)?.+\d{3}.+\d{4}", phone)):
+        phone1 = re.findall(r"(\(?\d{3}\)?.+\d{3}.+\d{4}).+\(?\d{3}\)?.+\d{3}.+\d{4}", phone)[0]
+        phone2 = re.findall(r"\(?\d{3}\)?.+\d{3}.+\d{4}.+(\(?\d{3}\)?.+\d{3}.+\d{4})", phone)[0]
+    else:
+        phone1 = phone
+
     #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
     profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
@@ -108,12 +114,20 @@ def script_main(driver, url, pos):
     print("department = " + department)
     print("email = " + email)
     print("ohio_id = " + ohio_id)
-    print("phone = " + phone)
+    try:
+        print("phone1 = " + phone1)
+    except:
+        pass
+    try:
+        print("phone2 = " + phone2)
+    except:
+        pass
 
     driver.get(profile_page_url)
     ohio_login(driver)
     wait = WebDriverWait(driver, 10)
 
+    # Selenium XPATHs
     display_name_xpath = '//*[@id="edit-title-0-value"]'
     first_name_xpath = '//*[@id="edit-field-first-name-0-value"]'
     last_name_xpath = '//*[@id="edit-field-last-name-0-value"]'
@@ -125,11 +139,21 @@ def script_main(driver, url, pos):
     profile_type_xpath = '//*[@id="edit-field-profile-type"]'
     ohio_id_xpath = '//*[@id="edit-field-ohio-id-0-value"]'
     email_xpath = '//*[@id="edit-field-email-0-value"]'
-    phone_xpath = '//*[@id="edit-field-phone-0-value"]'
+    phone1_xpath = '//*[@id="edit-field-phone-0-value"]'
+    phone2_xpath = '//*[@id="edit-field-phone-1-value"]'
     display_settings_xpath = '/html/body/div[2]/div/main/div[4]/div/form/div/div[2]/div/details[6]/summary'
     view_mode_xpath = '//*[@id="edit-ds-switch"]'
     columns_xpath = '//*[@id="edit-column-number"]'
     save_xpath = '//*[@id="edit-submit"]'
+
+    try:
+        phone1_js = "document.getElementById('edit-field-phone-0-value').value = '" + phone1 + "';"
+    except:
+        pass
+    try:
+        phone2_js = "document.getElementById('edit-field-phone-1-value').value = '" + phone2 + "';"
+    except:
+        pass
 
     driver.find_element_by_xpath(display_settings_xpath).click()
     Select(driver.find_element_by_xpath(view_mode_xpath)).select_by_visible_text("Full Profile")
@@ -150,7 +174,7 @@ def script_main(driver, url, pos):
         pass
 
     # Change this value for whatever web queue you are running
-    profile = "Staff"
+    profile = "Faculty"
     Select(driver.find_element_by_xpath(profile_type_xpath)).select_by_visible_text(profile)
 
     try:
@@ -162,7 +186,12 @@ def script_main(driver, url, pos):
     driver.find_element_by_xpath(email_xpath).send_keys(email)
 
     try:
-        driver.find_element_by_xpath(phone_xpath).send_keys(phone)
+        driver.find_element_by_xpath(phone1_xpath).send_keys(phone1)
+    except:
+        pass
+
+    try:
+        driver.find_element_by_xpath(phone2_xpath).send_keys(phone2)
     except:
         pass
 
@@ -173,7 +202,6 @@ def script_main(driver, url, pos):
         driver.find_element_by_xpath(alt_text_xpath).send_keys(alt_text)
     except:
         pass
-
 
     driver.find_element_by_xpath(save_xpath).click()
 
