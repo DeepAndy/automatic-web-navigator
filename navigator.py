@@ -22,9 +22,11 @@ class queue:
         self.web_action_queue = web_action_queue
 
 class web_driver:
-    def __init__(self, driver_type, driver_path):
+    def __init__(self, driver_type, driver_path, chrome_profile, firefox_profile):
         self.driver_type = driver_type
         self.driver_path = driver_path
+        self.chrome_profile = chrome_profile
+        self.firefox_profile = firefox_profile
 
 '''
 Function:       load_last_queue()
@@ -173,9 +175,13 @@ def initialization():
 
     driver_option_type = "driver_type"
     driver_option_path = "driver_path"
+    driver_option_chrome_profile = "chrome_profile"
+    driver_option_firefox_profile = "firefox_profile"
     found_driver_type = False
     found_correct_driver_type = False
     found_driver_path = False
+    found_chrome_profile = False
+    found_firefox_profile = False
 
     for option in config.options(driver_section):
         if (option == driver_option_type):
@@ -188,6 +194,16 @@ def initialization():
         if (option == driver_option_path):
             found_driver_path = True
             driver_path = config.get(driver_section, driver_option_path)
+
+        if (option == driver_option_chrome_profile):
+            chrome_profile = config.get(driver_section, driver_option_chrome_profile)
+        else:
+            found_chrome_profile = True
+
+        if (option == driver_option_firefox_profile):
+            firefox_profile = config.get(driver_section, driver_option_firefox_profile)
+        else:
+            found_firefox_profile = True
 
     if (found_driver_type == False):
         print
@@ -207,11 +223,17 @@ def initialization():
         print("Make sure a \"" + driver_option_path + "\" option is included under the \"[" + driver_section + "]\" section.")
         complete_config = False
 
+    if (found_chrome_profile == False):
+        chrome_profile = ""
+
+    if (found_firefox_profile == False):
+        firefox_profile = ""
+
     if (complete_config == False):
         print
         quit()
     else:
-        the_driver = web_driver(driver_type, driver_path)
+        the_driver = web_driver(driver_type, driver_path, chrome_profile, firefox_profile)
 
     load_last_queue(queues)
     menu(queues, the_driver)
@@ -945,30 +967,48 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
         return
     if (the_driver.driver_type == "chrome"):
         try:
-            driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+            if (re.match("^\s*$", the_driver.chrome_profile)):
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path)
+            else:
+                options = webdriver.ChromeOptions()
+                options.add_argument("user-data-dir=" + the_driver.chrome_profile)
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = options)
         except:
             print
             print("Could not open the chromedriver")
-            print("Check that the driver type and driver path is correct in config.ini")
+            print("Check that the driver type and driver path and browser profile is correct in config.ini")
             print("These are the current driver settings:")
             print
             print("driver_type = " + the_driver.driver_type)
             print("driver_path = " + the_driver.driver_path)
+            print("chrome_profile = " + the_driver.chrome_profile)
+            print("firefox_profile = " + the_driver.firefox_profile)
+            print
+            print("It may also be possible that the set browser profile is already in use")
             print
             menu(queues, the_driver)
     elif (the_driver.driver_type == "firefox"):
-            try:
+        try:
+            if (re.match("^\s*$", the_driver.firefox_profile)):
                 driver = webdriver.Firefox(executable_path=the_driver.driver_path)
-            except:
-                print
-                print("Could not open the geckodriver")
-                print("Check that the driver type and driver path is correct in config.ini")
-                print("These are the current driver settings:")
-                print
-                print("driver_type = " + the_driver.driver_type)
-                print("driver_path = " + the_driver.driver_path)
-                print
-                menu(queues, the_driver)
+            else:
+                profile = webdriver.FirefoxProfile(the_driver.firefox_profile)
+                driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_profile=profile)
+
+        except:
+            print
+            print("Could not open the chromedriver")
+            print("Check that the driver type and driver path and browser profile is correct in config.ini")
+            print("These are the current driver settings:")
+            print
+            print("driver_type = " + the_driver.driver_type)
+            print("driver_path = " + the_driver.driver_path)
+            print("chrome_profile = " + the_driver.chrome_profile)
+            print("firefox_profile = " + the_driver.firefox_profile)
+            print
+            print("It may also be possible that the set browser profile is already in use")
+            print
+            menu(queues, the_driver)
 
     web_check = True
     time_left = 0
@@ -1006,7 +1046,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
             elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
 
         first_time_connect = True
-        sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+        sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + "h " + str(int(elapsed_time_minutes)) + "m " + str(int(elapsed_time_seconds)) + "s]    " + "Remaining: [" + str(int(time_left_hours)) + "h " + str(int(time_left_minutes)) + "m " + str(int(time_left_seconds)) + "s]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
         sys.stdout.flush()
         cycle_start_time = time.time()
 
@@ -1075,7 +1115,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
     elapsed_time_seconds_exact = float(elapsed_time_minutes_exact) - float(elapsed_time_minutes)
     time_left_seconds = math.floor(float(time_left_seconds_exact * 60))
     elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
-    sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + " hours " + str(int(elapsed_time_minutes)) + " minutes " + str(int(elapsed_time_seconds)) + " seconds]    " + "Remaining: [" + str(int(time_left_hours)) + " hours " + str(int(time_left_minutes)) + " minutes " + str(int(time_left_seconds)) + " seconds]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
+    sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + "h " + str(int(elapsed_time_minutes)) + "m " + str(int(elapsed_time_seconds)) + "s]    " + "Remaining: [" + str(int(time_left_hours)) + "h " + str(int(time_left_minutes)) + "m " + str(int(time_left_seconds)) + "s]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
     sys.stdout.flush()
     print
 

@@ -314,7 +314,7 @@ def fix_all(soup, errors):
 
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
-        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "img"):
+        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "img" and tag.name != "br"):
             tag.decompose()
         if (tag.name == "hr"):
             tag.decompose()
@@ -345,10 +345,10 @@ def fix_all(soup, errors):
                 if (tag2.name == "img"):
                     found_special = True
                     continue
-                if (((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em")) and (found_special == False)):
+                if (((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em" or tag2.name == "a")) and (found_special == False)):
                     unwrap_tags = True
                     tag.name = "p"
-                elif (unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)):
+                elif ((unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)) and (tag2.name != "strong" or tag2.name != "em" or tag2.name != "a")):
                     tag2.unwrap()
             if (re.findall(r"^\s*$", tag.get_text()) and found_special == False):
                 tag.decompose()

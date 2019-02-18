@@ -13,6 +13,9 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from fix_html import *
 from ohio_login import ohio_login
 
@@ -90,6 +93,7 @@ def script_main(driver, received_url, pos):
     all_tags = soup.find("div", class_="groupings").text
     all_tags = all_tags.strip()
     tags = re.split(", ", all_tags)
+    soup.find("div", class_="groupings").decompose()
 
     content = soup.find("div", id="story")
 
@@ -103,6 +107,7 @@ def script_main(driver, received_url, pos):
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
     article_page_url = "https://webcms.ohio.edu/group/461/content/create/group_node%3Aarticle"
+    #article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Aarticle"
 
     output = ""
 
@@ -118,7 +123,7 @@ def script_main(driver, received_url, pos):
 
     ohio_login(driver)
 
-    time.sleep(2) # NEED TO WAIT FOR TEXTAREA TO LOAD
+    wait = WebDriverWait(driver, 10)
 
     title_xpath = "//*[@id='edit-title-0-value']"
     author_xpath = "//*[@id='edit-field-author-0-value']"
@@ -136,8 +141,8 @@ def script_main(driver, received_url, pos):
     parent_page = "- News"
     first = True
 
+    wait.until(EC.presence_of_element_located((By.XPATH, page_location_xpath)))
     driver.find_element_by_xpath(page_location_xpath).click()
-    time.sleep(2)
 
     element = Select(driver.find_element_by_xpath(parent_page_xpath))
     element.select_by_visible_text(parent_page)
@@ -163,8 +168,12 @@ def script_main(driver, received_url, pos):
                 element.deselect_all()
                 first = False
 
-            element.select_by_visible_text(tag)
+            try:
+                element.select_by_visible_text(tag)
+            except:
+                pass
 
+    wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
     element.click()
 
@@ -175,5 +184,3 @@ def script_main(driver, received_url, pos):
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
     '''
-
-    time.sleep(0.5)
