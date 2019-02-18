@@ -17,6 +17,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from ohio_login import ohio_login
 from drupal_image import *
+from fix_html import *
 
 def script_main(driver, url, pos):
     page_source = driver.page_source
@@ -104,10 +105,31 @@ def script_main(driver, url, pos):
     else:
         phone1 = phone
 
+    bio_found = False
+
     try:
-        bio = soup.find("div", class_="fullProfileBio").text
+        bio = soup.find("div", class_="fullProfileBio")
+        bio_found = True
     except:
         pass
+
+    if (bio_found == True):
+        errors, warnings, print_friendly_errors, error_line_string = find_errors(bio)
+
+        try:
+            fix_all(bio, errors)
+        except:
+            pass
+
+        line = ""
+
+        for tag in bio:
+            line += tag.encode("utf-8")
+
+        bio = line
+        bio = str(bio).strip()
+        bio = bio.replace("\n", "")
+        bio = bio.replace("'", "\\'")
 
     profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
     #profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
@@ -153,7 +175,7 @@ def script_main(driver, url, pos):
     columns_xpath = '//*[@id="edit-column-number"]'
     save_xpath = '//*[@id="edit-submit"]'
     bio_xpath = '/html/body/div[2]/div/main/div[4]/div/form/div/div[1]/div[16]/div/div[1]/div/div/div/div/iframe'
-    bio_js = "document.getElementsByClassName('cke_editable')[0].innerHTML = '" + bio + "';"
+    bio_js = "document.getElementsByTagName('body')[0].innerHTML='" + bio + "';"
 
     try:
         phone1_js = "document.getElementById('edit-field-phone-0-value').value = '" + phone1 + "';"
@@ -204,9 +226,11 @@ def script_main(driver, url, pos):
     except:
         pass
 
+    driver.switch_to.frame(driver.find_element_by_xpath(bio_xpath))
+    driver.execute_script(bio_js)
+
     try:
-        driver.switch.to.frame(driver.find_element_by_xpath(bio_xpath))
-        driver.execute_script(bio_js)
+        driver.switch_to.default_content()
     except:
         pass
 
