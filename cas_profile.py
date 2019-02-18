@@ -131,8 +131,8 @@ def script_main(driver, url, pos):
         bio = bio.replace("\n", "")
         bio = bio.replace("'", "\\'")
 
-    profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
-    #profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)
@@ -205,7 +205,7 @@ def script_main(driver, url, pos):
         pass
 
     # Change this value for whatever web queue you are running
-    profile = "Faculty"
+    profile = "Staff"
     Select(driver.find_element_by_xpath(profile_type_xpath)).select_by_visible_text(profile)
 
     try:
@@ -238,7 +238,8 @@ def script_main(driver, url, pos):
         file_name, image_title, alt_text = download_image(url, soup.find("div", class_="fullProfileImg"))
         driver.find_element_by_xpath(image_xpath).send_keys(os.getcwd() + "/images/" + file_name)
         wait.until(EC.presence_of_element_located((By.XPATH, alt_text_xpath)))
-        driver.find_element_by_xpath(alt_text_xpath).send_keys(alt_text)
+        alt_js = "document.querySelector(\"[id^='edit-field-image-0-alt']\").value=\"" + alt_text + "\";"
+        driver.execute_script(alt_js)
     except:
         pass
 
