@@ -138,8 +138,8 @@ def script_main(driver, url, pos):
         bio = bio.replace("\n", "")
         bio = bio.replace("'", "\\'")
 
-    #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
-    profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)
