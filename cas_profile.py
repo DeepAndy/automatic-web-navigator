@@ -91,8 +91,15 @@ def script_main(driver, url, pos):
     except:
         pass
 
-    email = soup.find("span", class_="cas_Email").text
-    ohio_id = re.findall("(.*?)@ohio.edu", email)[0]
+    try:
+        email = soup.find("span", class_="cas_Email").text
+    except:
+        ohio_id = first_name.lower() + last_name.lower()
+
+    try:
+        ohio_id = re.findall("(.*?)@ohiou?.edu", email)[0]
+    except:
+        ohio_id = first_name.lower() + last_name.lower()
 
     try:
         phone = soup.find("span", class_="cas_Phone").text
@@ -131,8 +138,8 @@ def script_main(driver, url, pos):
         bio = bio.replace("\n", "")
         bio = bio.replace("'", "\\'")
 
-    profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
-    #profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)
@@ -205,7 +212,7 @@ def script_main(driver, url, pos):
         pass
 
     # Change this value for whatever web queue you are running
-    profile = "Faculty"
+    profile = "Grad Student"
     Select(driver.find_element_by_xpath(profile_type_xpath)).select_by_visible_text(profile)
 
     try:
