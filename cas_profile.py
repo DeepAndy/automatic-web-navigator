@@ -131,7 +131,7 @@ def script_main(driver, url, pos):
         line = ""
 
         for tag in bio:
-            line += tag.encode("utf-8")
+            line += str(tag)
 
         bio = line
         bio = str(bio).strip()
