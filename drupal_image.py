@@ -1,4 +1,4 @@
-import urllib                                                                    
+import urllib
 import re
 import os
 import time
@@ -52,7 +52,7 @@ def download_image(url, content):
         image_source = "https://" + main_url + image_source
 
     try:
-        urllib.urlretrieve(image_source, "images/" + file_name)
+        urllib.request.urlretrieve(image_source, "images/" + file_name)
     except:
         print("Failed to download image at \"" + image_source + "\"")
 
