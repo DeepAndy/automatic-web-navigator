@@ -972,7 +972,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
             else:
                 options = webdriver.ChromeOptions()
                 options.add_argument("user-data-dir=" + the_driver.chrome_profile)
-                driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = options)
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path, options = options)
         except:
             print()
             print("Could not open the chromedriver")
