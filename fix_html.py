@@ -6,12 +6,10 @@ Description: Script for cleaning up HTML files during migration from CommonSpot
 '''
 
 import re
-import urllib2
-import StringIO
+import urllib
 import getpass
 import bs4
-from HTMLParser import HTMLParser
-from htmlentitydefs import name2codepoint
+from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 
 def translate_html(textarea):
@@ -21,49 +19,18 @@ def translate_html(textarea):
         textarea = re.findall(r'data-editor-value-original=\"((.|\n)*?)</textarea>', textarea)[0]
     else:
         print("Could not find the textarea HTML for this site.")
-        print
+        print()
         print("Possible solutions:")
-        print
+        print()
         print("Make sure your username and password were entered correctly.")
-        print
+        print()
         quit()
 
-    # create a subclass and override the handler methods
-    class MyHTMLParser(HTMLParser):
-        def handle_starttag(self, tag, attrs):
-            print "Start tag:", tag
-            for attr in attrs:
-                print "     attr:", attr
-
-        def handle_endtag(self, tag):
-            print "End tag  :", tag
-
-        def handle_data(self, data):
-            print "Data     :", data
-
-        def handle_comment(self, data):
-            print "Comment  :", data
-
-        def handle_entityref(self, name):
-            c = unichr(name2codepoint[name])
-            print "Named ent:", c
-
-        def handle_charref(self, name):
-            if name.startswith('x'):
-                c = unichr(int(name[1:], 16))
-            else:
-                c = unichr(int(name))
-                print "Num ent  :", c
-
-        def handle_decl(self, data):
-            print "Decl     :", data
-
     # instantiate the parser and feed it some HTML
-    parser = MyHTMLParser()
+    parser = HTMLParser()
     textarea = parser.unescape(textarea[0])
 
     return textarea
-
 
 def find_errors(soup):
     errors = []
@@ -226,11 +193,11 @@ def print_errors(print_friendly_errors, error_line_string, errors, warnings):
             #print(error_line_string[i].strip("\t"))
 
     print (str(len(errors)) + " Errors | " + str(len(warnings)) + " Warnings")
-    print
+    print()
 
     if (len(warnings) != 0):
         print("Note: Warnings can not be fixed.")
-        print
+        print()
 
 def print_errors_gui(print_friendly_errors, error_line_string, errors, warnings):
     gui_printout = ""
@@ -314,7 +281,7 @@ def fix_all(soup, errors):
 
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
-        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "img" and tag.name != "br"):
+        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "br"):
             tag.decompose()
         if (tag.name == "hr"):
             tag.decompose()
@@ -342,17 +309,13 @@ def fix_all(soup, errors):
                 tag.decompose()
         elif (tag.name == "div"):
             unwrap_tags = False
-            found_special = False
             for tag2 in tag:
-                if (tag2.name == "img"):
-                    found_special = True
-                    continue
-                if (((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em" or tag2.name == "a")) and (found_special == False)):
+                if ((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em")):
                     unwrap_tags = True
                     tag.name = "p"
-                elif ((unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)) and (tag2.name != "strong" or tag2.name != "em" or tag2.name != "a")):
+                elif (unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)):
                     tag2.unwrap()
-            if (re.findall(r"^\s*$", tag.get_text()) and found_special == False):
+            if (re.findall(r"^\s*$", tag.get_text())):
                 tag.decompose()
             elif (unwrap_tags == False):
                 tag.unwrap()
