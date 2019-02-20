@@ -26,7 +26,7 @@ def ohio_login(driver):
     login_complete = False
 
     if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = raw_input("Enter OHIO username: ")
+        username = input("Enter OHIO username: ")
         password = getpass.getpass("Enter OHIO password: ")
 
         element = driver.find_element_by_xpath(cas_username_xpath)
