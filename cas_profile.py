@@ -25,7 +25,12 @@ def script_main(driver, url, pos):
     page_source = page_source.replace(u"\xc2", u" ")
     soup = BeautifulSoup(page_source, features="html.parser")
 
-    display_name = soup.find("h1", class_="fullProfileName").text
+    try:
+        display_name = soup.find("h1", class_="fullProfileName").text
+    except:
+        print
+        print("Can not find any content")
+        return
 
     full_name = display_name.split()
     first_name = full_name[0]
