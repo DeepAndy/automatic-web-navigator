@@ -4,6 +4,7 @@ Script Type:    Companion Script
 Description:    This script creates modular pages for Ohio University's
                 College of Fine Arts given a website input from navigator.py.
                 Used in conjunction with navigator.py
+Python 2.7.10
 '''
 
 from bs4 import BeautifulSoup

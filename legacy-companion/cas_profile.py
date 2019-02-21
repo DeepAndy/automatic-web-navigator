@@ -1,8 +1,9 @@
 '''
 Author:         Austin Moore
 Script Type:    Companion Script
-Description:    This script migrates profile pages to Ohio University Drupal
-                pages
+Description:    This script migrates profile pages from the College of Arts and
+                Sciences Ohio University (OU) to OU Drupal pages
+Python 3.7.2
 '''
 
 import re
@@ -136,15 +137,15 @@ def script_main(driver, url, pos):
         line = ""
 
         for tag in bio:
-            line += tag.encode("utf-8")
+            line += str(tag)
 
         bio = line
         bio = str(bio).strip()
         bio = bio.replace("\n", "")
         bio = bio.replace("'", "\\'")
 
-    #profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
-    profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    profile_page_url = "https://webcmsstage.oit.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcms.ohio.edu/cas/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)

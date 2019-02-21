@@ -1,15 +1,16 @@
-import io
-from selenium import webdriver
-from ohio_login import ohio_login
-from bs4 import BeautifulSoup
-
 '''
 Author:         Austin Moore
 Script Type:    Main Script
 Description:    Just a quick script to copy over already used Scripps page
                 title. Some code is just hard-coded since this is a one time
                 script.
+Python 2.7.10
 '''
+
+import io
+from selenium import webdriver
+from ohio_login import ohio_login
+from bs4 import BeautifulSoup
 
 driver = webdriver.Chrome(executable_path="/Users/am058613/Desktop/chromedriver")
 

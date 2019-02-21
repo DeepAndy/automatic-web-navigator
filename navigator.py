@@ -3,13 +3,14 @@ Author:         Austin Moore
 Script Type:    Main Script
 Description:    A queue system for queueing websites and specific actions to be
                 performed on them
+Python 3.7.2
 '''
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import time
 import re
-import ConfigParser
+import configparser
 import os
 import sys
 import importlib
@@ -73,7 +74,7 @@ def load_last_queue(queues):
                 f = open(web_queue_text)
                 check = True
             except:
-                print
+                print()
                 print("Not able to find \"" + web_queue_text + "\"")
                 print("Will not load the file")
 
@@ -84,7 +85,7 @@ def load_last_queue(queues):
                 for line in lines:
                     queues.web_queue.append(line.strip())
 
-                print
+                print()
                 print('"' + web_queue_text + '"' + " has been loaded automatically")
 
     if (action_queue_found == True):
@@ -98,7 +99,7 @@ def load_last_queue(queues):
                 f = open(action_queue_text)
                 check = True
             except:
-                print
+                print()
                 print("Not able to find \"" + action_queue_text + "\"")
                 print("Will not load the file")
 
@@ -109,7 +110,7 @@ def load_last_queue(queues):
                 for line in lines:
                     queues.action_queue.append(line.strip())
 
-                print
+                print()
                 print('"' + action_queue_text + '"' + " has been loaded automatically")
 
     if (web_action_queue_found == True):
@@ -123,7 +124,7 @@ def load_last_queue(queues):
                 f = open(web_action_queue_text)
                 check = True
             except:
-                print
+                print()
                 print("Not able to find \"" + action_queue_text + "\"")
                 print("Will not load the file")
 
@@ -142,21 +143,21 @@ def load_last_queue(queues):
                         index += 1
                         continue
 
-                print
+                print()
                 print('"' + web_action_queue_text + '"' + " has been loaded automatically")
 
 def initialization():
     queues = queue([], [], [[]])
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config_file = "config.ini"
     complete_config = True
 
     try:
         config.read(config_file)
     except:
-        print
+        print()
         print("Could not find the configuration file \"" + config_file + "\" or the file has no sections")
-        print
+        print()
         quit()
 
     found_driver_section = False
@@ -167,10 +168,10 @@ def initialization():
             found_driver_section = True
 
     if (found_driver_section == False):
-        print
+        print()
         print("Could not find the \"" + driver_section + "\" section.")
         print("Make sure a \"[" + driver_section + "]\" section is included in \"" + config_file + "\".")
-        print
+        print()
         quit()
 
     driver_option_type = "driver_type"
@@ -206,19 +207,19 @@ def initialization():
             found_firefox_profile = True
 
     if (found_driver_type == False):
-        print
+        print()
         print("Could not find the \"" + driver_option_type + "\" option.")
         print("Make sure a \"" + driver_option_type + "\" option is included under the \"[" + driver_section + "]\" section.")
         complete_config = False
 
     if (found_correct_driver_type == False):
-        print
+        print()
         print("The \"" + driver_option_type + "\" value is either incorrect or the option is missing.")
         print("Make sure the value is a valid option.")
         complete_config = False
 
     if (found_driver_path == False):
-        print
+        print()
         print("Could not find the \"" + driver_option_path + "\" option.")
         print("Make sure a \"" + driver_option_path + "\" option is included under the \"[" + driver_section + "]\" section.")
         complete_config = False
@@ -230,7 +231,7 @@ def initialization():
         firefox_profile = ""
 
     if (complete_config == False):
-        print
+        print()
         quit()
     else:
         the_driver = web_driver(driver_type, driver_path, chrome_profile, firefox_profile)
@@ -242,11 +243,11 @@ def add_web_queue(queues):
     web_name = ""
 
     while (web_name == ""):
-        print
-        web_name = raw_input("Enter website name: ")
+        print()
+        web_name = input("Enter website name: ")
 
     queues.web_queue.append(web_name)
-    print
+    print()
     print("Added \"" + web_name + "\" to queue")
     return queues.web_queue
 
@@ -261,12 +262,12 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, "connect")
 
-        print
+        print()
         print("Added \"connect\" to action queue")
         return queues.action_queue
     elif (option == 2):
-        print
-        xpath = raw_input("Enter xpath of element: ")
+        print()
+        xpath = input("Enter xpath of element: ")
         action = "click`" + xpath
 
         if (pos < 0):
@@ -277,15 +278,15 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 else:
                         queues.web_action_queue[pos].insert(pos2, action)
 
-        print
+        print()
         print("Added element to action queue")
         return queues.action_queue
     elif (option == 3):
-        print
-        xpath = raw_input("Enter xpath of element: ")
+        print()
+        xpath = input("Enter xpath of element: ")
         action = "fill`" + xpath
-        print
-        fill = raw_input("Enter your input: ")
+        print()
+        fill = input("Enter your input: ")
         action += "`" + fill
 
         if (pos < 0):
@@ -296,12 +297,12 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, action)
 
-            print
+            print()
             print("Added element to action queue")
             return queues.action_queue
     elif (option == 4):
-        print
-        js_line = raw_input("Enter line of JavaScript: ")
+        print()
+        js_line = input("Enter line of JavaScript: ")
         action = "js_line`" + js_line
 
         if (pos < 0):
@@ -312,21 +313,21 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, action)
 
-        print
+        print()
         print("Added JS line to action queue")
         return queues.action_queue
     elif (option == 5):
-        print
+        print()
         dirs = os.listdir("javascript")
         for file in dirs:
             if (re.findall(r'[^\.].*?(\.js)$', str(file))):
                 print(str(file.split(".js")[0]))
 
-        print
+        print()
         exists = False
 
         while (exists == False):
-            script = raw_input("Enter name of the JavaScript file: ")
+            script = input("Enter name of the JavaScript file: ")
             script_file = "javascript/" + script + ".js"
 
             try:
@@ -334,7 +335,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 exists = True
             except:
                 exists = False
-                print
+                print()
                 print("Could not find the script")
 
         action = "js_script`" + script
@@ -347,21 +348,21 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, action)
 
-        print
+        print()
         print("Added \"" + script_file + "\" to action queue")
         return queues.action_queue
     elif (option == 6):
-        print
+        print()
         dirs = os.listdir(".")
         for file in dirs:
             if (re.findall(r'[^\.].*?(\.py)$', str(file))):
                 print(str(file.split(".py")[0]))
 
-        print
+        print()
         exists = False
 
         while (exists == False):
-            script = raw_input("Enter name of the Python script: ")
+            script = input("Enter name of the Python script: ")
             script_file = script + ".py"
 
             try:
@@ -369,7 +370,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 exists = True
             except:
                 exists = False
-                print
+                print()
                 print("Could not find the script")
 
         action = "py_script`" + script
@@ -382,13 +383,13 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
             else:
                 queues.web_action_queue[pos].insert(pos2, action)
 
-        print
+        print()
         print("Added " + script_file + " to the action queue")
         return queues.action_queue
     elif (option == 7):
         menu(queues, the_driver)
     else:
-        print
+        print()
         print("Invalid number.")
         add_action_menu(queues, option, pos, pos2, from_web_action)
 
@@ -396,7 +397,7 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
     option = ""
 
     while (option == ""):
-        print
+        print()
         print("----------------------------------------------------")
         print("WARNING: MAKE SURE YOUR ACTION IS UNIQUE")
         print("----------------------------------------------------")
@@ -410,10 +411,10 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
         print("----------------------------------------------------")
 
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             add_action_menu(queues, the_driver, pos, pos2, from_web_action)
 
@@ -422,16 +423,16 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
 
 def apply_action_queue_all(queues):
     if (len(queues.web_queue) == 0 and len(queues.action_queue) == 0):
-        print
+        print()
         print("The website queue is empty. Can not apply actions to no websites.")
         print("The action queue is empty. Can not apply any actions.")
         return
     elif (len(queues.web_queue) == 0):
-        print
+        print()
         print("The website queue is empty. Can not apply actions to no websites.")
         return
     elif (len(queues.action_queue) == 0):
-        print
+        print()
         print("The action queue is empty. Can not apply any actions.")
         return
 
@@ -442,7 +443,7 @@ def apply_action_queue_all(queues):
         queues.web_action_queue.append([queues.web_queue[index]])
         for action in queues.action_queue:
             queues.web_action_queue[index].append(action)
-    print
+    print()
     print("Applied action queue to website queue.")
     return queues.web_action_queue
 
@@ -452,7 +453,7 @@ def edit_print(queues, queue_type, edit_type):
 
     if (queue_type == "web_queue"):
         if (len(queues.web_queue) == 0):
-            print
+            print()
             print("Website[1]: ")
         else:
             for index in range(len(queues.web_queue)):
@@ -463,7 +464,7 @@ def edit_print(queues, queue_type, edit_type):
                 print("Website[" + str(last_index) + "]: ")
     elif (queue_type == "action_queue"):
         if (len(queues.action_queue) == 0):
-            print
+            print()
             print("Action[1]: ")
         else:
             for index in range(len(queues.action_queue)):
@@ -474,11 +475,11 @@ def edit_print(queues, queue_type, edit_type):
                 print("Action[" + str(last_index) + "]: ")
     elif (queue_type == "web_action_queue"):
         if (queues.web_action_queue == [[]]):
-            print
+            print()
             print("Website[1]: ")
         else:
             for index in range(len(queues.web_action_queue)):
-                print
+                print()
                 print("Website[" + str(index + 1) + "]: " + queues.web_action_queue[index][0])
                 last_index_web = index + 2
 
@@ -493,7 +494,7 @@ def edit_print(queues, queue_type, edit_type):
                         print("    Action[" + str(last_index_action) + "]: ")
 
             if (edit_type == "insert"):
-                print
+                print()
                 print("Website[" + str(last_index_web) + "]: ")
 
 def edit_queue(queues, queue_type, edit_type, the_driver):
@@ -503,36 +504,36 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
 
         while (option == ""):
             try:
-                print
+                print()
                 if (edit_type == "insert"):
-                    option = int(raw_input("Enter the position to insert: "))
+                    option = int(input("Enter the position to insert: "))
                 elif (edit_type == "remove"):
-                    option = int(raw_input("Enter the position to remove: "))
+                    option = int(input("Enter the position to remove: "))
             except:
                 option = ""
-                print
+                print()
                 print("Not a number.")
                 edit_print(queues, queue_type, edit_type)
                 continue
 
             if (option <= len(queues.web_queue) + 1 and option > 0):
-                print
+                print()
 
                 if (edit_type == "insert"):
-                    web_name = raw_input("Enter the website name: ")
+                    web_name = input("Enter the website name: ")
                     queues.web_queue.insert(int(option - 1), web_name)
                 elif (edit_type == "remove"):
                     try:
                         del queues.web_queue[option - 1]
                     except:
                         option = ""
-                        print
+                        print()
                         print("Invalid number.")
                         edit_print(queues, queue_type, edit_type)
                         continue
             else:
                 option = ""
-                print
+                print()
                 print("Invalid number.")
                 edit_print(queues, queue_type, edit_type)
                 continue
@@ -542,21 +543,21 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
 
         while (option == ""):
             try:
-                print
+                print()
 
                 if (edit_type == "insert"):
-                    option = int(raw_input("Enter the position to insert: "))
+                    option = int(input("Enter the position to insert: "))
                 elif (edit_type == "remove"):
-                    option = int(raw_input("Enter the position to remove: "))
+                    option = int(input("Enter the position to remove: "))
             except:
                 option = ""
-                print
+                print()
                 print("Not a number.")
                 edit_print(queues, queue_type, edit_type)
                 continue
 
             if (option <= len(queues.action_queue) + 1 and option > 0):
-                print
+                print()
 
                 if (edit_type == "insert"):
                     add_action_menu(queues, the_driver, option - 1, -1, False)
@@ -565,13 +566,13 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
                         del queues.action_queue[option - 1]
                     except:
                         option = ""
-                        print
+                        print()
                         print("Invalid number.")
                         edit_print(queues, queue_type, edit_type)
                         continue
             else:
                 option = ""
-                print
+                print()
                 print("Invalid number.")
                 edit_print(queues, queue_type, edit_type)
                 continue
@@ -583,20 +584,20 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
             arg1 = -1
             arg2 = -1
             edit_print(queues, queue_type, edit_type)
-            print
-            option = raw_input("Enter the position to remove: ")
+            print()
+            option = input("Enter the position to remove: ")
             options = re.split(r' ', option)
 
             if (len(options) > 2):
                 option = ""
-                print
+                print()
                 print("Must take 1 or 2 arguments")
                 continue
             try:
                 arg1 = int(options[0])
             except:
                 option = ""
-                print
+                print()
                 print("The first argument is not a number")
                 continue
 
@@ -605,20 +606,20 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
                     arg2 = int(options[1])
                 except:
                     option = ""
-                    print
+                    print()
                     print("The second argument is not a number")
                     continue
 
             if (queues.web_action_queue == [[]]):
                 if (arg1 > len(queues.web_action_queue) or arg1 < 1):
                     option = ""
-                    print
+                    print()
                     print("Invalid website position")
                     continue
             else:
                 if (arg1 > (len(queues.web_action_queue) + 1) or arg1 < 1):
                     option = ""
-                    print
+                    print()
                     print("Invalid website position")
                     continue
 
@@ -627,19 +628,19 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
                     queues.web_action_queue[arg1 - 1]
                 except:
                     option = ""
-                    print
+                    print()
                     print("Invalid action position")
                     continue
 
                 if (arg2 > len(queues.web_action_queue[arg1 - 1]) or arg1 < 1):
                     option = ""
-                    print
+                    print()
                     print("Invalid action position")
                     continue
         if (arg2 == -1):
             if (edit_type == "insert"):
-                print
-                web_name = raw_input("Enter the website name: ")
+                print()
+                web_name = input("Enter the website name: ")
             
             if (queues.web_action_queue == [[]]):
                 queues.web_action_queue[arg1 - 1].insert(0, web_name)
@@ -656,7 +657,7 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
                     del queues.web_action_queue[arg1 - 1][arg2]
                 except:
                     option = ""
-                    print
+                    print()
                     print("Invalid action position")
                     edit_queue(queues, queue_type, edit_type, the_driver)
 
@@ -665,7 +666,7 @@ def edit_queue_menu(queues, the_driver, edit_type):
 
     while (option == ""):
         if (edit_type == "insert"):
-            print
+            print()
             print("----------------------------------------------------")
             print("1.  Insert into website queue")
             print("2.  Insert into action queue")
@@ -673,7 +674,7 @@ def edit_queue_menu(queues, the_driver, edit_type):
             print("4.  Back")
             print("----------------------------------------------------")
         elif (edit_type == "remove"):
-            print
+            print()
             print("----------------------------------------------------")
             print("1.  Remove from website queue")
             print("2.  Remove from action queue")
@@ -682,17 +683,17 @@ def edit_queue_menu(queues, the_driver, edit_type):
             print("----------------------------------------------------")
 
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             edit_queue_menu(queues, the_driver, edit_type)
 
         if (option == 1):
             if (edit_type == "remove"):
                 if (len(queues.web_queue) == 0):
-                    print
+                    print()
                     print("The website queue is empty")
                     edit_queue_menu(queues, the_driver, edit_type)
 
@@ -700,7 +701,7 @@ def edit_queue_menu(queues, the_driver, edit_type):
         elif (option == 2):
             if (edit_type == "remove"):
                 if (len(queues.action_queue) == 0):
-                    print
+                    print()
                     print("The action queue is empty")
                     edit_queue_menu(queues, the_driver, edit_type)
 
@@ -708,7 +709,7 @@ def edit_queue_menu(queues, the_driver, edit_type):
         elif (option == 3):
             if (edit_type == "remove"):
                 if (queues.web_action_queue == [[]]):
-                    print
+                    print()
                     print("The website-action queue is empty")
                     edit_queue_menu(queues, the_driver, edit_type)
 
@@ -716,7 +717,7 @@ def edit_queue_menu(queues, the_driver, edit_type):
         elif (option == 4):
             menu(queues, the_driver)
         else:
-            print
+            print()
             print("Invalid number.")
             edit_queue_menu(queues, the_driver, edit_type)
 
@@ -728,20 +729,20 @@ def write_queue(queue_name, queues, queue_type):
                 f.write(queues.web_action_queue[index][index2] + "\n")
             if (index == len(queues.web_action_queue) - 1):
                 f.close()
-                print
+                print()
                 print("Saved web queue to \"" + queue_name + "\"")
             else:
                 f.write("\n")
     elif (queue_type == "web_queue"):
         for name in queues.web_queue:
             f.write(str(name) + "\n")
-        print
+        print()
         print("Saved web queue to \"" + queue_name + "\"")
         f.close()
     elif (queue_type == "action_queue"):
         for name in queues.action_queue:
             f.write(str(name) + "\n")
-        print
+        print()
         print("Saved web queue to \"" + queue_name + "\"")
         f.close()
 
@@ -770,25 +771,25 @@ def save_last_queue(queue_name, queue_type):
 def save_queue(queues, queue_type):
     exists = True
     answer = ""
-    print
-    queue_name = raw_input("Enter name of the queue: ")
+    print()
+    queue_name = input("Enter name of the queue: ")
 
     if (queue_type == "web_queue"):
         queue_name = "web-queues/" + queue_name + ".wq"
         if (len(queues.web_queue) == 0):
-            print
+            print()
             print("The website queue is empty.")
             return
     elif (queue_type == "action_queue"):
         queue_name = "action-queues/" + queue_name + ".aq"
         if (len(queues.action_queue) == 0):
-            print
+            print()
             print("The action queue is empty.")
             return
     elif (queue_type == "web_action_queue"):
         queue_name = "web-action-queues/" + queue_name + ".waq"
         if (queues.web_action_queue == [[]]):
-            print
+            print()
             print("The website-action queue is empty.")
             return
     try:
@@ -798,28 +799,28 @@ def save_queue(queues, queue_type):
         exists = False
 
     if (exists == True):
-        print
+        print()
         print("A file with that name already exists.")
 
         while (answer != "y" and answer != "n"):
-            answer = raw_input("Would you like to overwrite \"" + queue_name + "\" (y or n): ")
+            answer = input("Would you like to overwrite \"" + queue_name + "\" (y or n): ")
 
         if (answer == "y"):
             write_queue(queue_name, queues, queue_type)
             save_last_queue(queue_name, queue_type)
-            print
+            print()
             print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
         else:
             return
     else:
         write_queue(queue_name, queues, queue_type)
         save_last_queue(queue_name, queue_type)
-        print
+        print()
         print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
 
 def load_queue(queues, queue_type):
     exists = True
-    print
+    print()
 
     if (queue_type == "web_queue"):
         path = "web-queues/"
@@ -841,8 +842,8 @@ def load_queue(queues, queue_type):
         elif (queue_type == "web_action_queue"):
             print(str(file.split(".waq")[0]))
                     
-    print
-    queue_name = raw_input("Enter name of the queue file: ")
+    print()
+    queue_name = input("Enter name of the queue file: ")
 
     if (queue_type == "web_queue"):
         queue_name = "web-queues/" + queue_name + ".wq"
@@ -891,42 +892,42 @@ def load_queue(queues, queue_type):
                     continue
 
             save_last_queue(queue_name, "web_action_queue")
-        print
+        print()
         print("\"" + queue_name + "\" has been loaded")
-        print
+        print()
         print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
     else:
-        print
+        print()
         print("A file of that name does not exist in this directory.")
 
 def print_queue(queues, queue_type):
     if (queue_type == "web_queue"):
         if (len(queues.web_queue) == 0):
-            print
+            print()
             print("The website queue is empty.")
             return
 
-        print
+        print()
 
         for web_name in queues.web_queue:
             print("Website: " + web_name)
     elif (queue_type == "action_queue"):
         if (len(queues.action_queue) == 0):
-            print
+            print()
             print("The action queue is empty.")
             return
 
-        print
+        print()
 
         for action in queues.action_queue:
             print("Action: " + action)
     elif (queue_type == "web_action_queue"):
         if (queues.web_action_queue == [[]]):
-            print
+            print()
             print("The website-action queue is empty.")
             return
 
-        print
+        print()
         first_time = True
 
         for index in range(len(queues.web_action_queue)):
@@ -941,7 +942,7 @@ def print_queue(queues, queue_type):
             first_time = True
 
 def clear_queue(queues, queue_type):
-    print
+    print()
 
     if (queue_type == "web_queue"):
         queues.web_queue = []
@@ -962,7 +963,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
     times = []
 
     if (web_action_queue == [[]]):
-        print
+        print()
         print("The website-action queue is empty.")
         return
     if (the_driver.driver_type == "chrome"):
@@ -972,20 +973,20 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
             else:
                 options = webdriver.ChromeOptions()
                 options.add_argument("user-data-dir=" + the_driver.chrome_profile)
-                driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = options)
+                driver = webdriver.Chrome(executable_path=the_driver.driver_path, options = options)
         except:
-            print
+            print()
             print("Could not open the chromedriver")
             print("Check that the driver type and driver path and browser profile is correct in config.ini")
             print("These are the current driver settings:")
-            print
+            print()
             print("driver_type = " + the_driver.driver_type)
             print("driver_path = " + the_driver.driver_path)
             print("chrome_profile = " + the_driver.chrome_profile)
             print("firefox_profile = " + the_driver.firefox_profile)
-            print
+            print()
             print("It may also be possible that the set browser profile is already in use")
-            print
+            print()
             menu(queues, the_driver)
     elif (the_driver.driver_type == "firefox"):
         try:
@@ -996,18 +997,18 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                 driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_profile=profile)
 
         except:
-            print
+            print()
             print("Could not open the chromedriver")
             print("Check that the driver type and driver path and browser profile is correct in config.ini")
             print("These are the current driver settings:")
-            print
+            print()
             print("driver_type = " + the_driver.driver_type)
             print("driver_path = " + the_driver.driver_path)
             print("chrome_profile = " + the_driver.chrome_profile)
             print("firefox_profile = " + the_driver.firefox_profile)
-            print
+            print()
             print("It may also be possible that the set browser profile is already in use")
-            print
+            print()
             menu(queues, the_driver)
 
     web_check = True
@@ -1020,7 +1021,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
     elapsed_time_hours = 0
     elapsed_time_minutes = 0
     elapsed_time_seconds = 0
-    print
+    print()
 
     for index in range(len(web_action_queue)):
         if (index != 0):
@@ -1117,14 +1118,14 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
     elapsed_time_seconds = math.floor(float(elapsed_time_seconds_exact * 60))
     sys.stdout.write("\rElapsed: [" + str(int(elapsed_time_hours)) + "h " + str(int(elapsed_time_minutes)) + "m " + str(int(elapsed_time_seconds)) + "s]    " + "Remaining: [" + str(int(time_left_hours)) + "h " + str(int(time_left_minutes)) + "m " + str(int(time_left_seconds)) + "s]    [" + str(int(percent_complete)) + "%]    [" + str(entries_complete) + "/" + str(entries) + "]")
     sys.stdout.flush()
-    print
+    print()
 
     driver.quit()
 
 def save_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
-        print
+        print()
         print("----------------------------------------------------")
         print("1.  Save website queue")
         print("2.  Save action queue")
@@ -1132,10 +1133,10 @@ def save_queue_menu(queues, the_driver):
         print("4.  Back")
         print("----------------------------------------------------")
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             save_queue_menu(queues, the_driver)
         if (option == 1):
@@ -1147,7 +1148,7 @@ def save_queue_menu(queues, the_driver):
         elif (option == 4):
             menu(queues, the_driver)
         else:
-            print
+            print()
             print("Invalid number.")
             save_queue_menu(queues, the_driver)
         menu(queues, the_driver)
@@ -1155,7 +1156,7 @@ def save_queue_menu(queues, the_driver):
 def load_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
-        print
+        print()
         print("----------------------------------------------------")
         print("1.  Load website queue")
         print("2.  Load action queue")
@@ -1163,10 +1164,10 @@ def load_queue_menu(queues, the_driver):
         print("4.  Back")
         print("----------------------------------------------------")
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             load_queue_menu(queues, the_driver)
         if (option == 1):
@@ -1178,7 +1179,7 @@ def load_queue_menu(queues, the_driver):
         elif (option == 4):
             menu(queues, the_driver)
         else:
-            print
+            print()
             print("Invalid number.")
             load_queue_menu(queues, the_driver)
         menu(queues, the_driver)
@@ -1186,7 +1187,7 @@ def load_queue_menu(queues, the_driver):
 def print_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
-        print
+        print()
         print("----------------------------------------------------")
         print("1.  Print website queue")
         print("2.  Print action queue")
@@ -1194,10 +1195,10 @@ def print_queue_menu(queues, the_driver):
         print("4.  Back")
         print("----------------------------------------------------")
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             print_queue_menu(queues, the_driver)
         if (option == 1):
@@ -1209,7 +1210,7 @@ def print_queue_menu(queues, the_driver):
         elif (option == 4):
             menu(queues, the_driver)
         else:
-            print
+            print()
             print("Invalid number.")
             print_queue_menu(queues, the_driver)
         menu(queues, the_driver)
@@ -1217,7 +1218,7 @@ def print_queue_menu(queues, the_driver):
 def clear_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
-        print
+        print()
         print("----------------------------------------------------")
         print("1.  Clear website queue")
         print("2.  Clear action queue")
@@ -1225,10 +1226,10 @@ def clear_queue_menu(queues, the_driver):
         print("4.  Back")
         print("----------------------------------------------------")
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             clear_queue_menu(queues, the_driver)
         if (option == 1):
@@ -1240,7 +1241,7 @@ def clear_queue_menu(queues, the_driver):
         elif (option == 4):
             menu(queues, the_driver)
         else:
-            print
+            print()
             print("Invalid number.")
             clear_queue_menu(queues, the_driver)
         menu(queues, the_driver)
@@ -1248,7 +1249,7 @@ def clear_queue_menu(queues, the_driver):
 def menu(queues, the_driver):
     option = ""
     while (option == ""):
-        print
+        print()
         print("----------------------------------------------------")
         print("1.  Add site to website queue")
         print("2.  Add action to action queue")
@@ -1263,10 +1264,10 @@ def menu(queues, the_driver):
         print("11. Quit")
         print("----------------------------------------------------")
         try:
-            print
-            option = int(raw_input("Select an option: "))
+            print()
+            option = int(input("Select an option: "))
         except:
-            print
+            print()
             print("Not a number.")
             menu(queues, the_driver)
         if (option == 1):
@@ -1300,10 +1301,10 @@ def menu(queues, the_driver):
             run_web_action_queue(queues, queues.web_action_queue, the_driver)
             menu(queues, the_driver)
         elif (option == 11):
-            print
+            print()
             quit()
         else:
-            print
+            print()
             print("Invalid number.")
             menu(queues, the_driver)
 

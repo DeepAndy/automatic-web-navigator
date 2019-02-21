@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Companion Script
 Description:    This will take Drupal nodes as input and clean the HTML given
                 in any rich text editor. Used in conjunction with navigator.py
+Python 2.7.10
 '''
 
 import re

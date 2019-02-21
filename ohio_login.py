@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Helper Script
 Description:    This is a helper script to provide a function for logging into
                 an OHIO account with Selenium
+Python 3.7.2
 '''
 
 import re
@@ -26,7 +27,7 @@ def ohio_login(driver):
     login_complete = False
 
     if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = raw_input("Enter OHIO username: ")
+        username = input("Enter OHIO username: ")
         password = getpass.getpass("Enter OHIO password: ")
 
         element = driver.find_element_by_xpath(cas_username_xpath)

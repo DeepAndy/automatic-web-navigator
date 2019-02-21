@@ -1,4 +1,4 @@
-import urllib                                                                    
+import urllib
 import re
 import os
 import time
@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 Author:         Austin Moore
 Script Type:    Helper Script
 Description:    Download and upload images to Drupal
+Python 3.7.2 (Not working fully yet)
 '''
 
 '''
@@ -52,7 +53,7 @@ def download_image(url, content):
         image_source = "https://" + main_url + image_source
 
     try:
-        urllib.urlretrieve(image_source, "images/" + file_name)
+        urllib.request.urlretrieve(image_source, "images/" + file_name)
     except:
         print("Failed to download image at \"" + image_source + "\"")
 

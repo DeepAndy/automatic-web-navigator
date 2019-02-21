@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Main Script
 Description:    This script is used to create a website queue (.wq) of nodes
                 on Drupal
+Python 2.7.10
 '''
 
 import re

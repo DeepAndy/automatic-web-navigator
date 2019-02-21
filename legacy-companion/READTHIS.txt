@@ -1,0 +1,8 @@
+This folder contains all companion scripts that I have personally written
+that are no longer in use.
+
+Most of these companion scripts were used for one time jobs at Ohio University
+while I worked in web development.
+
+If any of these scripts are to be used, they will need to be moved into the
+root of this repository to be loaded by navigator.py
