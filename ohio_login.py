@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Helper Script
 Description:    This is a helper script to provide a function for logging into
                 an OHIO account with Selenium
+Python 3.7.2
 '''
 
 import re

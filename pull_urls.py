@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Main Script
 Description:    Used to create a website queue (.wq) of all URLs on a specified
                 page
+Python 2.7.10
 '''
 
 import re

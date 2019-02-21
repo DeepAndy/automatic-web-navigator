@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 Author:         Austin Moore
 Script Type:    Helper Script
 Description:    Download and upload images to Drupal
+Python 3.7.2 (Not working fully yet)
 '''
 
 '''

@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Main Script
 Description:    A queue system for queueing websites and specific actions to be
                 performed on them
+Python 3.7.2
 '''
 
 from selenium import webdriver
