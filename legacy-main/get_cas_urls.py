@@ -1,3 +1,10 @@
+'''
+Author:         Austin Moore
+Script Type:    Main Script
+Description:    Used to make a website queue for CAS
+Python 2.7.10
+'''
+
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver

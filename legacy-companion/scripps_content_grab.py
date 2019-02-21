@@ -2,33 +2,25 @@
 Author:         Austin Moore
 Script Type:    Companion Script
 Description:    This script migrates websites from Ohio University's
-                College of Fine Arts site into Drupal. Used in conjunction
+                Scripps College site into Drupal. Used in conjunction
                 with navigator.py
+Python 2.7.10
 '''
 
+import re
+import time
+import io
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import HTMLParser
-import StringIO
-import re
-from fix_html import *
-import getpass
-import time
-from pyexcel import *
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from fix_html import *
+from ohio_login import ohio_login
 
 def script_main(driver, received_url, pos):
-    sheet = get_sheet(file_name="CoFA News-selections-edits.xlsx")
-    school_names = sheet.column[2]
-    urls = sheet.column[3]
-
-    for i in range(len(urls)):
-        if (urls[i] == driver.current_url):
-            tag_name = school_names[i]
-
-    tags = tag_name.split(",")
-
     page_source = driver.page_source
     page_source = page_source.replace(u"\xa0", u" ")
     page_source = page_source.replace(u"\xc2", u" ")
@@ -39,6 +31,19 @@ def script_main(driver, received_url, pos):
     story_date = ""
     date = ""
 
+    title = driver.title
+
+    print("title = " + title)
+
+    f = io.open("title.txt", "r", encoding="utf-8")
+    all_sites = f.readlines()
+
+    for site in all_sites:
+        site = site.strip()
+        if (title == site):
+            print("SKIPPED")
+            return
+
     article_data = soup.find("div", id="articleData")
     for data in article_data.find_all():
         if (data.has_attr("id")):
@@ -48,6 +53,7 @@ def script_main(driver, received_url, pos):
                 author = author.strip()
             elif (data["id"] == "storyDate"):
                 story_date = data.text
+
     story_date = re.findall(r"(\S+)", story_date)
 
     for index in range(len(story_date)):
@@ -85,17 +91,24 @@ def script_main(driver, received_url, pos):
     for entry in story_date:
         date += entry
 
+    all_tags = soup.find("div", class_="groupings").text
+    all_tags = all_tags.strip()
+    tags = re.split(", ", all_tags)
+    soup.find("div", class_="groupings").decompose()
+
     content = soup.find("div", id="story")
 
     errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
-    fix_all(content, errors)
-
-    title = driver.title
+    try:
+        fix_all(content, errors)
+    except:
+        print("Skipping HTML cleanup")
 
     cas_username_xpath = "//*[@id='username']"
     cas_password_xpath = "//*[@id='password']"
     cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-    article_page_url = "https://webcms.ohio.edu/fine-arts/group/1/content/create/group_node%3Aarticle"
+    article_page_url = "https://webcms.ohio.edu/group/461/content/create/group_node%3Aarticle"
+    #article_page_url = "https://webcmsdev.oit.ohio.edu/group/461/content/create/group_node%3Aarticle"
 
     output = ""
 
@@ -109,30 +122,32 @@ def script_main(driver, received_url, pos):
 
     driver.get(article_page_url)
 
-    if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = raw_input("Enter OHIO username: ")
-        password = getpass.getpass("Enter OHIO password: ")
+    ohio_login(driver)
 
-        element = driver.find_element_by_xpath(cas_username_xpath)
-        element.send_keys(username)
-        element = driver.find_element_by_xpath(cas_password_xpath)
-        element.send_keys(password)
-        element = driver.find_element_by_xpath(cas_login_button_xpath)
-        element.click()
-
-    time.sleep(1) # NEED TO WAIT FOR TEXTAREA TO LOAD
+    wait = WebDriverWait(driver, 10)
 
     title_xpath = "//*[@id='edit-title-0-value']"
     author_xpath = "//*[@id='edit-field-author-0-value']"
     date_xpath = "//*[@id='edit-field-publication-date-0-value-date']"
-    tag_xpath = "//*[@id='edit-field-fine-arts-news-tags']"
-    navigation_xpath = "//*[@id='edit-menu-parent']"
-    display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
-    column_xpath = "//*[@id='edit-column-number']"
+    tag_xpath = '//*[@id="edit-field-scripps-college-article-ta"]'
+    page_location_xpath = '//*[@id="edit-page-location"]/summary'
+    parent_page_xpath = '//*[@id="edit-parent-page"]'
+    page_url_slug_xpath = '//*[@id="edit-slug"]'
+    #navigation_xpath = "//*[@id='edit-menu-parent']"
+    #display_settings_xpath = "//*[@id='edit-ds-switch-view-mode']/summary"
+    #column_xpath = "//*[@id='edit-column-number']"
     body_textarea_script = "window.frames[0].document.getElementsByTagName('body')[0].innerHTML='" + output + "';"
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
+    parent_page = "- News"
     first = True
+
+    wait.until(EC.presence_of_element_located((By.XPATH, page_location_xpath)))
+    driver.find_element_by_xpath(page_location_xpath).click()
+
+    element = Select(driver.find_element_by_xpath(parent_page_xpath))
+    element.select_by_visible_text(parent_page)
+    driver.find_element_by_xpath(page_url_slug_xpath).send_keys(title)
 
     if (title != ""):
         element = driver.find_element_by_xpath(title_xpath)
@@ -146,9 +161,6 @@ def script_main(driver, received_url, pos):
 
     driver.execute_script(body_textarea_script)
 
-    num_columns = "1"
-    nav = "</news/ | Left>"
-
     if len(tags) > 0:
         for tag in tags:
             element = Select(driver.find_element_by_xpath(tag_xpath))
@@ -157,25 +169,19 @@ def script_main(driver, received_url, pos):
                 element.deselect_all()
                 first = False
 
-            if (tag != "CoFA"): 
-                element.select_by_visible_text('-' + tag)
-            else:
+            try:
                 element.select_by_visible_text(tag)
+            except:
+                pass
 
-    element = Select(driver.find_element_by_xpath(navigation_xpath))
-    element.select_by_visible_text(nav)
-    element = driver.find_element_by_xpath(display_settings_xpath)
-    element.click()
-    element = Select(driver.find_element_by_xpath(column_xpath))
-    element.select_by_visible_text(num_columns)
-
+    wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
     element.click()
 
     alert = driver.switch_to.alert
     alert.accept()
 
+    '''
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
-
-    time.sleep(0.5)
+    '''

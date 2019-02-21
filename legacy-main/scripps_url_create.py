@@ -3,6 +3,7 @@ Author:         Austin Moore
 Script Type:    Main Script
 Description:    Quick script to create a web queue from a list of URL IDs given
                 to me
+Python 2.7.10
 '''
 
 import re

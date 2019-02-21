@@ -4,6 +4,7 @@ Script Type:    Companion Script
 Description:    This script migrates websites from Ohio University's
                 Scripps College site into Drupal. Used in conjunction
                 with navigator.py
+Python 2.7.10
 '''
 
 import re

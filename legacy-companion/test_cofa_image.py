@@ -1,4 +1,11 @@
-import urllib                                                                    
+'''
+Author:         Austin Moore
+Script Type:    Companion Script
+Description:    Testing script for embedding images on COFA
+Python 2.7.10
+'''
+
+import urllib
 import re
 import getpass
 import time
