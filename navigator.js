@@ -57,10 +57,11 @@ function load_queue_menu(queues)
             switch(input)
             {
                 case 1: load_queue(queues, "web_action_queue");
-                case 2: return;
+                        break;
+                case 2: return;                  
                 default: console.log("Invalid number.");
                          input = "";
-                         continue;
+                         continue;                
             }
         }
         else
