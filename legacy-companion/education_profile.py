@@ -20,7 +20,7 @@ from drupal_image import *
 from fix_html import *
 
 def convert_department(department):
-    if (re.findall(r"Recreation [and|&] Sports? Pedagogy", department)):
+    if (re.findall(r"Recreation [and]?|&? Sports? Pedagogy", department)):
         department = "Recreation and Sports Pedagogy"
     if (re.findall(r"Patton College Dean's Office", department)):
         department = "Dean's Office"
@@ -49,6 +49,10 @@ def script_main(driver, url, pos):
     found_department_field = False
     title = ""
     department = ""
+    f = open("departments.txt", "a+")
+    f1 = open("departments.txt", "r")
+    department_list = f1.readlines()
+    found_department_list = False
 
     try:
         department = soup.find("span", class_="edu_Department").text
@@ -81,6 +85,18 @@ def script_main(driver, url, pos):
         title = title_split[0]
         department = title_split[1]
         department = convert_department(department)
+
+    print(department_list)
+
+    for dep in department_list:
+        if (dep.strip() == department.strip()):
+            found_department_list = True
+
+    if (found_department_list == False):
+        print("Department not in list")
+        f.write(department + "\n")
+    else:
+        print("Department in list")
 
     '''
     if (re.findall(r"-Biological Sciences", department)):
@@ -181,8 +197,8 @@ def script_main(driver, url, pos):
         bio = bio.replace("\n", "")
         bio = bio.replace("'", "\\'")
 
-    profile_page_url = "https://webcmsdev.oit.ohio.edu/education/group/1/content/create/group_node%3Astaff_profile"
-    #profile_page_url = "https://webcms.ohio.edu/education/group/1/content/create/group_node%3Astaff_profile"
+    #profile_page_url = "https://webcmsdev.oit.ohio.edu/education/group/1/content/create/group_node%3Astaff_profile"
+    profile_page_url = "https://webcms.ohio.edu/education/group/1/content/create/group_node%3Astaff_profile"
 
     print("display_name = " + display_name)
     print("first_name = " + first_name)
@@ -207,6 +223,9 @@ def script_main(driver, url, pos):
     wait = WebDriverWait(driver, 10)
 
     # Selenium XPATHs
+    display_name = display_name.replace("'", "\\'")
+    first_name = first_name.replace("'", "\\'")
+    last_name = last_name.replace("'", "\\'")
     display_name_js = "document.getElementById('edit-title-0-value').value = '" + display_name + "';"
     first_name_js = "document.getElementById('edit-field-first-name-0-value').value = '" + first_name + "';"
     last_name_js = "document.getElementById('edit-field-last-name-0-value').value = '" + last_name + "';"
