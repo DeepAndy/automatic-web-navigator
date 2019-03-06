@@ -215,73 +215,9 @@ def print_errors_gui(print_friendly_errors, error_line_string, errors, warnings)
 
 # Fix all errors
 def fix_all(soup, errors):
-    # Assign default values
-    first_header_correct = True
-    order_correct = True
-    min_header_num = 2
-    max_header_num = 6
-
-    # Check if first header is correct
-    for error in errors:
-        if (error == "<h>"):
-            first_header_correct = False
-            order_correct = False # Correcting the first header will put everything out of order
-
-    # Check if headers are out of order
-    for error in errors:
-        if (error == "order"):
-            order_correct = False
-
-    # Correct out of order headers
-    if (order_correct == False):
-        first_header = True
-        header_lookup = dict()
-
-        for header in soup.find_all(re.compile(r"^h?\d+$")):
-            header_num = int(re.findall(r"^h?(\d+)$", header.name)[0])
-
-            if (first_header == True):
-                header.name = "h" + str(min_header_num)
-                first_header = False
-                last_header_num = header_num
-                correct_last_header = min_header_num
-                header_lookup[str(header_num)] = correct_last_header
-                continue
-            elif ((header_num > last_header_num) and (header_num != correct_last_header + 1)):
-                header.name = "h" + str(correct_last_header + 1)
-                last_header_num = header_num
-                correct_last_header += 1
-
-                try:
-                    header_lookup[str(header_num)]
-                except:
-                    header_lookup[str(header_num)] = correct_last_header
-
-                continue
-            elif (header_num < last_header_num):
-                last_header_num = header_num
-
-                try:
-                    header.name = "h" + str(header_lookup[str(header_num)])
-                    correct_last_header = header_lookup[str(header_num)]
-                except:
-                    correct_last_header = header_num
-
-                continue
-            elif (header_num == last_header_num):
-                last_header_num = header_num
-                header.name = "h" + str(correct_last_header)
-
-                continue
-            elif (header_num == correct_last_header + 1):
-                last_header_num = header_num
-                correct_last_header = header_num
-
-                continue
-
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
-        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "br"):
+        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "br" and tag.name != "drupal-entity"):
             tag.decompose()
         if (tag.name == "hr"):
             tag.decompose()
@@ -348,6 +284,82 @@ def fix_all(soup, errors):
         except:
             continue
 
+    # Assign default values
+    first_header_correct = True
+    order_correct = True
+    min_header_num = 2
+    max_header_num = 6
+
+    # Check if first header is correct
+    for error in errors:
+        if (error == "<h>"):
+            first_header_correct = False
+            order_correct = False # Correcting the first header will put everything out of order
+
+    # Check if headers are out of order
+    for error in errors:
+        if (error == "order"):
+            order_correct = False
+
+    # Correct out of order headers
+    if (order_correct == False):
+        first_header = True
+        after_first_header = False
+        header_lookup = dict()
+
+        for header in soup.find_all(re.compile(r"^h?\d+$")):
+            header_num = int(re.findall(r"^h?(\d+)$", header.name)[0])
+
+            if (first_header == True):
+                header.name = "h" + str(min_header_num)
+                first_header = False
+                last_header_num = header_num
+                correct_last_header = min_header_num
+                header_lookup[str(header_num)] = correct_last_header
+                after_first_header = True
+                continue
+            elif ((header_num > last_header_num) and (header_num != correct_last_header + 1)):
+                header.name = "h" + str(correct_last_header + 1)
+                last_header_num = header_num
+                correct_last_header += 1
+                after_first_header = False
+
+                try:
+                    header_lookup[str(header_num)]
+                except:
+                    header_lookup[str(header_num)] = correct_last_header
+
+                continue
+            elif (header_num < last_header_num):
+                last_header_num = header_num
+
+                if (after_first_header == True):
+                    header.name = "h" + str(correct_last_header)
+                    after_first_header = False
+                    continue                
+
+                try:
+                    header.name = "h" + str(header_lookup[str(header_num)])
+                    correct_last_header = header_lookup[str(header_num)]
+                except:
+                    correct_last_header = header_num
+
+                after_last_header = False
+
+                continue
+            elif (header_num == last_header_num):
+                last_header_num = header_num
+                header.name = "h" + str(correct_last_header)
+                after_first_header = False
+
+                continue
+            elif (header_num == correct_last_header + 1):
+                last_header_num = header_num
+                correct_last_header = header_num
+                after_first_header = False
+
+                continue
+                 
     return soup
 
 # Write everything to our output file
