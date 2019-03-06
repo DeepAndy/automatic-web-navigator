@@ -1,8 +1,8 @@
 '''
 Author:         Austin Moore
 Script Type:    Companion Script
-Description:    This script migrates profile pages from the College of Arts and
-                Sciences Ohio University (OU) to OU Drupal pages
+Description:    This script migrates profile pages from the Patton College of
+                Education to Ohio University Drupal pages
 Python 3.7.2
 '''
 
