@@ -39,9 +39,12 @@ def find_errors(soup):
     error_line_string = [] # For saving the line string an error is on
     first_header = True
     out_of_order = False
+    only_br = True
 
     # Iterate through each line and find errors
     for tag in soup.find_all():
+        if (tag.name != "br"):
+            only_br = False
         if (tag.name == "p"):
             if (re.findall(r"^\s*$", tag.text)):
                 errors.append("empty <p>")
@@ -166,6 +169,10 @@ def find_errors(soup):
                 print_friendly_errors.append("ERROR: CP___PAGEID found")
                 #error_line_string.append(lines[i])
 
+        if (only_br == True):
+            errors.append("only_br")
+            print_friendly_errors.append("ERROR: Only whitespace found in file")
+
         # Header order check
         if (out_of_order == False):
             if (re.findall(r"^h\d$", tag.name)):
@@ -215,8 +222,20 @@ def print_errors_gui(print_friendly_errors, error_line_string, errors, warnings)
 
 # Fix all errors
 def fix_all(soup, errors):
+    # If we only have breaks
+    for error in errors:
+        if (error == "only_br"):
+            breaks = soup.find_all("br")
+
+            for tag in breaks:
+                tag.decompose()
+
+            return soup
+
     # Go ahead and replace same of these easy to find errors
     for tag in soup.find_all():
+        if (tag.name != "br"):
+            only_br = False
         if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "br" and tag.name != "drupal-entity"):
             tag.decompose()
         if (tag.name == "hr"):
