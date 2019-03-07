@@ -7,15 +7,15 @@ Since the software is incomplete, it can cause a large amount of damage if not
 used with proper care. Use at your own risk.
 
 ## Required Software
-* [Python 2](https://www.python.org/downloads)
+* [Python 3](https://www.python.org/downloads)
 
-* [Python 2 pip](https://www.makeusof.com/tag/install-pip-for-python/)
+* [Python 3 pip](https://www.makeusof.com/tag/install-pip-for-python/)
 
-* Python 2 selenium module
+* Python 3 selenium module
 
-    * `pip install selenium`
+    * `pip3 install selenium`
 
-    * `pip install bs4`
+    * `pip3 install bs4`
 
 * Web Driver
 
@@ -26,16 +26,28 @@ used with proper care. Use at your own risk.
 ## How to use
 Using a terminal, type this command
 
-`python navigator.py`
-
-Note that some operating systems will require you to run Python as `python2`
+`python3 navigator.py`
 
 The above command will present the user with a menu to manage website and action
 queues.
 
+## Special Mac setup
+On MacOS, you will need to install the proper certificates for Python to connect
+to pages. You will need to run the following code in a terminal:
+
+`sudo /Applications/Python\ 3.7/Install\ Certificates.command`
+
+## Trello
+This project now keeps track of tasks on Trello.
+The link can be found [here.](https://trello.com/b/NrBC6CaV/automatic-web-navigator)
+
 ## Notes
-The chromedriver executable path is set to my personal directory for now.
+The chromedriver and geckodriver executable path is set to my personal directory for now.
 You will have to change the path in *config.ini* to get it to work.
+
+Also, many of the scripts here are for my work at the Office of Information Technology (OIT)
+at Ohio University. Most of these one time companion scripts are stored in the legacy-companion
+and legacy-main directories.
 
 ## License
 This software is licensed under the MIT license.
