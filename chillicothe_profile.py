@@ -51,21 +51,32 @@ def script_main(driver, url, pos):
 
     try:
         department = soup.find("span", class_="profile-department").text
+
+        f = open("departments.txt", "r")
+        f1 = open("departments.txt", "a+")
+
+        departments = f.readlines()
+        found_department = False
+
+        for dep in departments:
+            if (dep.strip() == department.strip()):
+                found_department = True
+
+        if (found_department == False):
+            f1.write(department + "\n")
     except:
         pass
 
-    f = open("departments.txt", "r")
-    f1 = open("departments.txt", "w")
+    degree_found = False
 
-    departments = f.readlines()
-    found_department = False
+    try:
+        degree = soup.find("div", class_="profile-degree-university").text
+        degree_found = True
+    except:
+        pass
 
-    for dep in departments:
-        if (dep.strip() == department.strip()):
-            found_department = True
-
-    if (found_department == False):
-        f1.write(department)
+    if (degree_found == True and not re.findall(r"^\s*$", degree)):
+        degree = "<p>" + degree + "</p>"
     
     try:
         address = soup.find("div", class_="profile-office-address").text
@@ -120,9 +131,12 @@ def script_main(driver, url, pos):
         bio = str(bio).strip()
         bio = bio.replace("\n", "")
         bio = bio.replace("'", "\\'")
+
+        if (degree_found == True):
+            bio = degree + bio
         
-        list_bio = bio.split()
-        print(list_bio)
+        if (re.findall(r"^\s*$", bio)):
+            bio_found = False
 
         print("bio_found = " + str(bio_found))
 
@@ -161,6 +175,7 @@ def script_main(driver, url, pos):
     image_xpath = '//*[@id="edit-field-image-0-upload"]'
     alt_text_xpath = '//*[contains(@id, "edit-field-image-0-alt")]'
     link_to_full_xpath = '//*[@id="edit-field-link-to-full-profile-value"]'
+    create_content_xpath = '//*[@id="edit-submit"]'
 
     try:
         title_js = "document.getElementById('edit-field-title-0-value').value = '" + title + "';"
@@ -243,7 +258,7 @@ def script_main(driver, url, pos):
         pass
 
     try:
-        file_name, image_title, alt_text = download_image(url, soup.find("div", class_="profileImg"))
+        file_name, image_title, alt_text = download_image(url, soup.find("div", class_="profile-img"))
         driver.find_element_by_xpath(image_xpath).send_keys(os.getcwd() + "/images/" + file_name)
         wait.until(EC.presence_of_element_located((By.XPATH, alt_text_xpath)))
 
@@ -258,8 +273,6 @@ def script_main(driver, url, pos):
     if (bio_found == True):
         driver.find_element_by_xpath(link_to_full_xpath).click()
 
-    time.sleep(20)
-    '''
     driver.find_element_by_xpath(save_xpath).click()
 
     # Accept alert
@@ -268,4 +281,9 @@ def script_main(driver, url, pos):
         alert.accept()
     except:
         pass
-    '''
+
+    try:
+        wait.until(EC.presence_of_element_located((By.XPATH, create_content_xpath)))
+        driver.find_element_by_xpath(create_content_xpath).click()
+    except:
+        pass
