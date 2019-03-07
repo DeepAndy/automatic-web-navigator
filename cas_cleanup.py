@@ -16,7 +16,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from fix_html import *
+from fix_html_img import *
 from ohio_login import ohio_login
 
 def script_main(driver, received_url, pos):
@@ -64,15 +64,66 @@ def script_main(driver, received_url, pos):
     except:
         print("Skipped HTML cleanup")
 
-    content = str(content)
-    content = content.replace('"', '\\"')
-    content = content.strip()
-    content = content.replace("\n", "")
+    first = True
 
-    body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + str(content) + '";'
-    driver.execute_script(body_textarea_script)
+    for tag in content:
+        if (tag.name == "img"):
+            try:
+                driver.switch_to.default_content()
+            except:
+                pass
+
+            try:
+                file_name, image_title, alt_text = download_image(received_url, content)
+                tag.decompose()
+            except:
+                continue
+
+            try:
+                driver.find_element_by_xpath(rich_text_xpath).click()
+                embed_image(driver, file_name, image_title, alt_text)
+            except:
+                continue
+        else:
+            try:
+                driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
+            except:
+                pass
+
+            line = str(tag)
+            line = line.strip()
+
+            # For JavaScript code in Drupal
+            line = line.replace('"', '\\"')
+            line = line.replace("\n", "")
+
+            print("line = " + line)
+
+            if (re.findall("^\s*$", line)):
+                continue
+
+            element = driver.find_element_by_xpath(rich_text_body_xpath)
+
+            if (first == False):
+                html_backup = element.get_attribute("innerHTML")
+                html_backup = html_backup.replace(u"\xa0", u" ")
+                html_backup = html_backup.replace(u"\xc2", u" ")
+                html_backup = str(html_backup)
+                html_backup = html_backup.replace('"', '\\"')
+                full = html_backup + line
+            else:
+                full = line
+                first = False
+
+            if (not re.findall("^\s*$", full)):
+                body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + full + '";'
+                driver.execute_script(body_textarea_script)
+
+
     driver.switch_to.default_content()
+    time.sleep(30)
 
+    '''
     # Click save button
     wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
@@ -85,7 +136,6 @@ def script_main(driver, received_url, pos):
     except:
         pass
 
-    '''
     # Create content button
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
