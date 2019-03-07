@@ -3,11 +3,11 @@ Author:         Austin Moore
 Script Type:    Main Script
 Description:    This script is used to create a website queue (.wq) of nodes
                 on Drupal
-Python 2.7.10
+Python 3.7.2
 '''
 
 import re
-import ConfigParser
+import configparser
 from selenium import webdriver
 from collections import OrderedDict
 import getpass
@@ -25,16 +25,16 @@ class options:
         self.remove_duplicates = remove_duplicates
 
 def initialization():
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config_file = "config.ini"
     complete_config = True
 
     try:
         config.read(config_file)
     except:
-        print
+        print()
         print("Could not find the configuration file \"" + config_file + "\" or the file has no sections")
-        print
+        print()
         quit()
 
     found_driver_section = False
@@ -50,17 +50,17 @@ def initialization():
             found_pull_urls_section = True
 
     if (found_driver_section == False):
-        print
+        print()
         print("Could not find the \"" + driver_section + "\" section.")
         print("Make sure a \"[" + driver_section + "]\" section is included in \"" + config_file + "\".")
-        print
+        print()
         quit()
 
     if (found_pull_urls_section == False):
-        print
+        print()
         print("Could not find the \"" + pull_urls_section + "\" section.")
         print("Make sure a \"[" + pull_urls_section + "]\" section is included in \"" + config_file + "\".")
-        print
+        print()
         quit()
 
     driver_option_type = "driver_type"
@@ -91,18 +91,18 @@ def initialization():
             driver_path = config.get(driver_section, driver_option_path)
 
     if (found_driver_type == False):
-        print
+        print()
         print("Could not find the \"" + driver_option_type + "\" option is included under the \"[" + driver_section + "]\" section.")
         complete_config = False
 
     if (found_correct_driver_type == False):
-        print
+        print()
         print("The \"" + driver_option_type + "\" value is either incorrect or the option is missing.")
         print("Make sure the value is a valid option.")
         complete_config = False
 
     if (found_driver_path == False):
-        print
+        print()
         print("Could not find the \"" + driver_option_path + "\" option.")
         print("Make sure \"" + driver_option_path + "\" option is included under the \"[" + driver_section + "]\" section.")
         complete_config = False
@@ -124,25 +124,25 @@ def initialization():
                 pull_urls_remove_duplicates = True
 
     if (found_pull_urls_absolute == False):
-        print
+        print()
         print("Could not find the \"" + pull_urls_option_absolute + "\" option.")
         print("Make sure \"" + pull_urls_option_absolute + "\" is included under the \"[" + pull_urls_section + "]\" section.")
         complete_config = False
 
     if (found_pull_urls_current_page == False):
-        print
+        print()
         print("Could not find the \"" + pull_urls_option_current_page + "\" option.")
         print("Make sure \"" + pull_urls_option_current_page + "\" is included under the \"[" + pull_urls_section + "]\" section.")
         complete_config = False
 
     if (found_pull_urls_duplicates == False):
-        print
+        print()
         print("Could not find the \"" + pull_urls_option_duplicates + "\" option.")
         print("Make sure \"" + pull_urls_option_duplicates + "\" is included under the \"[" + pull_urls_section + "]\" section.")
         complete_config = False
 
     if (complete_config == False):
-        print
+        print()
         quit()
     else:
         the_driver = web_driver(driver_type, driver_path)
@@ -154,7 +154,7 @@ def select_urls(urls):
     lower = 0
     upper = 0
     exists = False
-    print
+    print()
 
     for index in range(len(urls)):
         url = urls[index]
@@ -163,8 +163,8 @@ def select_urls(urls):
     complete = False
 
     while (complete == False):
-        print
-        url_input = raw_input("Enter individual sites to add or specify a range: ")
+        print()
+        url_input = input("Enter individual sites to add or specify a range: ")
         input_list = re.split(r' ', url_input)
         url_list = []
 
@@ -175,7 +175,7 @@ def select_urls(urls):
                 try:
                     url_list.append(int(input_url))
                 except:
-                    print
+                    print()
                     print("Incorrect input.")
                     continue
 
@@ -184,8 +184,8 @@ def select_urls(urls):
     option = ""
 
     while (option == ""):
-        print
-        output_file = raw_input("Enter a file name to write to: ")
+        print()
+        output_file = input("Enter a file name to write to: ")
         output_file = "web-queues/" + output_file + ".wq"
 
         try:
@@ -196,16 +196,16 @@ def select_urls(urls):
             break
 
         if (exists == True):
-            print
+            print()
             print("A file of that name already exists")
-            print
+            print()
             print("Would you like to: ")
             print("1. Append to file")
             print("2. Overwrite")
             print("3. Specify different name")
             print("4. Quit")
-            print
-            option = int(raw_input("Enter a number: "))
+            print()
+            option = int(input("Enter a number: "))
 
             if (option == 1):
                 f = open(output_file, "a+")
@@ -228,9 +228,9 @@ def select_urls(urls):
             for index in range(lower - 1, upper):
                 f.write(urls[index] + "\n")
 
-    print
+    print()
     print("Wrote output to \"" + output_file + "\"")
-    print
+    print()
 
 def remove_values_from_list(the_list, val):
     return [value for value in the_list if value != val]
@@ -241,16 +241,16 @@ def main(the_driver, pull_urls_config):
         chrome_options.add_argument("--headless")
 
         try:
-            driver = webdriver.Chrome(executable_path=the_driver.driver_path, chrome_options = chrome_options)
+            driver = webdriver.Chrome(executable_path=the_driver.driver_path, options = chrome_options)
         except:
-            print
+            print()
             print("Could not open the chromedriver")
             print("Check that the driver type and driver path is correct in config.ini")
             print("These are the current driver settings:")
-            print
+            print()
             print("driver_type = " + the_driver.driver_type)
             print("driver_path = " + the_driver.driver_path)
-            print
+            print()
             quit()
 
     elif (the_driver.driver_type == "firefox"):
@@ -259,18 +259,18 @@ def main(the_driver, pull_urls_config):
         try:
             driver = webdriver.Firefox(executable_path=the_driver.driver_path, firefox_options = firefox_options)
         except:
-            print
+            print()
             print("Could not open the geckodriver")
             print("Check that the driver type and driver path is correct in config.ini")
             print("These are the current driver settings:")
-            print
+            print()
             print("driver_type = " + the_driver.driver_type)
             print("driver_path = " + the_driver.driver_path)
-            print
+            print()
             quit()
 
-    print
-    url = raw_input("Enter page to parse: ")
+    print()
+    url = input("Enter page to parse: ")
     driver.get(url)
 
     cas_username_xpath = "//*[@id='username']"
@@ -279,7 +279,7 @@ def main(the_driver, pull_urls_config):
     article_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/node/add/article"
 
     if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = raw_input("Enter OHIO username: ")
+        username = input("Enter OHIO username: ")
         password = getpass.getpass("Enter OHIO password: ")
 
         element = driver.find_element_by_xpath(cas_username_xpath)
