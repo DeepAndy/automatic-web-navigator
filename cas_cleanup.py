@@ -16,7 +16,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from fix_html_img import *
+from fix_html import *
 from ohio_login import ohio_login
 
 def script_main(driver, received_url, pos):
@@ -96,8 +96,6 @@ def script_main(driver, received_url, pos):
             # For JavaScript code in Drupal
             line = line.replace('"', '\\"')
             line = line.replace("\n", "")
-
-            print("line = " + line)
 
             if (re.findall("^\s*$", line)):
                 continue
