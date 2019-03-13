@@ -9,6 +9,9 @@ Python 3.7.2
 import re
 import getpass
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 '''
 Function:       ohio_login()
@@ -18,21 +21,21 @@ Description:    Asks user for OHIO login ID and password. Completes the login
                 by Selenium
 '''
 def ohio_login(driver):
-    print()
+    if (re.findall(r"login.microsoftonline.com", str(driver.current_url))):
+        wait = WebDriverWait(driver, 10)
 
-    cas_username_xpath = "//*[@id='username']"
-    cas_password_xpath = "//*[@id='password']"
-    cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
+        print("\nPlease log in using the terminal\n")
 
-    login_complete = False
-
-    if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = input("Enter OHIO username: ")
+        email = input("Enter OHIO email: ")
         password = getpass.getpass("Enter OHIO password: ")
 
-        element = driver.find_element_by_xpath(cas_username_xpath)
-        element.send_keys(username)
-        element = driver.find_element_by_xpath(cas_password_xpath)
-        element.send_keys(password)
-        element = driver.find_element_by_xpath(cas_login_button_xpath)
-        element.click()
+        email_xpath = '//*[@id="i0116"]'
+        password_xpath = '//*[@id="i0118"]'
+        next_button_xpath = '//*[@id="idSIButton9"]'
+
+        driver.find_element_by_xpath(email_xpath).send_keys(email)
+        driver.find_element_by_xpath(next_button_xpath).click()
+
+        driver.find_element_by_xpath(password_xpath).send_keys(password)
+        wait.until(EC.presence_of_element_located((By.XPATH, next_button_xpath)))
+        driver.find_element_by_xpath(next_button_xpath).click()
