@@ -55,6 +55,7 @@ def script_main(driver, received_url, pos):
     # Clean and paste HTML
     driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
     content = driver.find_element_by_xpath(rich_text_body_xpath).get_attribute("innerHTML")
+    content = content.decode("utf-8")
     content = BeautifulSoup(content, "html.parser")
 
     errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
@@ -66,8 +67,9 @@ def script_main(driver, received_url, pos):
 
     first = True
 
-    for tag in content:
+    for tag in content.find_all():
         if (tag.name == "img"):
+            print("IMG")
             try:
                 driver.switch_to.default_content()
             except:
@@ -76,12 +78,14 @@ def script_main(driver, received_url, pos):
             try:
                 file_name, image_title, alt_text = download_image(received_url, content)
                 tag.decompose()
+                print("DOWNLOAD IMAGE")
             except:
                 continue
 
             try:
                 driver.find_element_by_xpath(rich_text_xpath).click()
                 embed_image(driver, file_name, image_title, alt_text)
+                print("EMBED")
             except:
                 continue
         else:
@@ -90,14 +94,13 @@ def script_main(driver, received_url, pos):
             except:
                 pass
 
-            line = str(tag)
-            line = line.strip()
+            line = str(tag).strip()
 
             # For JavaScript code in Drupal
             line = line.replace('"', '\\"')
             line = line.replace("\n", "")
 
-            if (re.findall("^\s*$", line)):
+            if (not re.findall("\S+", line)):
                 continue
 
             element = driver.find_element_by_xpath(rich_text_body_xpath)
@@ -113,7 +116,7 @@ def script_main(driver, received_url, pos):
                 full = line
                 first = False
 
-            if (not re.findall("^\s*$", full)):
+            if (re.findall("\S+", full)):
                 body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + full + '";'
                 driver.execute_script(body_textarea_script)
 
