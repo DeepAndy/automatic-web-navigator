@@ -7,8 +7,8 @@ Description: Script for cleaning up HTML files during migration from CommonSpot
 
 import re
 import urllib
-import getpass
 import bs4
+import configparser
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 
@@ -40,11 +40,13 @@ def find_errors(soup):
     first_header = True
     out_of_order = False
     only_br = True
+    remove_image = config()
 
     # Iterate through each line and find errors
     for tag in soup.find_all():
-        if (tag.name != "br"):
-            only_br = False
+        if (only_br != False):
+            if (tag.name != "br"):
+                only_br = False
         if (tag.name == "p"):
             if (re.findall(r"^\s*$", tag.text)):
                 errors.append("empty <p>")
@@ -78,10 +80,11 @@ def find_errors(soup):
             errors.append("<span>")
             print_friendly_errors.append("ERROR: <span> tag found")
             #error_line_string.append(lines[i])
-        if (tag.name == "img"):
-            errors.append("<img>")
-            print_friendly_errors.append("ERROR: <img> tag found. Will delete and needs to be Drupal embedded")
-            #error_line_string.append(lines[i])
+        if (remove_image == True):
+            if (tag.name == "img"):
+                errors.append("<img>")
+                print_friendly_errors.append("ERROR: <img> tag found. Will delete and needs to be Drupal embedded")
+                #error_line_string.append(lines[i])
         if (tag.name == "div"):
             errors.append("<div>")
             print_friendly_errors.append("ERROR: <div> tag found")
@@ -108,6 +111,10 @@ def find_errors(soup):
         if (re.findall(r'\?', tag.text)):
             warnings.append("?")
             print_friendly_errors.append("WARNING: ? found")
+            #error_line_string.append(lines[i])
+        if (re.findall(r'&nbsp', tag.text)):
+            errors.append("&nbsp;")
+            print_friendly_errors.append("ERROR: &nbsp; found")
             #error_line_string.append(lines[i])
         if (tag.has_attr("href")):
             if (re.findall(r'\.cfm', tag["href"])):
@@ -219,9 +226,46 @@ def print_errors_gui(print_friendly_errors, error_line_string, errors, warnings)
         gui_printout += "Note: Warnings can not be fixed.\n\n"
     return gui_printout
 
+def config():
+    config = configparser.ConfigParser()
+    config_file = "config_fix_html.ini"
+    config.read(config_file)
+    sections = config.sections()
+    fix_html_section = "fix-html"
+    found_fix_html_section = False
+    fix_html_remove_image_option = "remove_images"
 
-# Fix all errors
-def fix_all(soup, errors):
+    for section in sections:
+        if (section == fix_html_section):
+            found_fix_html_section = True
+
+    if (found_fix_html_section == True):
+        try:
+            image = config[fix_html_section][fix_html_remove_image_option]
+            if (str(image) != "True" and str(image) != "False"):
+                image = False
+        except:
+            image = False
+
+    return image
+
+# Remove empty tags of all children
+def remove_empty(tag, empty_tags):
+    children_in_empty = False
+    try:
+        for tag2 in tag.children:
+            if (isinstance(tag2, bs4.element.Tag)):
+                children_in_empty = True
+    except:
+        pass
+
+    try:
+        if (not re.findall(r"\S+", tag.get_text()) and children_in_empty == False and tag.name not in empty_tags):
+            tag.decompose()
+    except:
+        pass
+
+def br_analysis(soup, errors):
     # If we only have breaks
     for error in errors:
         if (error == "only_br"):
@@ -230,77 +274,9 @@ def fix_all(soup, errors):
             for tag in breaks:
                 tag.decompose()
 
-            return soup
+    return soup
 
-    # Go ahead and replace same of these easy to find errors
-    for tag in soup.find_all():
-        if (tag.name != "br"):
-            only_br = False
-        if (re.findall(r"^\s*$", tag.get_text()) and tag.name != "td" and tag.name != "tr" and tag.name != "div" and tag.name != "br" and tag.name != "drupal-entity"):
-            tag.decompose()
-        if (tag.name == "hr"):
-            tag.decompose()
-        elif (tag.name == "script"):
-            tag.decompose()
-        elif (tag.name == "style"):
-            tag.decompose()
-        elif (tag.name == "link"):
-            tag.decompose()
-        elif (tag.name == "b"):
-            tag.name = "strong"
-        elif (tag.name == "i"):
-            tag.name = "em"
-        elif (tag.name == "u"):
-            tag.unwrap()
-        elif (tag.name == "span"):
-            tag.unwrap()
-        elif (tag.name == "p"):
-            if (re.findall(r"^\s*$", tag.text)):
-                tag.decompose()
-        elif (re.findall(r"h\d", str(tag.name))):
-            if (re.findall(r"^\s*$", tag.text)):
-                tag.decompose()
-        elif (tag.name == "div"):
-            unwrap_tags = False
-            for tag2 in tag:
-                if ((isinstance(tag2, bs4.element.NavigableString) and not re.findall(r"^\s*$", tag2)) or (tag2.name == "strong" or tag2.name == "em")):
-                    unwrap_tags = True
-                    tag.name = "p"
-                elif (unwrap_tags == True and not isinstance(tag2, bs4.element.NavigableString)):
-                    tag2.unwrap()
-            if (re.findall(r"^\s*$", tag.get_text())):
-                tag.decompose()
-            elif (unwrap_tags == False):
-                tag.unwrap()
-        try:
-            if (tag.has_attr("class")):
-                del tag["class"]
-            if (tag.has_attr("style")):
-                del tag["style"]
-            if (tag.has_attr("dir")):
-                del tag["dir"]
-            if (tag.has_attr("id")):
-                if (re.findall("CP___PAGEID", tag["id"])):
-                    del tag["id"]
-            if (tag.has_attr("href")):
-                if (re.findall("\.pdf", tag["href"])):
-                    if (not re.findall("\[PDF\]", tag.text)):
-                        tag.string += " [PDF]"
-                if (re.findall("\.docx?", tag["href"])):
-                    if (not re.findall("\[Word\]", tag.text)):
-                        tag.string += " [Word]"
-                if (re.findall("\.pptx?", tag["href"])):
-                    if (not re.findall("\[Powerpoint\]", tag.text)):
-                        tag.string += " [Powerpoint]"
-                if (re.findall("\.xlsx?", tag["href"])):
-                    if (not re.findall("\[Excel\]", tag.text)):
-                        tag.string += " [Excel]"
-                if (re.findall(r'\.zip', tag["href"])):
-                    if (not re.findall(r'\[ZIP]', tag.text)):
-                        tag.string += " [ZIP]"
-        except:
-            continue
-
+def fix_headers(soup, errors):
     # Assign default values
     first_header_correct = True
     order_correct = True
@@ -334,6 +310,14 @@ def fix_all(soup, errors):
                 correct_last_header = min_header_num
                 header_lookup[str(header_num)] = correct_last_header
                 after_first_header = True
+                continue
+            elif (header_num < min_header_num):
+                header.name = "h" + str(min_header_num)
+                header_num = min_header_num
+                last_header_num = header_num
+                correct_last_header = min_header_num
+                header_lookup[str(header_num)] = correct_last_header
+                after_first_header = False
                 continue
             elif ((header_num > last_header_num) and (header_num != correct_last_header + 1)):
                 header.name = "h" + str(correct_last_header + 1)
@@ -374,11 +358,144 @@ def fix_all(soup, errors):
                 last_header_num = header_num
                 correct_last_header = header_num
                 after_first_header = False
-
                 continue
-                 
+
     return soup
 
+def handle_string(tag, string_blacklist):
+    if (re.findall(r"\S+", tag.string) and tag.parent.name in string_blacklist and len(tag.parent.contents) > 1):
+        tag2_text = "<p>" + tag.string.strip() + "</p>"
+        tag2 = BeautifulSoup(tag2_text, "html.parser").p.extract()
+        tag.insert_before(tag2)
+        tag.string.replace_with("\n")
+
+def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe):
+    # Go ahead and replace same of these easy to find errors
+    for tag in soup:
+        try:
+            x = tag.contents
+            cleanup(tag, errors, remove_image, empty_tags, string_blacklist, p_tag_safe)
+        except:
+            pass
+
+        if (isinstance(tag, bs4.element.Comment)):
+            continue
+
+        skip_remove_empty = False
+
+        if (isinstance(tag, bs4.element.Tag)):
+            if (tag.has_attr("id")):
+                if (re.findall(r"CP___PAGEID", tag["id"])):
+                    del tag["id"]
+                elif (re.findall(r"\.cfm\|?$", tag["id"])):
+                    del tag["id"]
+                else:
+                    skip_remove_empty = True
+
+        if (isinstance(tag, bs4.element.NavigableString)):
+            handle_string(tag, string_blacklist)
+
+        if (skip_remove_empty == False):
+            remove_empty(tag, empty_tags)
+
+        if (tag.name == "hr"):
+            tag.decompose()
+        elif (tag.name == "script"):
+            tag.decompose()
+        elif (tag.name == "style"):
+            tag.decompose()
+        elif (tag.name == "img"):
+            if (remove_image == "True"):
+                tag.decompose()
+        elif (tag.name == "link"):
+            tag.decompose()
+        elif (tag.name == "b"):
+            tag.name = "strong"
+        elif (tag.name == "i"):
+            tag.name = "em"
+        elif (tag.name == "u"):
+            tag.unwrap()
+        elif (tag.name == "span"):
+            tag.unwrap()
+        elif (tag.name == "div"):
+            change = False
+            unwrap = False
+            decompose = False
+            is_p_tag_safe = True
+
+            if (tag.has_attr("id")):
+                pass
+            elif (len(tag.contents) == 0):
+                decompose = True
+            elif (len(tag.contents) >= 1):
+                for tag2 in tag.children:
+                    if (isinstance(tag2, bs4.element.NavigableString) and re.findall(r"\S+", tag2.string)):
+                        change = True
+                    elif (isinstance(tag2, bs4.element.Tag) and tag2.name not in p_tag_safe):
+                        unwrap = True
+                        is_p_tag_safe = False
+                    elif (isinstance(tag2, bs4.element.Tag) and tag2.name in p_tag_safe):
+                        change = True
+                    else:
+                        decompose = True
+
+            if (is_p_tag_safe == False):
+                change = False
+
+            if (change == True):
+                tag.name = "p"
+            elif (unwrap == True):
+                tag.unwrap()
+            elif (decompose == True):
+                tag.decompose()
+
+        try:
+            if (tag.has_attr("class")):
+                del tag["class"]
+            if (tag.has_attr("style")):
+                del tag["style"]
+            if (tag.has_attr("dir")):
+                del tag["dir"]
+            if (tag.has_attr("href")):
+                if (re.findall(r"\.pdf", tag["href"])):
+                    if (not re.findall(r"\[PDF\]", tag.text)):
+                        tag.string += " [PDF]"
+                if (re.findall(r"\.docx?", tag["href"])):
+                    if (not re.findall(r"\[Word\]", tag.text)):
+                        tag.string += " [Word]"
+                if (re.findall(r"\.pptx?", tag["href"])):
+                    if (not re.findall(r"\[Powerpoint\]", tag.text)):
+                        tag.string += " [Powerpoint]"
+                if (re.findall(r"\.xlsx?", tag["href"])):
+                    if (not re.findall(r"\[Excel\]", tag.text)):
+                        tag.string += " [Excel]"
+                if (re.findall(r'\.zip', tag["href"])):
+                    if (not re.findall(r'\[ZIP]', tag.text)):
+                        tag.string += " [ZIP]"
+        except:
+            pass
+
+    return soup
+
+# Fix all errors
+def fix_all(soup, errors):
+    remove_image = config()
+    empty_tags = ["a", "td", "tr", "img", "drupal-entity", "div", "br"] # No text tags
+    string_blacklist = ["div"] # Can not have strings
+    p_tag_safe = ["a", "abbr", "area", "audio", "b", "bdi", "bdo", "br",
+        "button", "canvas", "cite", "code", "command", "datalist", "del", "dfn",
+        "em", "embed", "i", "iframe", "img", "input", "ins", "kdb", "keygen",
+        "label", "map", "mark", "math", "meter", "noscript", "object", "output",
+        "progress", "q", "ruby", "s", "samp", "script", "select", "small",
+        "span", "strong", "sub", "sup", "svg", "textarea", "time", "u", "var",
+        "video", "wbr", "text"]
+
+    soup = br_analysis(soup, errors)
+    soup = fix_headers(soup, errors)
+    soup = cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe)
+
+    return soup
+ 
 # Write everything to our output file
 def write_out(soup, output):
     output_file = open(output, "w")
