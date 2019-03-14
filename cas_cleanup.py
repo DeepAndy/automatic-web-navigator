@@ -32,6 +32,8 @@ def script_main(driver, received_url, pos):
     page_url_slug_xpath = '//*[@id="edit-slug"]'
     save_xpath = "//*[@id='edit-submit']"
     create_content_xpath = "//*[@id='edit-submit']"
+    source_xpath = '//*[@id="cke_12"]'
+    textarea_xpath = '/html/body/div[2]/div/main/div[5]/div/form/div/div[1]/div[6]/div/div[2]/div/div/div/div/textarea'
     rich_text_xpath = '//*[@id="cke_1_contents"]/iframe'
     rich_text_body_xpath = '/html/body'
     first = True
@@ -53,23 +55,24 @@ def script_main(driver, received_url, pos):
     driver.execute_script("document.getElementById('edit-slug').value='" + title + "';")
 
     # Clean and paste HTML
-    driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
-    content = driver.find_element_by_xpath(rich_text_body_xpath).get_attribute("innerHTML")
-    content = content.decode("utf-8")
+    wait.until(EC.presence_of_element_located((By.XPATH, source_xpath)))
+    driver.find_element_by_xpath(source_xpath).click()
+    source_on = True
+    content = driver.find_element_by_xpath(textarea_xpath).get_attribute("value")
     content = BeautifulSoup(content, "html.parser")
 
     errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
 
     try:
-        fix_all(content, errors)
+        content = fix_all(content, errors)
     except:
         print("Skipped HTML cleanup")
 
     first = True
 
-    for tag in content.find_all():
+    for tag in content:
+        '''
         if (tag.name == "img"):
-            print("IMG")
             try:
                 driver.switch_to.default_content()
             except:
@@ -88,43 +91,45 @@ def script_main(driver, received_url, pos):
                 print("EMBED")
             except:
                 continue
+        '''
+        if (source_on == False):
+            driver.find_element_by_xpath(source_xpath).click()
+            source_on = True
+
+        try:
+            driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
+        except:
+            pass
+
+        line = str(tag).strip()
+
+        # For JavaScript code in Drupal
+        line = line.replace('"', '\\"')
+        line = line.replace("\n", "")
+
+        if (not re.findall("\S+", line)):
+            continue
+
+        if (first == False):
+            html_backup = driver.find_element_by_xpath(textarea_xpath).get_attribute("value")
+            html_backup = html_backup.replace('"', '\\"')
+            html_backup = html_backup.strip()
+            html_backup = html_backup.replace("\n", "")
+            full = html_backup + line
         else:
-            try:
-                driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
-            except:
-                pass
+            full = line
+            first = False
 
-            line = str(tag).strip()
+        full = full.strip()
+        full = full.replace("\n", "")
 
-            # For JavaScript code in Drupal
-            line = line.replace('"', '\\"')
-            line = line.replace("\n", "")
-
-            if (not re.findall("\S+", line)):
-                continue
-
-            element = driver.find_element_by_xpath(rich_text_body_xpath)
-
-            if (first == False):
-                html_backup = element.get_attribute("innerHTML")
-                html_backup = html_backup.replace(u"\xa0", u" ")
-                html_backup = html_backup.replace(u"\xc2", u" ")
-                html_backup = str(html_backup)
-                html_backup = html_backup.replace('"', '\\"')
-                full = html_backup + line
-            else:
-                full = line
-                first = False
-
-            if (re.findall("\S+", full)):
-                body_textarea_script = 'document.getElementsByTagName("body")[0].innerHTML="' + full + '";'
-                driver.execute_script(body_textarea_script)
-
+        if (re.findall("\S+", full)):
+            body_textarea_script = 'document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value="' + full + '";'
+            driver.execute_script(body_textarea_script)
 
     driver.switch_to.default_content()
     time.sleep(30)
 
-    '''
     # Click save button
     wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
@@ -140,4 +145,3 @@ def script_main(driver, received_url, pos):
     # Create content button
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
-    '''
