@@ -4,7 +4,7 @@ Script Type:    Companion Script
 Description:    This script migrates websites from Ohio University's
                 Scripps College site into Drupal. Used in conjunction
                 with navigator.py
-Python 2.7.10
+Python 3.7.2
 '''
 
 import re
@@ -17,6 +17,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from fix_html import *
+from drupal_image import *
 from ohio_login import ohio_login
 
 def script_main(driver, received_url, pos):
@@ -24,7 +25,7 @@ def script_main(driver, received_url, pos):
         ohio_login(driver)
         driver.get(received_url)
 
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 30)
 
     title_xpath = "//*[@id='edit-title-0-value']"
     page_location_xpath = '//*[@id="edit-page-location"]/summary'
@@ -36,6 +37,7 @@ def script_main(driver, received_url, pos):
     textarea_xpath = '/html/body/div[2]/div/main/div[5]/div/form/div/div[1]/div[6]/div/div[2]/div/div/div/div/textarea'
     rich_text_xpath = '//*[@id="cke_1_contents"]/iframe'
     rich_text_body_xpath = '/html/body'
+    overlay_xpath = '//*[@class="ui-widget-overlay ui-front"]'
     first = True
 
     # Get title for the slug
@@ -43,7 +45,7 @@ def script_main(driver, received_url, pos):
     title = driver.find_element_by_xpath(title_xpath).get_attribute("value")
 
     # Page location drop down
-    wait.until(EC.presence_of_element_located((By.XPATH, page_location_xpath)))
+    wait.until(EC.element_to_be_clickable((By.XPATH, page_location_xpath)))
     driver.find_element_by_xpath(page_location_xpath).click()
 
     # Set parent page in select menu
@@ -55,7 +57,7 @@ def script_main(driver, received_url, pos):
     driver.execute_script("document.getElementById('edit-slug').value='" + title + "';")
 
     # Clean and paste HTML
-    wait.until(EC.presence_of_element_located((By.XPATH, source_xpath)))
+    wait.until(EC.element_to_be_clickable((By.XPATH, source_xpath)))
     driver.find_element_by_xpath(source_xpath).click()
     source_on = True
     content = driver.find_element_by_xpath(textarea_xpath).get_attribute("value")
@@ -70,66 +72,63 @@ def script_main(driver, received_url, pos):
 
     first = True
 
-    for tag in content:
-        '''
+    for tag in content.find_all():
+        print(str(tag))
         if (tag.name == "img"):
-            try:
-                driver.switch_to.default_content()
-            except:
-                pass
+            if (source_on == True):
+                wait.until(EC.element_to_be_clickable((By.XPATH, source_xpath)))
+                driver.find_element_by_xpath(source_xpath).click()
+                source_on = False
 
             try:
                 file_name, image_title, alt_text = download_image(received_url, content)
                 tag.decompose()
-                print("DOWNLOAD IMAGE")
             except:
+                print("Failed image download")
                 continue
 
             try:
                 driver.find_element_by_xpath(rich_text_xpath).click()
                 embed_image(driver, file_name, image_title, alt_text)
-                print("EMBED")
             except:
+                print("Failed image embed")
                 continue
-        '''
-        if (source_on == False):
-            driver.find_element_by_xpath(source_xpath).click()
-            source_on = True
-
-        try:
-            driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
-        except:
-            pass
-
-        line = str(tag).strip()
-
-        # For JavaScript code in Drupal
-        line = line.replace('"', '\\"')
-        line = line.replace("\n", "")
-
-        if (not re.findall("\S+", line)):
-            continue
-
-        if (first == False):
-            html_backup = driver.find_element_by_xpath(textarea_xpath).get_attribute("value")
-            html_backup = html_backup.replace('"', '\\"')
-            html_backup = html_backup.strip()
-            html_backup = html_backup.replace("\n", "")
-            full = html_backup + line
         else:
-            full = line
-            first = False
+            if (source_on == False):
+                wait.until(EC.invisibility_of_element_located((By.XPATH, overlay_xpath)))
+                wait.until(EC.element_to_be_clickable((By.XPATH, source_xpath)))
+                driver.find_element_by_xpath(source_xpath).click()
+                source_on = True
 
-        full = full.strip()
-        full = full.replace("\n", "")
+            try:
+                driver.switch_to.frame(driver.find_element_by_xpath(rich_text_xpath))
+            except:
+                pass
 
-        if (re.findall("\S+", full)):
-            body_textarea_script = 'document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value="' + full + '";'
-            driver.execute_script(body_textarea_script)
+            line = str(tag)
+
+            if (not re.findall("\S+", line)):
+                continue
+
+            if (first == False):
+                html_backup = driver.find_element_by_xpath(textarea_xpath).get_attribute("value")
+                full = html_backup + line
+            else:
+                full = line
+                first = False
+
+            full = full.strip()
+            full = full.replace("\n", "")
+            full = full.replace('"', '\\"')
+
+            if (re.findall("\S+", full)):
+                body_textarea_script = 'document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value="' + full + '";'
+                driver.execute_script(body_textarea_script)
 
     driver.switch_to.default_content()
     time.sleep(30)
 
+    '''
     # Click save button
     wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
@@ -145,3 +144,4 @@ def script_main(driver, received_url, pos):
     # Create content button
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
+    '''

@@ -50,7 +50,7 @@ def download_image(url, content):
         alt_text = "No alternative text available"
 
     if (image_source.find("/") == 0):
-        image_source = "https://" + main_url + image_source
+        image_source = "https://www.ohio.edu" + image_source
     
     try:
         urllib.request.urlretrieve(image_source, "images/" + file_name)
@@ -60,16 +60,16 @@ def download_image(url, content):
     return file_name, image_title, alt_text
 
 def embed_image(driver,file_name, image_title, alt_text):
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 30)
 
-    image_embed_xpath = '//*[@id="cke_42"]/span[1]'
+    image_embed_xpath = '//*[@id="cke_37"]'
     iframe_xpath = '//*[@id="entity_browser_iframe_media_embed2"]'
     add_new_image_xpath = '//*[@id="entity-browser-media-embed2-form"]/nav/ul/li[2]/a'
     image_upload_xpath = '//*[@id="edit-inline-entity-form-field-media-image-0-upload"]'
     name_xpath = '//*[@id="edit-inline-entity-form-name-0-value"]'
     alternative_text_xpath = '//*[contains(@id, "edit-inline-entity-form-field-media-image-0-alt")]'
     save_image_xpath = '//*[@id="edit-submit"]'
-    embed_xpath = '/html/body/div[5]/div[3]/div/button[2]'
+    embed_xpath = '/html/body/div[6]/div[3]/div/button[2]'
 
     driver.find_element_by_xpath(image_embed_xpath).click()
 
@@ -82,12 +82,17 @@ def embed_image(driver,file_name, image_title, alt_text):
     element = driver.find_element_by_xpath(image_upload_xpath)
     element.send_keys(os.getcwd() + "/images/" + file_name)
 
-    driver.find_element_by_xpath(name_xpath).send_keys(image_title)
+    image_title = image_title.replace("'", "\\'")
+    name_js = "document.getElementById('edit-inline-entity-form-name-0-value').value='" + image_title + "';"
+    driver.execute_script(name_js)
 
+    alt_text = alt_text.replace("'", "\\'")
+    alt_text_js = "document.getElementsByClassName('form-text required')[1].value='" + alt_text + "';"
     wait.until(EC.presence_of_element_located((By.XPATH, alternative_text_xpath)))
-    driver.find_element_by_xpath(alternative_text_xpath).send_keys(alt_text)
+    driver.execute_script(alt_text_js)
 
     driver.find_element_by_xpath(save_image_xpath).click()
 
-    wait.until(EC.presence_of_element_located((By.XPATH, embed_xpath)))
+    wait.until(EC.element_to_be_clickable((By.XPATH, embed_xpath)))
     driver.find_element_by_xpath(embed_xpath).click()
+    wait.until(EC.invisibility_of_element_located((By.XPATH, embed_xpath)))
