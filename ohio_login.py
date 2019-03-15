@@ -27,7 +27,6 @@ def ohio_login(driver):
         print("\nPlease log in using the terminal\n")
 
         email = input("Enter OHIO email: ")
-        password = getpass.getpass("Enter OHIO password: ")
 
         email_xpath = '//*[@id="i0116"]'
         password_xpath = '//*[@id="i0118"]'
@@ -36,6 +35,8 @@ def ohio_login(driver):
         driver.find_element_by_xpath(email_xpath).send_keys(email)
         driver.find_element_by_xpath(next_button_xpath).click()
 
+        password = getpass.getpass("Enter OHIO password: ")
+
         driver.find_element_by_xpath(password_xpath).send_keys(password)
-        wait.until(EC.presence_of_element_located((By.XPATH, next_button_xpath)))
+        wait.until(EC.element_to_be_clickable((By.XPATH, next_button_xpath)))
         driver.find_element_by_xpath(next_button_xpath).click()
