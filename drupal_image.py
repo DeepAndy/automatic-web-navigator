@@ -62,9 +62,12 @@ def download_document_source(url, content, documents_folder):
     file_name = re.findall(r"/([^/]+\.\w+)$", document)[0]
 
     if (document.find("/") == 0):
-        document = "https://www.ohio.edu/" + document
+        document = "https://www.ohio.edu" + document
 
-    urllib.request.urlretrieve(document, documents_folder + file_name)
+    try:
+        urllib.request.urlretrieve(document, documents_folder + file_name)
+    except:
+        print("Failed to download document at: " + document)
 
 def download_image_source(url, content, images_folder):
     content = str(content)

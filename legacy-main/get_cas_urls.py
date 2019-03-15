@@ -22,7 +22,7 @@ page_source = driver.page_source
 page_source = page_source.replace(u"\xa0", u" ")
 page_source = page_source.replace(u"\xc2", u" ")
 soup = BeautifulSoup(page_source, features="html.parser")
-append = "https://webcmsstage.oit.ohio.edu"
+append = "https://webcmsdev.oit.ohio.edu"
 
 for tag in soup.find_all("td", {"headers": "view-dropbutton-table-column"}):
     for tag2 in tag.find_all("a", href=True):

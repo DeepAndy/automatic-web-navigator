@@ -50,12 +50,17 @@ def script_main(driver, received_url, pos):
     driver.find_element_by_xpath(page_location_xpath).click()
 
     # Set parent page in select menu
-    element = Select(driver.find_element_by_xpath(parent_page_xpath))
-    #element.select_by_visible_text(parent_page)
-    element.select_by_index(1)
+    try:
+        element = Select(driver.find_element_by_xpath(parent_page_xpath))
+        element.select_by_index(1)
+    except:
+        pass
 
     # Slug
-    driver.execute_script("document.getElementById('edit-slug').value='" + title + "';")
+    try:
+        driver.execute_script("document.getElementById('edit-slug').value='" + title + "';")
+    except:
+        pass
 
     # Clean and paste HTML
     wait.until(EC.element_to_be_clickable((By.XPATH, source_xpath)))
@@ -82,7 +87,7 @@ def script_main(driver, received_url, pos):
 
         for document in all_documents:
             try:
-                download_document_source(received_url, all_documents, documents_folder)
+                download_document_source(received_url, document, documents_folder)
             except:
                 pass
 
@@ -90,10 +95,21 @@ def script_main(driver, received_url, pos):
 
     if (len(all_images) > 0):
         images_folder, documents_folder = image_init()
-        images_folder += folder_title + "/"
+        images_folder += folder_title
 
-        if (not os.path.exists(images_folder)):
-            os.mkdir(images_folder)
+        counter = 1
+
+        while (True):
+            if (not os.path.exists(images_folder)):
+                os.mkdir(images_folder)
+                break
+            else:
+                counter += 1
+                images_folder += str(counter)
+                first = False
+                continue
+
+        images_folder += "/"
 
         if (not os.path.exists(images_folder + "details.txt")):
             image_details = open(images_folder + "details.txt", "w")
@@ -144,7 +160,7 @@ def script_main(driver, received_url, pos):
             body_textarea_script = 'document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value+="' + line + '";'
             driver.execute_script(body_textarea_script)
 
-            added_tags.append(tag)
+        added_tags.append(tag)
 
     driver.switch_to.default_content()
 
