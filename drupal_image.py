@@ -30,6 +30,7 @@ def download_image(url, content):
     images = soup.find_all("img")
     main_url = re.findall(r"\//(.+?)/", url)[0]
     index = 0
+    link_text = ""
 
     image = images[0]
 
@@ -46,7 +47,7 @@ def download_image(url, content):
     file_name = re.findall(r"/([^/]+\.\w+)$", image_source)[0]
     image_title = re.findall(r"(.+?)\.", file_name)[0]
 
-    if (alt_text == ""):
+    if (not re.findall("\S+", alt_text)):
         alt_text = "No alternative text available"
 
     if (image_source.find("/") == 0):
@@ -57,9 +58,15 @@ def download_image(url, content):
     except:
         print("Failed to download image at \"" + image_source + "\"")
 
-    return file_name, image_title, alt_text
+    if (image.parent.name == "a" and image.parent.has_attr("href")):
+        link_text = image.parent["href"]
 
-def embed_image(driver,file_name, image_title, alt_text):
+    if (link_text.find("/") == 0):
+        link_text = "https://www.ohio.edu" + link_text
+
+    return file_name, image_title, alt_text, link_text
+
+def embed_image(driver,file_name, image_title, alt_text, link_text):
     wait = WebDriverWait(driver, 30)
 
     image_embed_xpath = '//*[@id="cke_37"]'
@@ -69,6 +76,7 @@ def embed_image(driver,file_name, image_title, alt_text):
     name_xpath = '//*[@id="edit-inline-entity-form-name-0-value"]'
     alternative_text_xpath = '//*[contains(@id, "edit-inline-entity-form-field-media-image-0-alt")]'
     save_image_xpath = '//*[@id="edit-submit"]'
+    link_xpath = '//*[contains(@id, "edit-attributes-data-entity-embed-display-settings-link-url")]'
     embed_xpath = '/html/body/div[6]/div[3]/div/button[2]'
 
     driver.find_element_by_xpath(image_embed_xpath).click()
@@ -93,6 +101,9 @@ def embed_image(driver,file_name, image_title, alt_text):
 
     driver.find_element_by_xpath(save_image_xpath).click()
 
+    wait.until(EC.presence_of_element_located((By.XPATH, link_xpath)))
+    link_js = "document.querySelector(\"[id^='edit-attributes-data-entity-embed-display-settings-link-url']\").value='" + link_text + "';"
+    driver.execute_script(link_js)
     wait.until(EC.element_to_be_clickable((By.XPATH, embed_xpath)))
     driver.find_element_by_xpath(embed_xpath).click()
     wait.until(EC.invisibility_of_element_located((By.XPATH, embed_xpath)))

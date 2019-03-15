@@ -70,30 +70,10 @@ def script_main(driver, received_url, pos):
     except:
         print("Skipped HTML cleanup")
 
-    first = True
+    added_tags = []
 
     for tag in content.find_all():
-        print(str(tag))
-        if (tag.name == "img"):
-            if (source_on == True):
-                wait.until(EC.element_to_be_clickable((By.XPATH, source_xpath)))
-                driver.find_element_by_xpath(source_xpath).click()
-                source_on = False
-
-            try:
-                file_name, image_title, alt_text = download_image(received_url, content)
-                tag.decompose()
-            except:
-                print("Failed image download")
-                continue
-
-            try:
-                driver.find_element_by_xpath(rich_text_xpath).click()
-                embed_image(driver, file_name, image_title, alt_text)
-            except:
-                print("Failed image embed")
-                continue
-        else:
+        if (tag.parent not in added_tags):
             if (source_on == False):
                 wait.until(EC.invisibility_of_element_located((By.XPATH, overlay_xpath)))
                 wait.until(EC.element_to_be_clickable((By.XPATH, source_xpath)))
@@ -106,24 +86,22 @@ def script_main(driver, received_url, pos):
                 pass
 
             line = str(tag)
+            line = line.strip()
+            line = line.replace("\n", "")
+            line = line.replace('"', '\\"')
+            print("line = " + line + "\n")
 
             if (not re.findall("\S+", line)):
                 continue
 
-            if (first == False):
-                html_backup = driver.find_element_by_xpath(textarea_xpath).get_attribute("value")
-                full = html_backup + line
-            else:
-                full = line
+            if (first == True):
+                driver.execute_script('document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value="";')
                 first = False
 
-            full = full.strip()
-            full = full.replace("\n", "")
-            full = full.replace('"', '\\"')
+            body_textarea_script = 'document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value+="' + line + '";'
+            driver.execute_script(body_textarea_script)
 
-            if (re.findall("\S+", full)):
-                body_textarea_script = 'document.getElementById("cke_1_contents").getElementsByClassName("cke_source")[0].value="' + full + '";'
-                driver.execute_script(body_textarea_script)
+            added_tags.append(tag)
 
     driver.switch_to.default_content()
     time.sleep(30)
