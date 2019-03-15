@@ -9,6 +9,7 @@ Python 3.7.2
 
 import re
 import time
+import os
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -65,6 +66,49 @@ def script_main(driver, received_url, pos):
 
     errors, warnings, print_friendly_errors, error_line_string = find_errors(content)
 
+    folder_title = title
+    folder_title = folder_title.replace(" ", "-")
+    folder_title = folder_title.replace("_", "-")
+    folder_title = re.sub(r"[^A-Za-z0-9\-]", "", folder_title)
+
+    if (not os.path.exists("cas_originals/" + folder_title + ".html")):
+        original = open("cas_originals/" + folder_title + ".html", "w")
+        original.write(str(content))
+
+    all_documents = content.find_all("a", href=True)
+
+    if (len(all_documents) > 0):
+        images_folder, documents_folder = image_init()
+
+        for document in all_documents:
+            try:
+                download_document_source(received_url, all_documents, documents_folder)
+            except:
+                pass
+
+    all_images = content.find_all("img")
+
+    if (len(all_images) > 0):
+        images_folder, documents_folder = image_init()
+        images_folder += folder_title + "/"
+
+        if (not os.path.exists(images_folder)):
+            os.mkdir(images_folder)
+
+        if (not os.path.exists(images_folder + "details.txt")):
+            image_details = open(images_folder + "details.txt", "w")
+
+            for tag in all_images:
+                try:
+                    file_name, folder_title, alt_text, link_text = download_image_source(received_url, all_images, images_folder)
+                    image_details.write("File Name:          " + file_name + "\n")
+                    image_details.write("Image Title:        " + folder_title + "\n")
+                    image_details.write("Alternative Text:   " + alt_text + "\n")
+                    image_details.write("Link:               " + link_text + "\n\n")
+                    tag.decompose()
+                except:
+                    pass
+
     try:
         content = fix_all(content, errors)
     except:
@@ -89,7 +133,6 @@ def script_main(driver, received_url, pos):
             line = line.strip()
             line = line.replace("\n", "")
             line = line.replace('"', '\\"')
-            print("line = " + line + "\n")
 
             if (not re.findall("\S+", line)):
                 continue
@@ -104,9 +147,7 @@ def script_main(driver, received_url, pos):
             added_tags.append(tag)
 
     driver.switch_to.default_content()
-    time.sleep(30)
 
-    '''
     # Click save button
     wait.until(EC.presence_of_element_located((By.XPATH, save_xpath)))
     element = driver.find_element_by_xpath(save_xpath)
@@ -119,6 +160,7 @@ def script_main(driver, received_url, pos):
     except:
         pass
 
+    '''
     # Create content button
     element = driver.find_element_by_xpath(create_content_xpath)
     element.click()
