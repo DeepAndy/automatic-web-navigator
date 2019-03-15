@@ -389,14 +389,11 @@ def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe
                     del tag["id"]
                 elif (re.findall(r"\.cfm\|?$", tag["id"])):
                     del tag["id"]
-                else:
-                    skip_remove_empty = True
 
         if (isinstance(tag, bs4.element.NavigableString)):
             handle_string(tag, string_blacklist)
 
-        if (skip_remove_empty == False):
-            remove_empty(tag, empty_tags)
+        remove_empty(tag, empty_tags)
 
         if (tag.name == "hr"):
             tag.decompose()
@@ -480,7 +477,7 @@ def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe
 # Fix all errors
 def fix_all(soup, errors):
     remove_image = config()
-    empty_tags = ["a", "td", "tr", "img", "drupal-entity", "div", "br"] # No text tags
+    empty_tags = ["td", "tr", "img", "drupal-entity", "div", "br"] # No text tags
     string_blacklist = ["div"] # Can not have strings
     p_tag_safe = ["a", "abbr", "area", "audio", "b", "bdi", "bdo", "br",
         "button", "canvas", "cite", "code", "command", "datalist", "del", "dfn",
