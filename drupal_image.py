@@ -109,6 +109,13 @@ def download_image_source(url, content, images_folder):
     if (link_text.find("/") == 0):
         link_text = "https://www.ohio.edu" + link_text
 
+    if (re.findall("http://", link_text)):
+        try:
+            urllib.request.urlopen(re.sub("http://", "https://", link_text))
+            link_text = re.sub("http://", "https://", link_text)
+        except:
+            pass
+
     return file_name, image_title, alt_text, link_text
 
 
@@ -172,6 +179,13 @@ def download_image(url, content):
 
     if (link_text.find("/") == 0):
         link_text = "https://www.ohio.edu" + link_text
+
+    if (re.findall("http://", link_text)):
+        try:
+            urllib.request.urlopen(re.sub("http://", "https://", link_text))
+            link_text = re.sub("http://", "https://", link_text)
+        except:
+            pass
 
     return file_name, image_title, alt_text, link_text
 

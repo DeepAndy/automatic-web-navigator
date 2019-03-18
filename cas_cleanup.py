@@ -91,22 +91,22 @@ def script_main(driver, received_url, pos):
             except:
                 pass
 
-    all_images = content.find_all("img")
+    all_images = content.find_all()
 
-    if (len(all_images) > 0):
-        images_folder, documents_folder = image_init()
-        images_folder += folder_title
+    images_folder, documents_folder = image_init()
+    images_folder += folder_title
 
-        counter = 1
+    counter = 1
 
+    if (content.find_all("img")):
         while (True):
             if (not os.path.exists(images_folder)):
                 os.mkdir(images_folder)
                 break
             else:
                 counter += 1
+                images_folder = re.sub(r"\d*$", "", images_folder)
                 images_folder += str(counter)
-                first = False
                 continue
 
         images_folder += "/"
@@ -115,15 +115,16 @@ def script_main(driver, received_url, pos):
             image_details = open(images_folder + "details.txt", "w")
 
             for tag in all_images:
-                try:
-                    file_name, folder_title, alt_text, link_text = download_image_source(received_url, all_images, images_folder)
-                    image_details.write("File Name:          " + file_name + "\n")
-                    image_details.write("Image Title:        " + folder_title + "\n")
-                    image_details.write("Alternative Text:   " + alt_text + "\n")
-                    image_details.write("Link:               " + link_text + "\n\n")
-                    tag.decompose()
-                except:
-                    pass
+                if (tag.name == "img"):
+                    try:
+                        file_name, folder_title, alt_text, link_text = download_image_source(received_url, all_images, images_folder)
+                        image_details.write("File Name:          " + file_name + "\n")
+                        image_details.write("Image Title:        " + folder_title + "\n")
+                        image_details.write("Alternative Text:   " + alt_text + "\n")
+                        image_details.write("Link:               " + link_text + "\n\n")
+                        tag.decompose()
+                    except:
+                        pass
 
     try:
         content = fix_all(content, errors)
