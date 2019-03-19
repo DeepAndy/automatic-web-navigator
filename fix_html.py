@@ -9,6 +9,7 @@ import re
 import urllib
 import bs4
 import configparser
+import urllib.request
 from html.parser import HTMLParser
 from bs4 import BeautifulSoup
 
@@ -454,6 +455,12 @@ def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe
             if (tag.has_attr("dir")):
                 del tag["dir"]
             if (tag.has_attr("href")):
+                if (re.findall(r"http://", tag["href"])):
+                    try:
+                        urllib.request.urlopen(re.sub(r"http://", "https://", tag["href"]))
+                        tag["href"] = re.sub(r"http://", "https://", tag["href"])
+                    except:
+                        pass
                 if (re.findall(r"\.pdf", tag["href"])):
                     if (not re.findall(r"\[PDF\]", tag.text)):
                         tag.string += " [PDF]"
