@@ -12,6 +12,7 @@ from selenium import webdriver
 from collections import OrderedDict
 import getpass
 from bs4 import BeautifulSoup
+from ohio_login import ohio_login
 
 class web_driver:
     def __init__(self, driver_type, driver_path):
@@ -273,21 +274,7 @@ def main(the_driver, pull_urls_config):
     url = input("Enter page to parse: ")
     driver.get(url)
 
-    cas_username_xpath = "//*[@id='username']"
-    cas_password_xpath = "//*[@id='password']"
-    cas_login_button_xpath = "/html/body/div[1]/div[2]/div/form/section[3]/div/button[1]"
-    article_page_url = "https://webcmsdev.oit.ohio.edu/fine-arts/node/add/article"
-
-    if (re.findall(r"cas.sso.ohio.edu", str(driver.current_url))):
-        username = input("Enter OHIO username: ")
-        password = getpass.getpass("Enter OHIO password: ")
-
-        element = driver.find_element_by_xpath(cas_username_xpath)
-        element.send_keys(username)
-        element = driver.find_element_by_xpath(cas_password_xpath)
-        element.send_keys(password)
-        element = driver.find_element_by_xpath(cas_login_button_xpath)
-        element.click()
+    ohio_login(driver)
 
     urls = []
     html = driver.page_source
