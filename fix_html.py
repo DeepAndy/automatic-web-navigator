@@ -309,28 +309,26 @@ def fix_headers(soup, errors):
                 first_header = False
                 last_header_num = header_num
                 correct_last_header = min_header_num
-                header_lookup[str(header_num)] = correct_last_header
+
                 after_first_header = True
+                header_lookup[str(header_num)] = correct_last_header
                 continue
             elif (header_num < min_header_num):
                 header.name = "h" + str(min_header_num)
                 header_num = min_header_num
                 last_header_num = header_num
                 correct_last_header = min_header_num
-                header_lookup[str(header_num)] = correct_last_header
+
                 after_first_header = False
+                header_lookup[str(header_num)] = correct_last_header
                 continue
             elif ((header_num > last_header_num) and (header_num != correct_last_header + 1)):
                 header.name = "h" + str(correct_last_header + 1)
                 last_header_num = header_num
                 correct_last_header += 1
+
                 after_first_header = False
-
-                try:
-                    header_lookup[str(header_num)]
-                except:
-                    header_lookup[str(header_num)] = correct_last_header
-
+                header_lookup[str(header_num)] = correct_last_header
                 continue
             elif (header_num < last_header_num):
                 last_header_num = header_num
@@ -338,27 +336,29 @@ def fix_headers(soup, errors):
                 if (after_first_header == True):
                     header.name = "h" + str(correct_last_header)
                     after_first_header = False
-                    continue                
+                else:
+                    try:
+                        header.name = "h" + str(header_lookup[str(header_num)])
+                        correct_last_header = header_lookup[str(header_num)]
+                    except:
+                        correct_last_header = header_num # The header is not in the lookup table.
 
-                try:
-                    header.name = "h" + str(header_lookup[str(header_num)])
-                    correct_last_header = header_lookup[str(header_num)]
-                except:
-                    correct_last_header = header_num
-
-                after_last_header = False
-
+                after_first_header = False
+                header_lookup[str(header_num)] = correct_last_header
                 continue
             elif (header_num == last_header_num):
                 last_header_num = header_num
                 header.name = "h" + str(correct_last_header)
-                after_first_header = False
 
+                after_first_header = False
+                header_lookup[str(header_num)] = correct_last_header
                 continue
             elif (header_num == correct_last_header + 1):
                 last_header_num = header_num
                 correct_last_header = header_num
+
                 after_first_header = False
+                header_lookup[str(header_num)] = correct_last_header
                 continue
 
     return soup
@@ -499,7 +499,7 @@ def fix_all(soup, errors):
     soup = cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe)
 
     return soup
- 
+
 # Write everything to our output file
 def write_out(soup, output):
     output_file = open(output, "w")
