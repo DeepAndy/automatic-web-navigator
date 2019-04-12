@@ -9,7 +9,7 @@ used with proper care. Use at your own risk.
 ## Required Software
 * [Python 3](https://www.python.org/downloads)
 
-* [Python 3 pip](https://www.makeusof.com/tag/install-pip-for-python/)
+* Python 3 pip (Should be installed with Python 3)
 
 * Python 3 selenium module
 
