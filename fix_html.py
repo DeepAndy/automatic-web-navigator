@@ -495,8 +495,8 @@ def fix_all(soup, errors):
         "video", "wbr", "text"]
 
     soup = br_analysis(soup, errors)
-    soup = fix_headers(soup, errors)
     soup = cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe)
+    soup = fix_headers(soup, errors)
 
     return soup
 
