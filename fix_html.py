@@ -457,9 +457,14 @@ def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe
             if (tag.has_attr("href")):
                 if (re.findall(r"http://", tag["href"])):
                     try:
-                        urllib.request.urlopen(re.sub(r"http://", "https://", tag["href"]))
+                        print("Attempting to connect to " + re.sub(r"http://", "https://", tag["href"]))
+                        urllib.request.urlopen(re.sub(r"http://", "https://", tag["href"]), timeout=5)
                         tag["href"] = re.sub(r"http://", "https://", tag["href"])
+                        print("Successfully found an HTTPS connection to " + tag["href"])
+                        print()
                     except:
+                        print("Failed to find an HTTPS connection for " + tag["href"])
+                        print()
                         pass
                 if (re.findall(r"\.pdf", tag["href"])):
                     if (not re.findall(r"\[PDF\]", tag.text)):
