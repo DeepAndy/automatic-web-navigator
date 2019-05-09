@@ -1,8 +1,0 @@
-image_embed_xpath = //*[@id="cke_38"]/span[1]
-iframe_xpath = //*[@id="entity_browser_iframe_media_embed2"]
-add_new_image_xpath = //*[@id="entity-browser-media-embed2-form"]/nav/ul/li[2]/a
-image_upload_xpath = //*[@id="edit-inline-entity-form-field-media-image-0-upload"]
-name_xpath = //*[@id="edit-inline-entity-form-name-0-value"]
-alternative_text_xpath = //*[contains(@id, "edit-inline-entity-form-field-media-image-0-alt")]
-save_image_xpath = //*[@id="edit-submit"]
-embed_xpath = /html/body/div[6]/div[3]/div/button[2]
