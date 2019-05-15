@@ -94,6 +94,10 @@ def find_errors(soup):
             errors.append("<script>")
             print_friendly_errors.append("ERROR: <script> tag found")
             #error_line_string.append(lines[i])
+        if (tag.name == 'noscript'):
+            errors.append('<noscript')
+            print_friendly_errors.append('ERROR: <noscript> tag found')
+            #error_line_string.append(lines[i])
         if (tag.name == "style"):
             errors.append("<style>")
             print_friendly_errors.append("ERROR: <style> tag found")
@@ -399,6 +403,8 @@ def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe
         if (tag.name == "hr"):
             tag.decompose()
         elif (tag.name == "script"):
+            tag.decompose()
+        elif (tag.name == 'noscript'):
             tag.decompose()
         elif (tag.name == "style"):
             tag.decompose()
