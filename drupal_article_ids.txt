@@ -1,0 +1,2 @@
+title_id = edit-title-0-value
+date_id = edit-field-publication-date-0-value-date

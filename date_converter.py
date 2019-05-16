@@ -37,3 +37,5 @@ def date_converter(date):
         date = date_list[2] + '-11-' + date_list[1]
     elif (re.search(r'Dec(ember)?', date_list[0], re.IGNORECASE)):
         date = date_list[2] + '-12-' + date_list[1]
+
+    return date
