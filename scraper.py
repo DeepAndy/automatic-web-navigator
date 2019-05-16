@@ -17,6 +17,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from ohio_login import ohio_login
 from fix_html import *
+from download_image_document import download_images_from_soup
+from download_image_document import download_documents_from_soup
 from date_converter import date_converter
 
 '''
@@ -26,6 +28,7 @@ Parameters: driver (selenium webdriver), soup (BeautifulSoup object),
             content (BeautifulSoup object), config_value (regex)
 '''
 def scrape_article(driver, soup, content, config_value):
+    title = driver.title
     date_element_found = False
     date_id_found = False
     date_class_found = False
@@ -56,6 +59,8 @@ def scrape_article(driver, soup, content, config_value):
 
     date = soup.find(date_element, attrs=date_attributes).text
     date = date_converter(date)
+
+    download_documents_from_soup(content)
 
 def script_main(driver, url, pos):
     # Set up page source and BeautifulSoup object
