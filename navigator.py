@@ -1094,6 +1094,8 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                     except Exception as e:
                         print('\nERROR')
                         print(e)
+                        driver.quit()
+                        return
             else:
                 web_check = False
 
