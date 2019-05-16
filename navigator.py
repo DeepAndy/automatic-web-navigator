@@ -384,7 +384,7 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
                 queues.web_action_queue[pos].insert(pos2, action)
 
         print()
-        print("Added " + script_file + " to the action queue")
+        print('Added "' + script_file + '" to the action queue')
         return queues.action_queue
     elif (option == 7):
         menu(queues, the_driver)
@@ -641,7 +641,7 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
             if (edit_type == "insert"):
                 print()
                 web_name = input("Enter the website name: ")
-            
+
             if (queues.web_action_queue == [[]]):
                 queues.web_action_queue[arg1 - 1].insert(0, web_name)
             else:
@@ -841,7 +841,7 @@ def load_queue(queues, queue_type):
             print(str(file.split(".aq")[0]))
         elif (queue_type == "web_action_queue"):
             print(str(file.split(".waq")[0]))
-                    
+
     print()
     queue_name = input("Enter name of the queue file: ")
 
@@ -1088,7 +1088,12 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                     import_module = order[len(order) - 1]
                     func = importlib.import_module(import_module).__getattribute__("script_main")
                     driver.get(web_action_queue[index][0])
-                    func(driver, web_action_queue[index][0], index)
+
+                    try:
+                        func(driver, web_action_queue[index][0], index)
+                    except Exception as e:
+                        print('\nERROR')
+                        print(e)
             else:
                 web_check = False
 
@@ -1255,7 +1260,7 @@ def menu(queues, the_driver):
         print("2.  Add action to action queue")
         print("3.  Apply action queue to all sites in website queue")
         print("4.  Insert into a queue")
-        print("5.  Remove from a queue") 
+        print("5.  Remove from a queue")
         print("6.  Save a queue")
         print("7.  Load a queue")
         print("8.  Clear a queue")
