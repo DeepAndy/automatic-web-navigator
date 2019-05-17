@@ -1,2 +1,14 @@
 title_id = edit-title-0-value
 date_id = edit-field-publication-date-0-value-date
+image_id = edit-field-image-0-upload
+image_alt_id_partial = edit-field-image-0-alt
+page_location_id = edit-page-location
+parent_page_id = edit-parent-page
+parent_page_option_text = -- News
+page_url_slug_id = edit-slug
+display_settings_id = edit-ds-switch-view-mode
+columns_id = edit-column-number
+columns_num = 1
+article_type_id = edit-field-article-type
+article_type_option_text = News
+save_id = edit-submit
