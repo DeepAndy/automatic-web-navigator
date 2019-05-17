@@ -1088,14 +1088,7 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
                     import_module = order[len(order) - 1]
                     func = importlib.import_module(import_module).__getattribute__("script_main")
                     driver.get(web_action_queue[index][0])
-
-                    try:
-                        func(driver, web_action_queue[index][0], index)
-                    except Exception as e:
-                        print('\nERROR')
-                        print(e)
-                        driver.quit()
-                        return
+                    func(driver, web_action_queue[index][0], index)
             else:
                 web_check = False
 
