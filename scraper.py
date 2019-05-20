@@ -88,9 +88,9 @@ def scrape_article(driver, soup, content, config_value):
             if (re.search(config_value, value)):
                 image_alt_id_partial = re.search(config_value, value).group(1)
                 image_alt_xpath = '//*[contains(@id, "' + image_alt_id_partial + '")]'
-        elif (re.search(r'page_location_id', value)):
+        elif (re.search(r'page_location_class', value)):
             if (re.search(config_value, value)):
-                page_location_id = re.search(config_value, value).group(1)
+                page_location_class = re.search(config_value, value).group(1)
         elif (re.search(r'parent_page_id', value)):
             if (re.search(config_value, value)):
                 parent_page_id = re.search(config_value, value).group(1)
@@ -140,10 +140,10 @@ def scrape_article(driver, soup, content, config_value):
         file_name = re.search(r'\..*/(.*\..*)', images[0]['src']).group(1)
 
         if (images[0].has_attr('alt')):
-            alt_text = images[0]['alt']
-        elif (images[0].has_attr('alt')):
             if (re.search(r'^\s*$', images[0]['alt'])):
                 alt_text = 'No alternative text available'
+            else:
+                alt_text = images[0]['alt']
         else:
             alt_text = 'No alternative text available'
 
@@ -153,8 +153,7 @@ def scrape_article(driver, soup, content, config_value):
         driver.execute_script('document.querySelector("[id^=\'' + image_alt_id_partial + '\']").value="' + alt_text + '";')
 
     # Click page location
-    wait.until(EC.element_to_be_clickable((By.ID, page_location_id)))
-    driver.find_element_by_id(page_location_id).click()
+    driver.execute_script('document.getElementsByClassName("' + page_location_class + '")[0].click();')
 
     # Enter the value of the parent page
     wait.until(EC.visibility_of_element_located((By.ID, parent_page_id)))
