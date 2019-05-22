@@ -1,15 +1,21 @@
 title_id = edit-title-0-value
 date_id = edit-field-publication-date-0-value-date
+
 image_id = edit-field-image-0-upload
 image_alt_id_partial = edit-field-image-0-alt
+
 page_location_id = //*[@id="edit-page-location"]/summary
 page_location_class = seven-details__summary
-parent_page_id = edit-parent-page
-parent_page_option_text = -- News
+
+parent_page_xpath = //*[@id="edit-parent-page"]/option[3]
+
 page_url_slug_id = edit-slug
 display_settings_id = edit-ds-switch-view-mode
+
 columns_id = edit-column-number
 columns_num = 1
+
 article_type_id = edit-field-article-type
-article_type_option_text = News
+article_type_option_text = Blog
+
 save_id = edit-submit
