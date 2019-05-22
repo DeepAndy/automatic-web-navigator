@@ -32,9 +32,13 @@ Parameters: driver (selenium webdriver), soup (BeautifulSoup object),
 def scrape_article(driver, soup, content, config_value):
     wait = WebDriverWait(driver, 30)
     title = driver.title
+    title = title.replace('"', '\\"')
     date_element_found = False
     scrape_date_id_found = False
     date_class_found = False
+    author_element_found = False
+    author_id_found = False
+    author_class_found = False
 
     # Read for article values of interest from config file
     f = open('scrape_values.txt', 'r')
@@ -52,6 +56,18 @@ def scrape_article(driver, soup, content, config_value):
             if (re.search(config_value, value)):
                 date_class_found = True
                 date_class = re.search(config_value, value).group(1)
+        elif (re.search(r'author_element', value)):
+            if (re.search(config_value, value)):
+                author_element_found = True
+                author_element = re.search(config_value, value).group(1)
+        elif (re.search(r'author_id', value)):
+            if (re.search(config_value, value)):
+                author_id_found = True
+                author_id = re.search(config_value, value).group(1)
+        elif (re.search(r'author_class', value)):
+            if (re.search(config_value, value)):
+                author_class_found = True
+                author_class = re.search(config_value, value).group(1)
         elif (re.search(r'webcms_node', value)):
             if (re.search(config_value, value)):
                 webcms_node_found = True
@@ -59,6 +75,7 @@ def scrape_article(driver, soup, content, config_value):
 
     f.close()
     date_attributes = {}
+    author_attributes = {}
 
     # Get date attributes
     if (scrape_date_id_found == True):
@@ -66,9 +83,18 @@ def scrape_article(driver, soup, content, config_value):
     if (date_class_found == True):
         date_attributes['class'] = date_class
 
+    # Get author attributes
+    if (author_id_found == True):
+        author_attributes['id'] = author_id
+    if (author_class_found == True):
+        author_attributes['class'] = author_class
+
     # Get the date and convert to YYYY-MM-DD
     date = soup.find(date_element, attrs=date_attributes).text
     date = date_converter(date)
+
+    # Get the author
+    author = soup.find(author_element, attrs=author_attributes).text
 
     # Get xpaths from drupal_article_ids
     f1 = open('drupal_article_ids.txt', 'r')
@@ -91,12 +117,9 @@ def scrape_article(driver, soup, content, config_value):
         elif (re.search(r'page_location_class', value)):
             if (re.search(config_value, value)):
                 page_location_class = re.search(config_value, value).group(1)
-        elif (re.search(r'parent_page_id', value)):
+        elif (re.search(r'parent_page_xpath', value)):
             if (re.search(config_value, value)):
-                parent_page_id = re.search(config_value, value).group(1)
-        elif (re.search(r'parent_page_option_text', value)):
-            if (re.search(config_value, value)):
-                parent_page_option_text = re.search(config_value, value).group(1)
+                parent_page_xpath = re.search(config_value, value).group(1)
         elif (re.search(r'page_url_slug_id', value)):
             if (re.search(config_value, value)):
                 page_url_slug_id = re.search(config_value, value).group(1)
@@ -131,13 +154,17 @@ def scrape_article(driver, soup, content, config_value):
     wait.until(EC.visibility_of_element_located((By.ID, drupal_date_id)))
     driver.execute_script('document.getElementById("' + drupal_date_id + '").value="' + date + '";')
 
+    '''
+    # Add author
+    '''
+
     # Download documents and images
     download_documents_from_soup(content)
     images = download_images_from_soup_return(content)
 
     # Upload images
     if (len(images) > 0):
-        file_name = re.search(r'\..*/(.*\..*)', images[0]['src']).group(1)
+        file_name = re.search(r'\..*/(\S+\.\w+)', images[0]['src']).group(1)
 
         if (images[0].has_attr('alt')):
             if (re.search(r'^\s*$', images[0]['alt'])):
@@ -147,20 +174,24 @@ def scrape_article(driver, soup, content, config_value):
         else:
             alt_text = 'No alternative text available'
 
-        wait.until(EC.element_to_be_clickable((By.ID, image_id)))
-        driver.find_element_by_id(image_id).send_keys(os.getcwd() + '/images/' + file_name)
-        wait.until(EC.visibility_of_element_located((By.XPATH, image_alt_xpath)))
-        driver.execute_script('document.querySelector("[id^=\'' + image_alt_id_partial + '\']").value="' + alt_text + '";')
+        try:
+            wait.until(EC.element_to_be_clickable((By.ID, image_id)))
+            driver.find_element_by_id(image_id).send_keys(os.getcwd() + '/images/' + file_name)
+            wait.until(EC.visibility_of_element_located((By.XPATH, image_alt_xpath)))
+            driver.execute_script('document.querySelector("[id^=\'' + image_alt_id_partial + '\']").value="' + alt_text + '";')
+        except Exception as e:
+            print('Could not upload image')
+            print(e)
 
     # Click page location
     driver.execute_script('document.getElementsByClassName("' + page_location_class + '")[0].click();')
 
     # Enter the value of the parent page
-    wait.until(EC.visibility_of_element_located((By.ID, parent_page_id)))
-    select = Select(driver.find_element_by_id(parent_page_id))
-    select.select_by_visible_text(parent_page_option_text)
+    driver.find_element_by_xpath(parent_page_xpath).click()
 
     # Enter the title into the page url slug
+    if (len(title) > 128):
+        title = title[0:128]
     wait.until(EC.visibility_of_element_located((By.ID, page_url_slug_id)))
     driver.execute_script('document.getElementById("' + page_url_slug_id + '").value="' + title + '";')
 
@@ -224,7 +255,7 @@ def script_main(driver, url, pos):
     content_xpath_found = False
     scrape_type_found = False
 
-    config_value = re.compile('=\s*(.+)')
+    config_value = re.compile('=\s*(\S+)')
 
     # Evaluate our config file
     for value in f.readlines():

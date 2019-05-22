@@ -8,7 +8,7 @@ Parameters:     image (string)
 '''
 def download_image(image):
     try:
-        file_name = re.search(r'\..*/(.*\..*)', image).group(1)
+        file_name = re.search(r'\..*/(\S+\.\w+)', image).group(1)
     except:
         pass
 
@@ -28,7 +28,7 @@ Parameters:     document (string)
 '''
 def download_document(document):
     try:
-        file_name = re.search(r'\..*/(.*\..*)', document).group(1)
+        file_name = re.search(r'\..*/(\S+\.\w+)', document).group(1)
     except:
         pass
 
