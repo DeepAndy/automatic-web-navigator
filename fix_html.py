@@ -61,12 +61,10 @@ def find_errors(soup):
             if (re.findall(r"^\s*$", tag.text)):
                 errors.append("empty header")
                 print_friendly_errors.append("ERROR: empty header tag found")
-        '''
         if (tag.name == "hr"):
             errors.append("<hr />")
             print_friendly_errors.append("ERROR: <hr /> tag found")
             #error_line_string.append(lines[i])
-        '''
         if (tag.name == "b"):
             errors.append("<b>")
             print_friendly_errors.append("ERROR: <b> tag found")
@@ -402,10 +400,8 @@ def cleanup(soup, errors, remove_image, empty_tags, string_blacklist, p_tag_safe
 
         remove_empty(tag, empty_tags)
 
-        '''
         if (tag.name == "hr"):
             tag.decompose()
-        '''
         if (tag.name == "script"):
             tag.decompose()
         elif (tag.name == 'noscript'):
