@@ -112,6 +112,7 @@ def script_main(driver, url, pos):
         if (html_cleaned == True):
             drupal_action(driver, soup)
 
+        download_images_from_url(url)
         download_documents_from_soup(soup)
 
     else:

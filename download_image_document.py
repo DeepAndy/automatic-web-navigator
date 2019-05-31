@@ -1,5 +1,6 @@
-import urllib.request
 import re
+import urllib.request
+from bs4 import BeautifulSoup
 
 '''
 Function:       download_image
@@ -91,3 +92,13 @@ def download_documents_from_soup(soup):
 
     for document in documents:
         download_document(document)
+
+'''
+Function: download_images_from_url
+Description: Download images from a given URL
+Parameters: url (string)
+'''
+def download_images_from_url(url):
+    response = urllib.request.urlopen(url)
+    page_source = response.read()
+    soup = BeautifulSoup(page_source, 'html.parser')
