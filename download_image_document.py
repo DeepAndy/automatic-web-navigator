@@ -36,7 +36,7 @@ def download_document(document):
         urllib.request.urlretrieve(document, "documents/" + file_name)
         print('Successfully downloaded ' + file_name)
     except Exception as e:
-        print("Failed to download image at \"" + document + "\"")
+        print("Failed to download document at \"" + document + "\"")
         print(e)
 
         return
@@ -72,7 +72,6 @@ def download_images_from_soup_return(soup):
         download_image(image['src'])
 
     return images
-
 
 '''
 Function:       download_documents_from_soup
