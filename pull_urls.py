@@ -18,8 +18,8 @@ class web_driver:
         self.driver_path = driver_path
 
 class options:
-    def __init__(self, remove_absolute, remove_current_page, remove_duplicates):
-        self.remove_absolute = remove_absolute
+    def __init__(self, remove_relative, remove_current_page, remove_duplicates):
+        self.remove_relative = remove_relative
         self.remove_current_page = remove_current_page
         self.remove_duplicates = remove_duplicates
 
@@ -44,7 +44,7 @@ def initialization():
     for section in config.sections():
         if (section == driver_section):
             found_driver_section = True
-            
+
         if (section == pull_urls_section):
             found_pull_urls_section = True
 
@@ -64,7 +64,7 @@ def initialization():
 
     driver_option_type = "driver_type"
     driver_option_path = "driver_path"
-    pull_urls_option_absolute = "remove_absolute"
+    pull_urls_option_absolute = "remove_relative"
     pull_urls_option_current_page = "remove_current_page"
     pull_urls_option_duplicates = "remove_duplicates"
     found_driver_type = False
@@ -73,14 +73,14 @@ def initialization():
     found_pull_urls_absolute = False
     found_pull_urls_current_page = False
     found_pull_urls_duplicates = False
-    pull_urls_remove_absolute = False
+    pull_urls_remove_relative = False
     pull_urls_remove_current_page = False
     pull_urls_remove_duplicates = False
 
     for option in config.options(driver_section):
         if (option == driver_option_type):
             found_driver_type = True
-            
+
             if (config.get(driver_section, driver_option_type) == "chrome" or config.get(driver_section, driver_option_type) == "firefox"):
                 found_correct_driver_type = True
                 driver_type = config.get(driver_section, driver_option_type)
@@ -110,7 +110,7 @@ def initialization():
         if (option == pull_urls_option_absolute):
             found_pull_urls_absolute = True
             if (config.get(pull_urls_section, pull_urls_option_absolute) == "true"):
-                pull_urls_remove_absolute = True
+                pull_urls_remove_relative = True
 
         if (option == pull_urls_option_current_page):
             found_pull_urls_current_page = True
@@ -127,13 +127,13 @@ def initialization():
         print("Could not find the \"" + pull_urls_option_absolute + "\" option.")
         print("Make sure \"" + pull_urls_option_absolute + "\" is included under the \"[" + pull_urls_section + "]\" section.")
         complete_config = False
-        
+
     if (found_pull_urls_current_page == False):
         print()
         print("Could not find the \"" + pull_urls_option_current_page + "\" option.")
         print("Make sure \"" + pull_urls_option_current_page + "\" is included under the \"[" + pull_urls_section + "]\" section.")
         complete_config = False
-        
+
     if (found_pull_urls_duplicates == False):
         print()
         print("Could not find the \"" + pull_urls_option_duplicates + "\" option.")
@@ -145,7 +145,7 @@ def initialization():
         quit()
     else:
         the_driver = web_driver(driver_type, driver_path)
-        pull_urls_config = options(pull_urls_remove_absolute, pull_urls_remove_current_page, pull_urls_remove_duplicates)
+        pull_urls_config = options(pull_urls_remove_relative, pull_urls_remove_current_page, pull_urls_remove_duplicates)
 
     main(the_driver, pull_urls_config)
 
@@ -181,12 +181,12 @@ def select_urls(urls):
         complete = True
 
     option = ""
-    
+
     while (option == ""):
         print()
         output_file = input("Enter a file name to write to: ")
         output_file = "web-queues/" + output_file + ".wq"
-    
+
         try:
             open(output_file)
             exists = True
@@ -205,7 +205,7 @@ def select_urls(urls):
             print("4. Quit")
             print()
             option = int(input("Enter a number: "))
-        
+
             if (option == 1):
                 f = open(output_file, "a+")
             elif (option == 2):
@@ -226,11 +226,11 @@ def select_urls(urls):
 
             for index in range(lower - 1, upper):
                 f.write(urls[index] + "\n")
-                
+
     print()
     print("Wrote output to \"" + output_file + "\"")
     print()
-        
+
 def remove_values_from_list(the_list, val):
     return [value for value in the_list if value != val]
 
@@ -238,7 +238,7 @@ def main(the_driver, pull_urls_config):
     if (the_driver.driver_type == "chrome"):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--headless")
-        
+
         try:
             driver = webdriver.Chrome(executable_path=the_driver.driver_path, options = chrome_options)
         except:
@@ -251,7 +251,7 @@ def main(the_driver, pull_urls_config):
             print("driver_path = " + the_driver.driver_path)
             print()
             quit()
-            
+
     elif (the_driver.driver_type == "firefox"):
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless")
@@ -267,53 +267,48 @@ def main(the_driver, pull_urls_config):
             print("driver_path = " + the_driver.driver_path)
             print()
             quit()
-    
+
     print()
     url = input("Enter page to parse: ")
     driver.get(url)
     html = driver.page_source
     soup = BeautifulSoup(driver.page_source, "html.parser")
+    driver_current_url = driver.current_url
+    driver.quit()
     anchors = soup.find_all("a")
     urls = []
     for anchor in anchors:
         if (anchor.has_attr("href")):
-            if (re.findall(r"\.com|\.org|\.edu|\.gov|\.net|\.html|\.cfm", str(anchor["href"]))):
+            if (re.findall(r"(\.com/?)|(\.org/?)|(\.edu/?)|(\.cfm/?)|(\.html?/?)|(\.net/?)|(\.gov/?)", str(anchor["href"]))):
                 urls.append(str(anchor["href"]))
-    print(urls)
+
+    #print(urls)
 
     # Remove emails
     for current_url in urls:
         if (current_url.find("mailto:") == 0):
             urls = remove_values_from_list(urls, current_url)
 
-    # Remove relative links (named 'absolute' incorrectly)
-    if (pull_urls_config.remove_absolute == True):
+    # Remove relative links
+    if (pull_urls_config.remove_relative == True):
         for current_url in urls:
-            if (current_url.find("/") == 0):
-                urls = remove_values_from_list(urls, current_url)
-            elif (current_url.find("http://") == -1 and current_url.find("https://") == -1 and current_url.find("www.") == -1 and current_url.find("file://") == -1):
+            if (not (re.search(r'^https?://', urls[index]) and not re.search(r'^www', urls[index]) and not re.search(r'^file://', urls[index])) or urls[index].find('/') == 0):
                 urls = remove_values_from_list(urls, current_url)
     else:
-        if (url.find(".com") != -1):
-            new_url = re.split(r'\.com', url)[0] + ".com"
-        elif (url.find(".org") != -1):
-            new_url = re.split(r'\.org', url)[0] + ".org"
-        elif (url.find(".edu") != -1):
-            new_url = re.split(r'\.edu', url)[0] + ".edu"
-        elif (url.find(".gov") != -1):
-            new_url = re.split(r'\.gov', url)[0] + ".gov"
-        elif (url.find(".net") != -1):
-            new_url = re.split(r'\.net', url)[0] + ".net"
-        elif (url.find(".html") != -1):
-            new_url = re.split(r'\.html', url)[0] + ".html"
-            
         for index in range(len(urls)):
-            if (urls[index].find("/") == 0):
-                urls[index] = new_url + urls[index]
-            elif (urls[index].find("http://") == -1 and urls[index].find("https://") == -1 and urls [index].find("www.") == -1 and urls[index].find("file://") == -1):
-                if (re.findall(r'(.*?)/[\w+|-]+\.\w+$', url)):
-                    new_url = re.findall(r'(.*?)/[\w+|-]+\.\w+$', url)[0]
-                    urls[index] = new_url + "/" + urls[index]
+            if (not (re.search(r'^https?://', urls[index]) and not re.search(r'^www', urls[index]) and not re.search(r'^file://', urls[index])) or urls[index].find('/') == 0):
+                if (urls[index].find('/') == 0):
+                    urls[index][0] = ''
+
+                urls[index] = re.sub(r'\.com.+$', '\.com', urls[index])
+                urls[index] = re.sub(r'\.org.+$', '\.org', urls[index])
+                urls[index] = re.sub(r'\.edu.+$', '\.edu', urls[index])
+                urls[index] = re.sub(r'\.cfm.+$', '\.cfm', urls[index])
+                urls[index] = re.sub(r'\.htm.+$', '\.htm', urls[index])
+                urls[index] = re.sub(r'\.html.+$', '\.html', urls[index])
+                urls[index] = re.sub(r'\.net.+$', '\.net', urls[index])
+                urls[index] = re.sub(r'\.gov.+$', '\.gov', urls[index])
+                urls[index] = driver_current_url + urls[index]
 
     if (pull_urls_config.remove_current_page == True):
         urls = remove_values_from_list(urls, "#")
@@ -323,7 +318,7 @@ def main(the_driver, pull_urls_config):
 
     if (pull_urls_config.remove_duplicates == True):
         urls = list(OrderedDict.fromkeys(urls))
-    
+
     select_urls(urls)
 
 initialization()
