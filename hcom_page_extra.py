@@ -36,18 +36,10 @@ def drupal_action(driver, url, soup):
     wait.until(EC.visibility_of_element_located((By.ID, 'edit-slug')))
     driver.execute_script('document.getElementById("edit-slug").value="' + title + '";')
 
-    # Add date
-    f2 = open('url_and_date.txt', 'r')
-    lines = f2.readlines()
-
-    for index in range(len(lines)):
-        if (lines[index].strip() == url.strip()):
-            date = lines[index + 1].strip()
-
-    if (not re.search(r'^\s*$', date)):
-        print(date)
-        wait.until(EC.visibility_of_element_located((By.ID, 'edit-field-publication-date-0-value-date')))
-        driver.execute_script('document.getElementById("edit-field-publication-date-0-value-date").value="' + date + '";')
+    # Enter date
+    date = '2007-07-16'
+    wait.until(EC.visibility_of_element_located((By.ID, 'edit-field-publication-date-0-value-date')))
+    driver.execute_script('document.getElementById("edit-field-publication-date-0-value-date").value="' + date + '";')
 
     # Click page location
     driver.execute_script('document.getElementsByClassName("seven-details__summary")[0].click();')

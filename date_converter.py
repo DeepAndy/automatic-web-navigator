@@ -8,6 +8,7 @@ Parameters: date (string)
 '''
 def date_converter(date):
     date = date.replace(',', '')
+    date = date.replace('.', '')
     date_list = date.split(' ')
 
     if (int(date_list[1]) < 10):
