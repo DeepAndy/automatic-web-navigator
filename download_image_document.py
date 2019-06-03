@@ -45,8 +45,9 @@ def download_document(document):
 Function:       download_images_from_soup
 Description:    Download images from a BeautifulSoup object
 Parameters:     soup (BeautifulSoup object)
+Returns:        images (List of BeautifulSoup tags) (optional parameter)
 '''
-def download_images_from_soup(soup):
+def download_images_from_soup(soup, return_images=False):
     images = soup.find_all('img', src=True)
 
     for image in images:
@@ -55,23 +56,8 @@ def download_images_from_soup(soup):
 
         download_image(image['src'])
 
-'''
-Function:       download_images_from_soup_return
-Description:    Download images from a BeautifulSoup object and return a list
-                of images as BeautifulSoup objects
-Parameters:     soup (BeautifulSoup object)
-Returns:        images (BeautifulSoup object)
-'''
-def download_images_from_soup_return(soup):
-    images = soup.find_all('img', src=True)
-
-    for image in images:
-        if (image['src'].find('/') == 0):
-            image['src'] = 'https://www.ohio.edu' + image['src']
-
-        download_image(image['src'])
-
-    return images
+    if (return_images == True):
+        return images
 
 '''
 Function:       download_documents_from_soup
