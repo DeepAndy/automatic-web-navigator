@@ -62,14 +62,23 @@ Description:    Download documents from a BeautifulSoup object
 Parameters:     soup (BeautifulSoup object), url (Optional string)
 '''
 def download_documents_from_soup(soup, url=''):
+    relative_url = re.sub(r'/[^/]+$', '', url)
     links = soup.find_all('a', href=True)
     documents = []
 
     for link in links:
         if (re.search('r(\.docx?)|(\.pptx?)|(\.xlsx?)|(\.pdf)|(\.zip)', link['href'])):
-            if (re.search(r'^\s*$', url)):
-                if (link['href'].find('/') == 0):
-                    link['href'] = 'https://www.ohio.edu' + link['href']
+            if (not (re.search(r'^https?://', link['href']) and not re.search(r'^www', link['href']) and not re.search(r'^file://', link['href']))):
+                if (not re.search(r'^\s*$', url)):
+                    print('relative_url = ' + relative_url)
+
+                    if (link['href'].find('/') == 0):
+                        link['href'] = relative_url + link['href']
+                    else:
+                        link['href'] = relative_url + '/' + link['href']
+                else:
+                    print('No URL was provided to find relative link: ' + link['href'])
+                    continue
 
             documents.append(link['href'])
 
@@ -85,7 +94,7 @@ def download_images_from_url(url):
     page_source = urllib.request.urlopen(url)
     page_source = page_source.read()
     soup = BeautifulSoup(page_source, 'html.parser')
-    download_images_from_soup(soup)
+    download_images_from_soup(soup, url)
 
 '''
 Function:       download_documents_from_url
@@ -96,4 +105,4 @@ def download_documents_from_url(url):
     page_source = urllib.request.urlopen(url)
     page_source = page_source.read()
     soup = BeautifulSoup(page_source, 'html.parser')
-    download_documents_from_soup(soup)
+    download_documents_from_soup(soup, url)
