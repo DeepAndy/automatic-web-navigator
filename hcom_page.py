@@ -15,7 +15,7 @@ def drupal_action(driver, url, soup):
     title = driver.title
     title = title.replace('"', '\\"')
 
-    webcms_url = 'https://webcmsdev.oit.ohio.edu/medicine/group/1/content/create/group_node%3Aarticle'
+    webcms_url = 'https://webcms.ohio.edu/medicine/group/1/content/create/group_node%3Aarticle'
     driver.get(webcms_url)
     ohio_login(driver)
 

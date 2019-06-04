@@ -15,7 +15,7 @@ def drupal_action(driver, url, soup):
     title = driver.title
     title = title.replace('"', '\\"')
 
-    webcms_url = 'https://webcmsdev.oit.ohio.edu/medicine/group/1/content/create/group_node%3Aarticle'
+    webcms_url = 'https://webcms.ohio.edu/medicine/group/1/content/create/group_node%3Aarticle'
     driver.get(webcms_url)
     ohio_login(driver)
 
@@ -37,7 +37,7 @@ def drupal_action(driver, url, soup):
     driver.execute_script('document.getElementById("edit-slug").value="' + title + '";')
 
     # Enter date
-    date = '2007-07-16'
+    date = '2006-01-01'
     wait.until(EC.visibility_of_element_located((By.ID, 'edit-field-publication-date-0-value-date')))
     driver.execute_script('document.getElementById("edit-field-publication-date-0-value-date").value="' + date + '";')
 
