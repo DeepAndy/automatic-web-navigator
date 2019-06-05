@@ -19,7 +19,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from ohio_login import ohio_login
 from fix_html import *
-from download_image_document import download_images_from_soup_return
 from download_image_document import download_documents_from_soup
 from date_converter import date_converter
 
@@ -160,7 +159,7 @@ def scrape_article(driver, soup, content, config_value):
 
     # Download documents and images
     download_documents_from_soup(content)
-    images = download_images_from_soup_return(content)
+    images = download_images_from_soup(content, True)
 
     # Upload images
     if (len(images) > 0):
