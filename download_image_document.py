@@ -1,4 +1,5 @@
 import re
+import os
 import urllib.request
 from bs4 import BeautifulSoup
 
@@ -24,6 +25,9 @@ def get_base_and_relative(url):
 
     relative_url = re.sub(r'[^/]+$', '', url)
 
+    if (relative_url[len(relative_url) - 1] != '/'):
+        relative_url += '/'
+
     return base_url, relative_url
 
 '''
@@ -38,7 +42,7 @@ def create_url_from_relative(href, base_url, relative_url):
         href = href[1:]
         href = base_url + href
     else:
-        href = relative_url + '/' + href
+        href = relative_url + href
 
     return href
 
@@ -49,16 +53,30 @@ Parameters:     image (string)
 '''
 def download_image(image):
     try:
-        file_name = re.search(r'\.?.*/(\S+\.\w+)', image).group(1)
-    except:
-        pass
+        file_name = re.search(r'[^/]+\.((png)|(gif)|(jpe?g)|(jpe)|(jif)|(jfif?)|(svg)|(tiff?))', image, re.IGNORECASE).group(0)
+        file_name = 'images/' + file_name
+        i = 0
+
+        while (os.path.isfile(file_name)):
+            if (re.search(r'(\(\d+\))\.', file_name)):
+                file_name = re.sub(r'(\(\d+\))', '', file_name)
+
+            i += 1
+            dot_index = file_name.find('.')
+            file_name = file_name[:dot_index] + '(' + str(i) + ')' + file_name[dot_index:]
+    except Exception as e:
+        print('\nFailed to download image at "' + image + '"')
+        print('This was a naming error')
+        print(str(e) + '\n')
+        return
 
     try:
-        urllib.request.urlretrieve(image, "images/" + file_name)
-        print('Successfully downloaded ' + file_name)
+        urllib.request.urlretrieve(image, file_name)
+        print('Successfully downloaded /' + file_name)
     except Exception as e:
-        print("Failed to download image at \"" + image + "\"")
-        print(e)
+        print("\nFailed to download image at \"" + image + "\"")
+        print(str(e) + '\n')
+        return
 
 '''
 Function:       download_document
@@ -67,16 +85,31 @@ Parameters:     document (string)
 '''
 def download_document(document):
     try:
-        file_name = re.search(r'\.?.*/(\S+\.\w+)', document).group(1)
-    except:
-        pass
+        file_name = re.search(r'[^/]+\.((pdf)|(docx?)|(xlsx?)|(pptx?))', document, re.IGNORECASE).group(0)
+        file_name = 'documents/' + file_name
+        i = 0
+
+        while (os.path.isfile(file_name)):
+            if (re.search(r'(\(\d+\))\.', file_name)):
+                file_name = re.sub(r'(\(\d+\))', '', file_name)
+
+            i += 1
+            dot_index = file_name.find('.')
+            file_name = file_name[:dot_index] + '(' + str(i) + ')' + file_name[dot_index:]
+
+    except Exception as e:
+        print('\nFailed to download document at "' + document + '"')
+        print('This was a naming error')
+        print(str(e) + '\n')
+        return
 
     try:
-        urllib.request.urlretrieve(document, "documents/" + file_name)
-        print('Successfully downloaded ' + file_name)
+        urllib.request.urlretrieve(document, file_name)
+        print('Successfully downloaded /' + file_name)
     except Exception as e:
-        print("Failed to download document at \"" + document + "\"")
-        print(e)
+        print('\nFailed to download document at "' + document + '"')
+        print(str(e) + '\n')
+        return
 
 '''
 Function:       download_images_from_soup
@@ -91,8 +124,8 @@ def download_images_from_soup(soup, url='', return_images=False):
     images = soup.find_all('img', src=True)
 
     for image in images:
-        if ((not re.search(r'^https?://', image['src'])) and (not re.search(r'^www', image['src'])) and (not re.search(r'^file:///', image['src']))):
-            if (not re.search('^\s*$', url)):
+        if (re.search(r'[^/]+\.((png)|(gif)|(jpe?g)|(jpe)|(jif)|(jfif?)|(svg)|(tiff?))', image['src'], re.IGNORECASE)):
+            if ((not re.search(r'^https?://', image['src'])) and (not re.search(r'^www', image['src'])) and (not re.search(r'^file:///', image['src']))):
                 if (not re.search(r'^\s*$', url)):
                     image['src'] = create_url_from_relative(image['src'], base_url, relative_url)
                 else:
@@ -117,7 +150,7 @@ def download_documents_from_soup(soup, url=''):
     documents = []
 
     for link in links:
-        if (re.search('r(\.docx?)|(\.pptx?)|(\.xlsx?)|(\.pdf)|(\.zip)', link['href'])):
+        if (re.search(r'[^/]+\.((pdf)|(docx?)|(xlsx?)|(pptx?))', link['href'])):
             if ((not re.search(r'^https?://', link['href'])) and (not re.search(r'^www', link['href'])) and (not re.search(r'^file:///', link['href']))):
                 if (not re.search(r'^\s*$', url)):
                     link['href'] = create_url_from_relative(link['href'], base_url, relative_url)
