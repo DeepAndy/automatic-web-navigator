@@ -2,9 +2,7 @@
 This software is designed to automate reptitive web tasks such as clicking
 the same button across a large portion of websites.
 
-This software is not yet complete and should not be used for any important tasks.
-Since the software is incomplete, it can cause a large amount of damage if not
-used with proper care. Use at your own risk.
+This software must be used with care.
 
 ## Required Software
 * [Python 3](https://www.python.org/downloads)
