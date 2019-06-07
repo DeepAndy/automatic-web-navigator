@@ -1,8 +1,0 @@
-This folder contains all main scripts that I have personally written
-that are no longer in use.
-
-Most of these main scripts were used for one time jobs at Ohio University
-while I worked in web development.
-
-These scripts are not loaded by navigator.py but they do assist with doing small
-jobs while working in this repository. These scripts will not need to be moved.
