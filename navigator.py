@@ -30,11 +30,9 @@ class web_driver:
         self.firefox_profile = firefox_profile
 
 '''
-Function:       load_last_queue()
-Arguments:      list
-Return Type:    void
-Description:    Reads last_queue.txt and loads the web-action-queue that was
-                saved there
+Function:       load_last_queue
+Description:    Reads text files for the last used or saved queues
+Parameters:     queues (list)
 '''
 def load_last_queue(queues):
     web_queue_found = False
@@ -146,6 +144,11 @@ def load_last_queue(queues):
                 print()
                 print('"' + web_action_queue_text + '"' + " has been loaded automatically")
 
+'''
+Function:       initialization
+Description:    Initialize user configuration and variables
+Parameters:     void
+'''
 def initialization():
     queues = queue([], [], [[]])
     config = configparser.ConfigParser()
@@ -239,6 +242,11 @@ def initialization():
     load_last_queue(queues)
     menu(queues, the_driver)
 
+'''
+Function:       add_web_queue
+Description:    Add a single site to the website queue
+Parameters:     queues (list)
+'''
 def add_web_queue(queues):
     web_name = ""
 
@@ -251,6 +259,12 @@ def add_web_queue(queues):
     print("Added \"" + web_name + "\" to queue")
     return queues.web_queue
 
+'''
+Function:       add_action
+Description:    Add an action to the action queue
+Parameters:     queues (list), the_driver (selenium driver), option (int),
+                pos (int), pos2 (int), from_web_action (bool)
+'''
 def add_action(queues, the_driver, option, pos, pos2, from_web_action):
 
     if (option == 1):
@@ -393,6 +407,12 @@ def add_action(queues, the_driver, option, pos, pos2, from_web_action):
         print("Invalid number.")
         add_action_menu(queues, option, pos, pos2, from_web_action)
 
+'''
+Function:       add_action_menu
+Description:    Menu for adding actions to the action queue
+Parameters:     queues (list), the_driver (selenium driver), pos (int),
+                pos2 (int), from_web_action (bool)
+'''
 def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
     option = ""
 
@@ -421,6 +441,12 @@ def add_action_menu(queues, the_driver, pos, pos2, from_web_action):
         queues.action_queue = add_action(queues, the_driver, option, pos, pos2, from_web_action)
         return queues.action_queue
 
+'''
+Function:       apply_action_queue_all
+Description:    Apply all actions in the action queue to all sites in the
+                website queue. This will create the website-action queue
+Parameters:     queues (list)
+'''
 def apply_action_queue_all(queues):
     if (len(queues.web_queue) == 0 and len(queues.action_queue) == 0):
         print()
@@ -447,6 +473,11 @@ def apply_action_queue_all(queues):
     print("Applied action queue to website queue.")
     return queues.web_action_queue
 
+'''
+Function:       edit_print
+Description:    What to print when editing queues
+Parameters:     queues (list), queue_type (string), edit_type (string)
+'''
 def edit_print(queues, queue_type, edit_type):
     last_index_web = 0
     last_index_action = 0
@@ -497,6 +528,12 @@ def edit_print(queues, queue_type, edit_type):
                 print()
                 print("Website[" + str(last_index_web) + "]: ")
 
+'''
+Function:       edit_queue
+Description:    Edit the queue website or actions
+Parameters:     queues (list), queue_type (string), edit_type (string),
+                the_driver (selenium driver)
+'''
 def edit_queue(queues, queue_type, edit_type, the_driver):
     if (queue_type == "web_queue"):
         edit_print(queues, queue_type, edit_type)
@@ -661,6 +698,11 @@ def edit_queue(queues, queue_type, edit_type, the_driver):
                     print("Invalid action position")
                     edit_queue(queues, queue_type, edit_type, the_driver)
 
+'''
+Function:       edit_queue_menu
+Description:    Menu for selecting edit options on queues
+Parameters:     queues (list), the_driver (selenium driver), edit_type (string)
+'''
 def edit_queue_menu(queues, the_driver, edit_type):
     option = ""
 
@@ -721,6 +763,11 @@ def edit_queue_menu(queues, the_driver, edit_type):
             print("Invalid number.")
             edit_queue_menu(queues, the_driver, edit_type)
 
+'''
+Function:       write_queue
+Description:    Write out the different queues to output files
+Parameters:     queue_name (string), queues (list), queue_type (string)
+'''
 def write_queue(queue_name, queues, queue_type):
     f = open(queue_name, "w")
     if (queue_type == "web_action_queue"):
@@ -748,10 +795,8 @@ def write_queue(queue_name, queues, queue_type):
 
 '''
 Function:       save_last_queue(queue_name, queue_type)
-Arguments:      string, string
-Return:         void
-Description:    Saves the file name of the current web action queue loaded by
-                this program
+Description:    Saves the given queue to a file to be used as the last queue
+Parameters:     queue_name (string), queue_type (string)
 '''
 def save_last_queue(queue_name, queue_type):
     web_queue_name = "last_web_queue.txt"
@@ -768,6 +813,11 @@ def save_last_queue(queue_name, queue_type):
         f = open(web_action_queue_name, "w")
         f.write(queue_name + "\n")
 
+'''
+Function:       save_queue
+Description:    Save a queue out to a file
+Parameters:     queues (list), queue_type(string)
+'''
 def save_queue(queues, queue_type):
     exists = True
     answer = ""
@@ -818,6 +868,11 @@ def save_queue(queues, queue_type):
         print()
         print('"' + queue_name + '"'+ " will automatically be loaded the next time you launch this program.")
 
+'''
+Function:       load_queue
+Description:    Load a queue from file
+Parameters:     queues (list), queue_type (string)
+'''
 def load_queue(queues, queue_type):
     exists = True
     print()
@@ -900,6 +955,11 @@ def load_queue(queues, queue_type):
         print()
         print("A file of that name does not exist in this directory.")
 
+'''
+Function:       print_queue
+Description:    Print the given queue by type
+Parameters:     queues (list), queue_type (string)
+'''
 def print_queue(queues, queue_type):
     if (queue_type == "web_queue"):
         if (len(queues.web_queue) == 0):
@@ -941,6 +1001,11 @@ def print_queue(queues, queue_type):
 
             first_time = True
 
+'''
+Function:       clear_queue
+Description:    Clears the given queue by the given queue type
+Parameters:     queues (list), queue_type (string)
+'''
 def clear_queue(queues, queue_type):
     print()
 
@@ -954,6 +1019,12 @@ def clear_queue(queues, queue_type):
         queues.web_action_queue = [[]]
         print("The website-action queue has been cleared.")
 
+'''
+Function:       run_web_action_queue
+Description:    Run the web action queue's actions on each page
+Parameters:     queues (list), web_action_queue (double list),
+                the_driver (selenium driver)
+'''
 def run_web_action_queue(queues, web_action_queue, the_driver):
     key = -1
     entries = len(web_action_queue)
@@ -1122,6 +1193,11 @@ def run_web_action_queue(queues, web_action_queue, the_driver):
 
     driver.quit()
 
+'''
+Function:       save_queue_menu
+Description:    Print a menu for saving a queue
+Parameters:     queues (list), the_driver (selenum driver)
+'''
 def save_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
@@ -1153,6 +1229,11 @@ def save_queue_menu(queues, the_driver):
             save_queue_menu(queues, the_driver)
         menu(queues, the_driver)
 
+'''
+Function:       load_queue_menu
+Description:    Print a menu for loading a queue
+Parameters:     queues (list), the_driver (selenium driver)
+'''
 def load_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
@@ -1184,6 +1265,11 @@ def load_queue_menu(queues, the_driver):
             load_queue_menu(queues, the_driver)
         menu(queues, the_driver)
 
+'''
+Function:       print_queue_menu
+Description:    Print a menu for printing a queue
+Parameters:     queues (list), the_driver (selenium driver)
+'''
 def print_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
@@ -1215,6 +1301,11 @@ def print_queue_menu(queues, the_driver):
             print_queue_menu(queues, the_driver)
         menu(queues, the_driver)
 
+'''
+Function:       clear_queue_menu
+Description:    Print a menu for clearing a queue
+Parameters:     queues (list), the_driver (selenium driver)
+'''
 def clear_queue_menu(queues, the_driver):
     option = ""
     while (option == ""):
@@ -1246,6 +1337,11 @@ def clear_queue_menu(queues, the_driver):
             clear_queue_menu(queues, the_driver)
         menu(queues, the_driver)
 
+'''
+Function:       menu
+Description:    Print the main menu
+Parameters:     queues (list), the_driver (selenium driver)
+'''
 def menu(queues, the_driver):
     option = ""
     while (option == ""):
